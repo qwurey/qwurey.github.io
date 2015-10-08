@@ -1,0 +1,31 @@
+<ul class="title">
+  <li><a href="/">Hi,I'am urey</a></li>
+</ul>
+  
+<ul class="main-navigation">
+
+  <li class="other"><a href="{{ root_url }}/">Blog</a></li>
+  <li class="other"><a href="{{ root_url }}/projects">Projects</a></li>
+  <li class="other"><a href="{{ root_url }}/aboutme">About Me</a></li>
+
+  <!-- <li class="other"><a target="_blank" href="http://linkedin.com/in/qwurey">LinkedIn</a></li>-->
+</ul>
+
+<!--
+<ul class="subscription" data-subscription="rss{% if site.subscribe_email %} email{% endif %}">
+  {% if site.subscribe_email %}
+    <li><a href="{{ site.subscribe_email }}" rel="subscribe-email" title="subscribe via email">Email</a></li>
+  {% endif %}
+</ul>
+-->
+  {% if site.simple_search %}
+<form action="{{ site.simple_search }}" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:{{ site.url | shorthand_url }}" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  {% endif %}
+{% include custom/navigation.html %}
+
+

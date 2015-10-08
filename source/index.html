@@ -1,0 +1,14 @@
+---
+layout: default
+title: "Urey's blog"
+description: "A blog about culture, technology, and interesting things."
+---
+
+<div id="blog-archives">
+{% for post in site.posts reverse %}
+
+<article>
+  {% include archive_post.html %}
+</article>
+{% endfor %}
+</div>

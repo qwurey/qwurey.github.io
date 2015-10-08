@@ -1,0 +1,24 @@
+p a {
+  border: none;
+}
+
+#pinboard_linkroll {
+  .pin-title, .pin-description {
+    display: block;
+  }
+  .pin-item p {
+    font-size: 13px;
+    line-height: 16px;
+    a {
+      margin-bottom: 2px;
+      border: none;
+    }
+  }
+  .pin-tag {
+    @include hover-link;
+    @extend .aside-alt-link;
+    &:after { content: ','; }
+    &:last-child:after { content: ''; }
+  }
+}
+

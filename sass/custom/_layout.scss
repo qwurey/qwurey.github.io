@@ -1,0 +1,228 @@
+/* #OVERRIDING SKELETON
+================================================== */
+
+/* #Base 960 Grid
+================================================== */
+
+.container .four.columns { 
+  width: 180px !important;
+  margin-right: 50px;
+  #code img, #habit div.link {
+    max-width: 170px;
+    margin-left: 5px; }
+  #habit div.link {
+    max-width: 170px;
+  }
+  #code hr.badges {
+    height: 1px solid #ddd;
+    margin: 7px 0 8px 0;
+  }
+  #goals {
+    border: 1px solid #ddd;
+    background-image: url(http://www.joesgoals.com/badge/A69840CF-A48A-380E-735F1A12ABA3F6C1_v_180_200.jpg);
+    background-position: -5px -55px;
+    margin-left: 4px;
+    width: 170px;
+    height: 76px;
+  }
+  #habit p { margin-bottom: 1em;}
+}
+
+.container .twelve.columns .video {
+  position: relative;
+  padding-bottom: 56.25%; /* 16/9 ratio */
+  padding-top: 30px; /* IE6 workaround*/
+  height: 0;
+  overflow: hidden;
+  iframe, object, embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }  
+}
+
+.container .twelve.columns iframe {
+  width: 100%;
+}
+
+.project img, .project-stripe img, .project a img, .project-stripe a img {
+  max-width: 100%;
+}
+
+
+
+
+/* #Tablet (Portrait)
+================================================== */
+
+  /* Note: Design for a width of 768px */
+
+  @media only screen and (min-width: 768px) and (max-width: 959px) {
+    .container .four.columns { 
+      width: 172px !important;
+      margin-right: 10px;
+      .title li a {
+        font-size: 1.6em;
+        line-height: 1em;
+      }
+      #code img, #habit div.link {
+        max-width: 162px;
+        margin-left: 4px !important;
+      } 
+    }
+    .container .twelve.columns { 
+      width: 556px !important;
+      h1 {
+        font-size: 38px;
+        line-height: 42px;
+      }
+      .video {
+        max-width: 556px;
+      } 
+    }
+
+    #goals {
+      margin-left: 0px !important;
+    }
+
+  }
+
+
+
+/*  #Mobile (Portrait)
+================================================== */
+
+    /* Note: Design for a width of 320px */
+
+  @media only screen and (max-width: 767px) {
+    .container .four.columns { 
+      height: 60px;
+      width: 300px !important;
+      margin-right: 0;
+      ul.title {
+        margin-bottom: 15px;
+        li a {
+          font-size: 1.5em;
+          line-height: 1.1em;
+        }
+      }
+      ul.main-navigation, ul.subscription, aside.sidebar {
+        display: none;
+      }
+    }
+    .container .twelve.columns { 
+      width: 300px !important;
+      header {
+        height: 48px;
+      }
+      .video {
+        max-width: 300px;
+      }       
+      hgroup h1, h1.entry-title {
+        margin-top: 0;
+        font-size: 28px;
+        line-height: 28px;
+        border-top: none;
+      }
+      p.meta {display: none;}
+      div.entry-content {
+        margin-top: 4em;
+      }
+      div.post-intro {margin-top:-2em;}
+      div.project {
+        margin-top: 2em;
+      }
+      article p:first-of-type {
+        margin-top: 1em;
+      }
+
+    }   
+    header[role=banner] {
+      margin: 0;
+    }
+    #blog-archives {
+      margin-top: 0 !important;
+      article {
+      &:hover {
+        background-color: #fdfae3;
+        }
+      time {
+        display: block;
+      }  
+      }
+    }
+    div.sharing {
+  display: none;
+  }
+  }     
+
+
+
+
+/* #Mobile (Landscape)
+================================================== */
+
+    /* Note: Design for a width of 480px */
+
+  @media only screen and (min-width: 480px) and (max-width: 767px) {
+    .container .four.columns { 
+      width: 420px !important;
+      margin-right: 0;
+      ul.title {
+        margin-bottom: 15px;
+        li a {
+          font-size: 1.5em;
+          line-height: 1.1em;
+        }
+      }
+      ul.main-navigation, ul.subscription, aside.sidebar {
+        display: none;
+      }
+    }
+
+    .container .twelve.columns { 
+      width: 420px !important;
+      header {
+        height: 48px;
+      }
+      .video {
+        max-width: 420px;
+      }       
+      hgroup h1, h1.entry-title {
+        margin-top: 0;
+        font-size: 28px;
+        line-height: 28px;
+        border-top: none;
+      }
+      p.meta {display: none;}
+      div.post-intro {margin-top:-2em;}
+      div.project {
+        margin-top: 2em;
+      }
+    }
+    header[role=banner] {
+      margin: 0;
+      hgroup h1 {
+        padding-top: 2px;
+      }
+    }
+    #blog-archives {
+      margin-top: 0 !important;
+      article {
+      &:hover {
+        background-color: #fdfae3;
+        }
+      time {
+        display: inline;
+      }  
+      }
+    }
+    div.sharing {
+  display: none;
+  }
+  }     
+
+  
+        

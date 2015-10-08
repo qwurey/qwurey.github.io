@@ -1,0 +1,20 @@
+---
+layout: post
+title: "搬家啦"
+date: 2015-08-31 17:15:31 +0800
+comments: true
+categories: life
+tags: [tips]
+---
+
+　　以前一直把博客的家安在CSDN上(<http://blog.csdn.net/yeruby>)，它记录了我从大一开始，一直到研一生活结束的点点滴滴，这也是我一直不断前进的动力，但就像一直住在别人家里一样，有点别扭。
+
+
+　　因此赶在2015年的8月末，我决定将博客迁移到github上，并且从以前的技术为主转变为：写写技术、还要再聊聊生活。
+
+
+　　脚踏实地，仰望星空。
+
+![BlueSky](http://7xlhna.com1.z0.glb.clouddn.com/1.png)
+
+

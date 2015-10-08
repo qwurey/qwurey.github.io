@@ -1,0 +1,46 @@
+{% capture root_url %}{{ site.root | strip_slash }}{% endcapture %}
+{% include head.html %}
+
+<body {% if page.body_id %} id="{{ page.body_id }}" {% endif %} {% if page.sidebar == false %} class="no-sidebar" {% endif %} {% if page.sidebar == 'collapse' or site.sidebar == 'collapse' %} class="collapse-sidebar sidebar-footer" {% endif %}>
+
+  <div class="container">
+
+    <div class="four columns">
+        <nav role="navigation">{% include navigation.html %}</nav>
+        <aside class="sidebar">
+          {% if site.blog_index_asides.size %}
+            {% include_array blog_index_asides %}
+          {% else %}
+            {% include_array default_asides %}
+          {% endif %}
+
+          <section id="code">
+            <h2>Code</h2>
+              <p><a target="_blank" href="https://github.com/qwurey" target="_blank">GitHub</a></p>         
+          </section>
+
+        </aside>    
+    </div>
+
+    <div id="main" class="twelve columns">
+      <div id="content">
+        {{ content | expand_urls: root_url }}
+      </div>
+    </div>
+  
+  <footer role="contentinfo"  class="sixteen columns">{% include footer.html %}</footer>
+  
+  {% include after_footer.html %}
+
+<script>
+  $('li.other').hover (
+    function () {
+    $(this).toggleClass("current-menu-item")
+  });
+</script>
+
+</body>
+</html>
+
+
+  </div> <!-- container -->

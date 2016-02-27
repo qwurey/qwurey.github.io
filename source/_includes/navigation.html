@@ -19,13 +19,40 @@
 </ul>
 -->
   {% if site.simple_search %}
-<form action="{{ site.simple_search }}" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:{{ site.url | shorthand_url }}" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
+<div id="search-2" class="clf widget-item widget_search">
+    <form action="{{ site.simple_search }}" method="get">
+        <fieldset role="search">
+        <input type="hidden" name="q" value="site:{{ site.url | shorthand_url }}" />
+        <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+        </fieldset>
+    </form>
+</div>
   {% endif %}
+<!--
+<div id="search-2" class="clf widget-item widget_search">
+    <h3>站内搜索</h3>
+    <form role="search" method="get" id="searchform" action="http://qiaowei.xyz/">
+        <div>
+            <input type="text" value="" name="s" id="s" placeholder="输入，回车搜索">
+        </div>
+    </form>
+</div>
+-->
+<!--
+<script>
+  (function() {
+        var cx = '007906514384430331739:v0sq6wikoca';
+           var gcse = document.createElement('script');
+               gcse.type = 'text/javascript';
+                   gcse.async = true;
+                       gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+                               '//cse.google.com/cse.js?cx=' + cx;
+                                   var s = document.getElementsByTagName('script')[0];
+                                       s.parentNode.insertBefore(gcse, s);
+                                         })();
+</script>
+<gcse:search></gcse:search>
+-->
 {% include custom/navigation.html %}
 
 

@@ -1,0 +1,663 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Postgres-XL集群的搭建 | Urey on the way</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="urey">
+    
+
+    
+    <meta name="description" content="“如果你惟一的工具是一把锤子，你往往会把一切问题看成钉子” —— 无名
+
+集群规划建立5个虚拟机构成的集群，虚拟机的os均为centos6.5，依次命名为cnode1，cnode2，cnode3，cnode4，cnode5，其中cnode1为gtm，其余4个节点均为coordinator和datanode。
+
+
+
+hostname
+ip
+function
+
+
+
+
+cnode1
+172.16.15">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Postgres-XL集群的搭建">
+<meta property="og:url" content="http://qiaowei.xyz/2015/10/08/2015-10-08-postgres-xlji-qun-de-da-jian/index.html">
+<meta property="og:site_name" content="Urey on the way">
+<meta property="og:description" content="“如果你惟一的工具是一把锤子，你往往会把一切问题看成钉子” —— 无名
+
+集群规划建立5个虚拟机构成的集群，虚拟机的os均为centos6.5，依次命名为cnode1，cnode2，cnode3，cnode4，cnode5，其中cnode1为gtm，其余4个节点均为coordinator和datanode。
+
+
+
+hostname
+ip
+function
+
+
+
+
+cnode1
+172.16.15">
+<meta property="og:updated_time" content="2016-03-05T03:50:35.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Postgres-XL集群的搭建">
+<meta name="twitter:description" content="“如果你惟一的工具是一把锤子，你往往会把一切问题看成钉子” —— 无名
+
+集群规划建立5个虚拟机构成的集群，虚拟机的os均为centos6.5，依次命名为cnode1，cnode2，cnode3，cnode4，cnode5，其中cnode1为gtm，其余4个节点均为coordinator和datanode。
+
+
+
+hostname
+ip
+function
+
+
+
+
+cnode1
+172.16.15">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Urey on the way" title="Urey on the way"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Urey on the way">Urey on the way</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:qiaowei.xyz">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/10/08/2015-10-08-postgres-xlji-qun-de-da-jian/" title="Postgres-XL集群的搭建" itemprop="url">Postgres-XL集群的搭建</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
+		
+  <p class="article-time">
+    <time datetime="2015-10-08T11:32:26.000Z" itemprop="datePublished"> 发表于 2015-10-08</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#集群规划"><span class="toc-number">1.</span> <span class="toc-text">集群规划</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#建立用户"><span class="toc-number">2.</span> <span class="toc-text">建立用户</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ssh免密码登录"><span class="toc-number">3.</span> <span class="toc-text">ssh免密码登录</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#安装postgres-xl"><span class="toc-number">4.</span> <span class="toc-text">安装postgres-xl</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#配置集群"><span class="toc-number">5.</span> <span class="toc-text">配置集群</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#初始化-启动集群"><span class="toc-number">6.</span> <span class="toc-text">初始化+启动集群</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#测试集群"><span class="toc-number">7.</span> <span class="toc-text">测试集群</span></a></li></ol>
+		
+		</div>
+		
+		<blockquote>
+<p>“如果你惟一的工具是一把锤子，你往往会把一切问题看成钉子” —— 无名</p>
+</blockquote>
+<h4 id="集群规划"><a href="#集群规划" class="headerlink" title="集群规划"></a><strong>集群规划</strong></h4><p>建立5个虚拟机构成的集群，虚拟机的os均为centos6.5，依次命名为cnode1，cnode2，cnode3，cnode4，cnode5，其中cnode1为gtm，其余4个节点均为coordinator和datanode。</p>
+<table>
+<thead>
+<tr>
+<th>hostname</th>
+<th>ip</th>
+<th>function</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cnode1</td>
+<td>172.16.15.131</td>
+<td>gtm</td>
+</tr>
+<tr>
+<td>cnode2</td>
+<td>172.16.15.132</td>
+<td>coordinator &amp; datanode</td>
+</tr>
+<tr>
+<td>cnode3</td>
+<td>172.16.15.133</td>
+<td>coordinator &amp; datanode</td>
+</tr>
+<tr>
+<td>cnode4</td>
+<td>172.16.15.134</td>
+<td>coordinator &amp; datanode</td>
+</tr>
+<tr>
+<td>cnode5</td>
+<td>172.16.15.135</td>
+<td>coordinator &amp; datanode</td>
+</tr>
+</tbody>
+</table>
+<h4 id="建立用户"><a href="#建立用户" class="headerlink" title="建立用户"></a><strong>建立用户</strong></h4><p>每个节点(<code>cnode1~cnode5</code>)都建立用户<code>postgres</code>，并且建立<code>.ssh</code>目录，并配置相应的权限：</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">useradd postgres</span><br><span class="line">passwd postgres</span><br><span class="line"><span class="keyword">su</span> - postgres</span><br><span class="line"><span class="keyword">mkdir</span> ~/.ssh</span><br><span class="line">chmod 700 ~/.ssh</span><br></pre></td></tr></table></figure>
+<h4 id="ssh免密码登录"><a href="#ssh免密码登录" class="headerlink" title="ssh免密码登录"></a><strong>ssh免密码登录</strong></h4><p>在cnode1节点配置：</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">su - postgres</span><br><span class="line">ssh-keygen -t rsa</span><br><span class="line">cat ~<span class="regexp">/.ssh/id</span>_rsa.pub <span class="meta">&gt;&gt; </span>~<span class="regexp">/.ssh/authorized</span>_keys</span><br><span class="line">chmod <span class="number">600</span> ~<span class="regexp">/.ssh/authorized</span>_keys</span><br></pre></td></tr></table></figure>
+<p>将刚生成的认证文件拷贝到cnode2到cnode5中，使得cnode1可以免密码登录cnode2~cnode5的任意一个节点：</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp ~<span class="regexp">/.ssh/authorized</span>_keys postgres<span class="variable">@cnode2</span><span class="symbol">:~/</span>.ssh/</span><br></pre></td></tr></table></figure>
+<h4 id="安装postgres-xl"><a href="#安装postgres-xl" class="headerlink" title="安装postgres-xl"></a><strong>安装postgres-xl</strong></h4><p>每个节点安装编译pgxl所需的依赖包：</p>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y flex bison <span class="built_in">readline</span>-devel zlib-devel openjade docbook-<span class="built_in">style</span>-dsssl</span><br></pre></td></tr></table></figure>
+<p>每个节点安装postgres-xl和pgxc_ctl，我这里使用的版本是：<code>postgres-xl-v9.2-src.tar.gz</code>：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf postgres-xl-v9.<span class="number">2</span>-src.tar.gz</span><br><span class="line"><span class="keyword">cd</span> postgres-xl</span><br><span class="line">./configure --prefix=/home/postgres/pgxl/</span><br><span class="line"><span class="keyword">make</span></span><br><span class="line"><span class="keyword">make</span> install</span><br><span class="line"><span class="keyword">cd</span> contrib/</span><br><span class="line"><span class="keyword">make</span></span><br><span class="line"><span class="keyword">make</span> install</span><br></pre></td></tr></table></figure>
+<p>每个节点编辑环境变量：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">vim</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
+<p>添加如下内容：</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">export PGHOME=/home/postgres/pgxl</span><br><span class="line">export PGUSER=postgres</span><br><span class="line">export LD_LIBRARY_PATH=$PGHOME/lib:$LD_LIBRARY_PATH</span><br><span class="line">export PATH=$PGHOME/bin:$PATH</span><br></pre></td></tr></table></figure>
+<p>使之生效：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
+<h4 id="配置集群"><a href="#配置集群" class="headerlink" title="配置集群"></a><strong>配置集群</strong></h4><p>关闭防火墙或者放开相应的端口，这里我直接关闭了每个虚拟机的防火墙，并且重启它们：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">chkconfig</span> iptables <span class="literal">off</span>   --重启后生效</span><br></pre></td></tr></table></figure>
+<p>选择cnode1(gtm)，进入/home/pgxc/postgres-xl/contrib/pgxc_ctl目录中，执行pgxc_ctl命令来生成配置集群的模板文件：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./pgxc_ctl				<span class="comment">---会提示Error说没有配置文件，忽略即可</span></span><br><span class="line">PGXC <span class="built_in">prepare</span>			<span class="comment">---执行该命令将会生成一份配置文件模板</span></span><br><span class="line">PGXC ^C</span><br></pre></td></tr></table></figure>
+<p>根据自己的集群配置该文件：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">vim</span> ~/pgxc_ctl/pgxc_ctl.<span class="keyword">conf</span></span><br></pre></td></tr></table></figure>
+<p>我这里简单的进行了如下的配置：</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#user and path</span></span><br><span class="line"><span class="attr">pgxcInstallDir=$HOME/pgxl</span></span><br><span class="line"><span class="attr">pgxcOwner=postgres</span></span><br><span class="line"><span class="attr">pgxcUser=$pgxcOwner</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#gtm</span></span><br><span class="line"><span class="attr">gtmName=gtm</span></span><br><span class="line"><span class="attr">gtmMasterServer=cnode1</span></span><br><span class="line"><span class="attr">gtmMasterPort=20001</span></span><br><span class="line"><span class="attr">gtmMasterDir=$HOME/pgxl/nodes/gtm</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#---- Configuration ---</span></span><br><span class="line"><span class="attr">gtmExtraConfig=none</span>                     <span class="comment"># Will be added gtm.conf for both Master and Slave (done at initilization only)</span></span><br><span class="line"><span class="attr">gtmMasterSpecificExtraConfig=none</span>       <span class="comment"># Will be added to Master's gtm.conf (done at initialization only)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="attr">gtmSlave=n</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#gtm proxy</span></span><br><span class="line"><span class="attr">gtmProxy=n</span></span><br><span class="line"><span class="comment">#gtmProxyDir=$HOME/pgxl/nodes/gtm_pxy</span></span><br><span class="line"><span class="comment">#gtmProxyNames=(gtm_pxy1 gtm_pxy2 gtm_pxy3 gtm_pxy4)</span></span><br><span class="line"><span class="comment">#gtmProxyServers=(cnode2 cnode3 cnode4 cnode5)</span></span><br><span class="line"><span class="comment">#gtmProxyPorts=(20001 20001 20001 20001)</span></span><br><span class="line"><span class="comment">#gtmProxyDirs=($gtmProxyDir $gtmProxyDir $gtmProxyDir $gtmProxyDir)</span></span><br><span class="line"><span class="comment">#gtmPxyExtraConfig=none</span></span><br><span class="line"><span class="comment">#gtmPxySpecificExtraConfig=(none none none none)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#coordinator</span></span><br><span class="line"><span class="attr">coordMasterDir=$HOME/pgxl/nodes/coord</span></span><br><span class="line"><span class="attr">coordNames=(coord1</span> coord2 coord3 coord4)</span><br><span class="line"><span class="attr">coordPorts=(20004</span> <span class="number">20004</span> <span class="number">20004</span> <span class="number">20004</span>)</span><br><span class="line"><span class="attr">poolerPorts=(20010</span> <span class="number">20010</span> <span class="number">20010</span> <span class="number">20010</span>)</span><br><span class="line"><span class="attr">coordPgHbaEntries=(0.0.0.0/0)</span></span><br><span class="line"><span class="attr">coordMasterServers=(cnode2</span> cnode3 cnode4 cnode5)</span><br><span class="line"><span class="attr">coordMasterDirs=($coordMasterDir</span> $coordMasterDir $coordMasterDir $coordMasterDir)</span><br><span class="line"><span class="attr">coordMaxWALsernder=0</span></span><br><span class="line"><span class="attr">coordMaxWALSenders=($coordMaxWALsernder</span> $coordMaxWALsernder $coordMaxWALsernder $coordMaxWALsernder)</span><br><span class="line"><span class="attr">coordSlave=n</span></span><br><span class="line"><span class="attr">coordSpecificExtraConfig=(none</span> none none none)</span><br><span class="line"><span class="attr">coordSpecificExtraPgHba=(none</span> none none none)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#datanode</span></span><br><span class="line"><span class="attr">datanodeNames=(datanode1</span> datanode2 datanode3 datanode4)</span><br><span class="line"><span class="attr">datanodePorts=(20008</span> <span class="number">20008</span> <span class="number">20008</span> <span class="number">20008</span>)</span><br><span class="line"><span class="attr">datanodePoolerPorts=(20012</span> <span class="number">20012</span> <span class="number">20012</span> <span class="number">20012</span>)</span><br><span class="line"><span class="attr">datanodePgHbaEntries=(0.0.0.0/0)</span></span><br><span class="line"><span class="attr">datanodeMasterServers=(cnode2</span> cnode3 cnode4 cnode5)</span><br><span class="line"><span class="attr">datanodeMasterDir=$HOME/pgxl/nodes/dn_master</span></span><br><span class="line"><span class="attr">datanodeMasterDirs=($datanodeMasterDir</span> $datanodeMasterDir $datanodeMasterDir $datanodeMasterDir)</span><br><span class="line"><span class="attr">datanodeMaxWalSender=0</span></span><br><span class="line"><span class="attr">datanodeMaxWALSenders=($datanodeMaxWalSender</span> $datanodeMaxWalSender $datanodeMaxWalSender $datanodeMaxWalSender)</span><br><span class="line"><span class="attr">datanodeSlave=n</span></span><br><span class="line"><span class="attr">primaryDatanode=datanode1</span></span><br></pre></td></tr></table></figure>
+<p>以上各配置项的具体含义可以参考：<a href="http://files.postgres-xl.org/documentation/pgxc_ctl.html" target="_blank" rel="external">http://files.postgres-xl.org/documentation/pgxc_ctl.html</a></p>
+<h4 id="初始化-启动集群"><a href="#初始化-启动集群" class="headerlink" title="初始化+启动集群"></a><strong>初始化+启动集群</strong></h4><p>在cnode1（gtm）执行命令，这个命令会初始化（配置）各个节点，并且启动相应的进程：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pgxc_ctl -c pgxc_ctl<span class="selector-class">.conf</span> init all    --初始化完成后会自动启动</span><br></pre></td></tr></table></figure>
+<p>可以在每个节点上查看对应的进程：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ps</span> -ef | <span class="keyword">grep</span> gtm</span><br><span class="line"><span class="keyword">ps</span> -ef | <span class="keyword">grep</span> postgres</span><br></pre></td></tr></table></figure>
+<h4 id="测试集群"><a href="#测试集群" class="headerlink" title="测试集群"></a><strong>测试集群</strong></h4><p>可以在任意节点上输入以下命令，查看除gtm以外的所有节点的配置情况：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> pgxc_node;</span><br></pre></td></tr></table></figure>
+<p>简单的测试，在cnode2节点上创建一个数据库test，并创建一个表test，插入数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">psql -p 20004 -U postgres </span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">DATABASE</span> <span class="keyword">test</span>;</span><br><span class="line">\c test</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">test</span>(<span class="keyword">id</span> <span class="built_in">int</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">test</span> <span class="keyword">VALUES</span>(<span class="number">1</span>);</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">test</span>;</span><br><span class="line">\q</span><br></pre></td></tr></table></figure>
+<p>在cnode3节点上查看刚刚在cnode2节点的更改：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">psql -p 20004 -U postgres  </span><br><span class="line">\c test</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">test</span>;</span><br><span class="line">\q</span><br></pre></td></tr></table></figure>
+<p>发现有刚刚插入的数据，验证成功！</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/pgxl/">pgxl</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/pgxl/">pgxl</a><a href="/tags/postgres-xl/">postgres-xl</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://qiaowei.xyz/2015/10/08/2015-10-08-postgres-xlji-qun-de-da-jian/" data-title="Postgres-XL集群的搭建 | Urey on the way" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/10/08/2015-10-08-postgres-xl-de-jie-shao/" title="Postgres-XL介绍">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Postgres-XL介绍</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/09/30/2015-09-30-python-flask-rest-apide-shi-yong/"  title="python Flask REST API的使用">
+ <strong>下一篇：</strong><br/> 
+ <span>python Flask REST API的使用
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#集群规划"><span class="toc-number">1.</span> <span class="toc-text">集群规划</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#建立用户"><span class="toc-number">2.</span> <span class="toc-text">建立用户</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ssh免密码登录"><span class="toc-number">3.</span> <span class="toc-text">ssh免密码登录</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#安装postgres-xl"><span class="toc-number">4.</span> <span class="toc-text">安装postgres-xl</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#配置集群"><span class="toc-number">5.</span> <span class="toc-text">配置集群</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#初始化-启动集群"><span class="toc-number">6.</span> <span class="toc-text">初始化+启动集群</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#测试集群"><span class="toc-number">7.</span> <span class="toc-text">测试集群</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/ambari/" title="ambari">ambari<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/flume/" title="flume">flume<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/life/" title="life">life<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/osx/" title="osx">osx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pg/" title="pg">pg<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pgxl/" title="pgxl">pgxl<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/python/" title="python">python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/regex/" title="regex">regex<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tool/" title="tool">tool<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/postgres-xl/" title="postgres-xl">postgres-xl<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/tips/" title="tips">tips<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pgxl/" title="pgxl">pgxl<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/regex/" title="regex">regex<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST-API/" title="REST API">REST API<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ambari/" title="ambari">ambari<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pg/" title="pg">pg<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/puppet/" title="puppet">puppet<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/flume/" title="flume">flume<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/elasticsearch/" title="elasticsearch">elasticsearch<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="/about" target="_blank" title="urey">urey</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

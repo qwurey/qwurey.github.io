@@ -1,0 +1,603 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Postgres-XL介绍 | Urey on the way</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="urey">
+    
+
+    
+    <meta name="description" content="“沉默即赞同” —— 无名
+
+什么是Postgres-XLXL的意思是：eXtensible Lattice，可以扩展的格子，即将PostgreSQL应用在多机器上的分布式数据库的形象化表达。
+Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩展的、多租户安全的、基于PostgreSQL的数据库解决方案。
+Postgres-XL 可非常灵活的应付各种负载，比如：
+
+OLA">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Postgres-XL介绍">
+<meta property="og:url" content="http://qiaowei.xyz/2015/10/08/2015-10-08-postgres-xl-de-jie-shao/index.html">
+<meta property="og:site_name" content="Urey on the way">
+<meta property="og:description" content="“沉默即赞同” —— 无名
+
+什么是Postgres-XLXL的意思是：eXtensible Lattice，可以扩展的格子，即将PostgreSQL应用在多机器上的分布式数据库的形象化表达。
+Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩展的、多租户安全的、基于PostgreSQL的数据库解决方案。
+Postgres-XL 可非常灵活的应付各种负载，比如：
+
+OLA">
+<meta property="og:updated_time" content="2016-03-05T03:50:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Postgres-XL介绍">
+<meta name="twitter:description" content="“沉默即赞同” —— 无名
+
+什么是Postgres-XLXL的意思是：eXtensible Lattice，可以扩展的格子，即将PostgreSQL应用在多机器上的分布式数据库的形象化表达。
+Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩展的、多租户安全的、基于PostgreSQL的数据库解决方案。
+Postgres-XL 可非常灵活的应付各种负载，比如：
+
+OLA">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Urey on the way" title="Urey on the way"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Urey on the way">Urey on the way</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:qiaowei.xyz">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/10/08/2015-10-08-postgres-xl-de-jie-shao/" title="Postgres-XL介绍" itemprop="url">Postgres-XL介绍</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
+		
+  <p class="article-time">
+    <time datetime="2015-10-08T11:32:26.000Z" itemprop="datePublished"> 发表于 2015-10-08</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#什么是Postgres-XL"><span class="toc-number">1.</span> <span class="toc-text">什么是Postgres-XL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PostgreSQL与Postgres-XL"><span class="toc-number">2.</span> <span class="toc-text">PostgreSQL与Postgres-XL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Postgres-XC与Postgres-XL"><span class="toc-number">3.</span> <span class="toc-text">Postgres-XC与Postgres-XL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PGXL架构基本知识"><span class="toc-number">4.</span> <span class="toc-text">PGXL架构基本知识</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#如何实现High-Availability"><span class="toc-number">5.</span> <span class="toc-text">如何实现High Availability</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PGXL的license"><span class="toc-number">6.</span> <span class="toc-text">PGXL的license</span></a></li></ol>
+		
+		</div>
+		
+		<blockquote>
+<p>“沉默即赞同” —— 无名</p>
+</blockquote>
+<h4 id="什么是Postgres-XL"><a href="#什么是Postgres-XL" class="headerlink" title="什么是Postgres-XL"></a><strong>什么是Postgres-XL</strong></h4><p>XL的意思是：eXtensible Lattice，可以扩展的格子，即将PostgreSQL应用在多机器上的分布式数据库的形象化表达。</p>
+<p>Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩展的、多租户安全的、基于PostgreSQL的数据库解决方案。</p>
+<p>Postgres-XL 可非常灵活的应付各种负载，比如：</p>
+<ul>
+<li>OLAP（通过MPP并行化）</li>
+<li>OLTP</li>
+<li>OLAP &amp; OLTP</li>
+<li>操作数据存储</li>
+<li>Key-value存储，包括JSON格式</li>
+</ul>
+<p>不同的应用场景：</p>
+<ul>
+<li>支持商业智能应用（数据仓库&amp;数据集市），因为PGXL支持MPP(Massively Parallel Processing)</li>
+<li>Web2.0，数据库扩容的解决方案</li>
+<li>遗留系统的数据库扩容的解决方案</li>
+<li>新应用，可以先使用PostgreSQL，之后随着数据库变大使用PGXL扩容</li>
+</ul>
+<p>PGXL底层为PostgreSQL，这意味着它支持所有支持PostgresSQL类型的驱动，包括： JDBC, ODBC, OLE DB, Python, Ruby, perl DBI, Tcl, and Erlang.</p>
+<h4 id="PostgreSQL与Postgres-XL"><a href="#PostgreSQL与Postgres-XL" class="headerlink" title="PostgreSQL与Postgres-XL"></a><strong>PostgreSQL与Postgres-XL</strong></h4><p>1994年，Postgre95发布，开源。<br>1996年，PostgreSQL继承了Postgre95，发布。<br>2010年，Postgres-XC发布。<br>2012年，前PGXC核心开发者创建StormDB公司，进行了一些改进，包括对MPP并行化的性能改进和多租户安全。<br>2013年，TransLattice收购了StormDB。<br>2014年，将项目开源，命名为Postgres-XL。</p>
+<h4 id="Postgres-XC与Postgres-XL"><a href="#Postgres-XC与Postgres-XL" class="headerlink" title="Postgres-XC与Postgres-XL"></a><strong>Postgres-XC与Postgres-XL</strong></h4><p>PGXL的架构师和开发者    很多都是以前做PGXC的，PGXL的部分代码是从PGXC移植过来的。</p>
+<p>比起功能性，PGXL更强调稳定性, 正确性和性能. </p>
+<p>PGXL增加了一些重要的性能提升，比如MPP和replan avoidance on the data nodes，这些都是PGXC没有的。</p>
+<p>PGXC目前集中在OLTP的业务上面，PGXL则更加灵活，可以应用于很多不同种类的业务上，比如可以用在大数据处理领域，除此，在多租户的环境中，PGXL也更加安全。</p>
+<p>PGXL的社区非常开放。</p>
+<h4 id="PGXL架构基本知识"><a href="#PGXL架构基本知识" class="headerlink" title="PGXL架构基本知识"></a><strong>PGXL架构基本知识</strong></h4><p>PGXL是一系列PostgreSQL数据库的集群，在上层看来就像使用一个数据库一样。根据设计方案的不同，每张表可以是replicated或是distributed的形式。</p>
+<p>PGXL有三个主要组件，分别是GTM，Coordinator和Datanode。</p>
+<ul>
+<li>GTM(Gloable Transaction Manager)负责提供事务的ACID属性；</li>
+<li>Datanode负责存储表的数据和本地执行由Coordinator派发的SQL任务；</li>
+<li>Coordinator负责处理每个来自Application的SQL任务，并且决定由哪个Datanode执行，然后将任务计划派发给相应的Datanode，根据需要收集结果返还给Application；</li>
+</ul>
+<p>GTM通常由一台独立的服务器承担，因为GTM需要处理来自所有Coordinator和Datanode的事务请求。为了将Coordinator和Datanode上进程的请求和响应聚集到一台机器上，可以配置GTM-Proxy。GTM-Proxy会减少GTM的负载，同时会帮助处理GTM失效的情况。即便如此，GTM还是可能会发生单点失效问题，这时可以配置一个GTM-Standby节点作为GTM的备用节点。</p>
+<p>每台机器最好同时配置一个Coordinator和一个Datanode，这样既不用担心二者的负载均衡，而且可以降低网络流量。</p>
+<h4 id="如何实现High-Availability"><a href="#如何实现High-Availability" class="headerlink" title="如何实现High Availability"></a><strong>如何实现High Availability</strong></h4><p>可以对每个节点增加slave，就类似PostgreSQL的streaming replication一样。</p>
+<p>GTM可以有一个GTM Standby。</p>
+<p>针对自动的failover，目前可以使用Corosync/Pacemaker，虽然它们现在还不是核心项目。</p>
+<h4 id="PGXL的license"><a href="#PGXL的license" class="headerlink" title="PGXL的license"></a><strong>PGXL的license</strong></h4><p>PGXL和PostgreSQL使用相同的LICENSE，截止到2015年，使用的还是Mozilla Public License.</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/pgxl/">pgxl</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/pgxl/">pgxl</a><a href="/tags/postgres-xl/">postgres-xl</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://qiaowei.xyz/2015/10/08/2015-10-08-postgres-xl-de-jie-shao/" data-title="Postgres-XL介绍 | Urey on the way" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/10/09/2015-10-09-postgresqlde-jdbcfang-wen/" title="PostgreSQL的JDBC访问">
+  <strong>上一篇：</strong><br/>
+  <span>
+  PostgreSQL的JDBC访问</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/10/08/2015-10-08-postgres-xlji-qun-de-da-jian/"  title="Postgres-XL集群的搭建">
+ <strong>下一篇：</strong><br/> 
+ <span>Postgres-XL集群的搭建
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#什么是Postgres-XL"><span class="toc-number">1.</span> <span class="toc-text">什么是Postgres-XL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PostgreSQL与Postgres-XL"><span class="toc-number">2.</span> <span class="toc-text">PostgreSQL与Postgres-XL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Postgres-XC与Postgres-XL"><span class="toc-number">3.</span> <span class="toc-text">Postgres-XC与Postgres-XL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PGXL架构基本知识"><span class="toc-number">4.</span> <span class="toc-text">PGXL架构基本知识</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#如何实现High-Availability"><span class="toc-number">5.</span> <span class="toc-text">如何实现High Availability</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PGXL的license"><span class="toc-number">6.</span> <span class="toc-text">PGXL的license</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/ambari/" title="ambari">ambari<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/flume/" title="flume">flume<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/life/" title="life">life<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/osx/" title="osx">osx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pg/" title="pg">pg<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pgxl/" title="pgxl">pgxl<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/python/" title="python">python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/regex/" title="regex">regex<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tool/" title="tool">tool<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/postgres-xl/" title="postgres-xl">postgres-xl<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/tips/" title="tips">tips<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pgxl/" title="pgxl">pgxl<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/regex/" title="regex">regex<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST-API/" title="REST API">REST API<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ambari/" title="ambari">ambari<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pg/" title="pg">pg<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/puppet/" title="puppet">puppet<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/flume/" title="flume">flume<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/elasticsearch/" title="elasticsearch">elasticsearch<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="/about" target="_blank" title="urey">urey</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

@@ -1,0 +1,619 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana) | Urey on the way</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="urey">
+    
+
+    
+    <meta name="description" content="“世界上有10种人，一种懂二进制，一种不懂二进制” ——匿名
+
+实时日志收集，查询，分析系统设计方案：Flume（日志收集） +　ElasticSearch（日志查询）+ Kibana（日志分析与展示）
+实验使用场景：通过ambari部署集群后，可以添加自己的日志系统，记录每个组件的产生的日志，实时的查询分析
+一、Flume概述：Apache Flume is a distributed, re">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)">
+<meta property="og:url" content="http://qiaowei.xyz/2016/02/27/2016-02-27-shi-shi-ri-zhi-shou-ji-cha-xun-fen-xi-xi-tong-flume-plus-elasticsearch-plus-kibana/index.html">
+<meta property="og:site_name" content="Urey on the way">
+<meta property="og:description" content="“世界上有10种人，一种懂二进制，一种不懂二进制” ——匿名
+
+实时日志收集，查询，分析系统设计方案：Flume（日志收集） +　ElasticSearch（日志查询）+ Kibana（日志分析与展示）
+实验使用场景：通过ambari部署集群后，可以添加自己的日志系统，记录每个组件的产生的日志，实时的查询分析
+一、Flume概述：Apache Flume is a distributed, re">
+<meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/flume_arch.png">
+<meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/log_arch.png">
+<meta property="og:updated_time" content="2016-02-27T10:58:57.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)">
+<meta name="twitter:description" content="“世界上有10种人，一种懂二进制，一种不懂二进制” ——匿名
+
+实时日志收集，查询，分析系统设计方案：Flume（日志收集） +　ElasticSearch（日志查询）+ Kibana（日志分析与展示）
+实验使用场景：通过ambari部署集群后，可以添加自己的日志系统，记录每个组件的产生的日志，实时的查询分析
+一、Flume概述：Apache Flume is a distributed, re">
+<meta name="twitter:image" content="http://7xlhna.com1.z0.glb.clouddn.com/flume_arch.png">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Urey on the way" title="Urey on the way"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Urey on the way">Urey on the way</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:qiaowei.xyz">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/02/27/2016-02-27-shi-shi-ri-zhi-shou-ji-cha-xun-fen-xi-xi-tong-flume-plus-elasticsearch-plus-kibana/" title="实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)" itemprop="url">实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
+		
+  <p class="article-time">
+    <time datetime="2016-02-27T09:22:17.000Z" itemprop="datePublished"> 发表于 2016-02-27</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#实时日志收集，查询，分析系统"><span class="toc-number">1.</span> <span class="toc-text">实时日志收集，查询，分析系统</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、Flume概述："><span class="toc-number">1.0.0.1.</span> <span class="toc-text">一、Flume概述：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、Flume架构"><span class="toc-number">1.0.0.2.</span> <span class="toc-text">二、Flume架构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、Flume需要理解的内容"><span class="toc-number">1.0.0.3.</span> <span class="toc-text">三、Flume需要理解的内容</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ElasticSearch概述"><span class="toc-number">1.0.0.4.</span> <span class="toc-text">ElasticSearch概述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ElasticSearch的数据模型的简单理解"><span class="toc-number">1.0.0.5.</span> <span class="toc-text">ElasticSearch的数据模型的简单理解</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Kibana概述"><span class="toc-number">1.0.0.6.</span> <span class="toc-text">Kibana概述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#系统实现："><span class="toc-number">1.0.0.7.</span> <span class="toc-text">系统实现：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#系统改进："><span class="toc-number">1.0.0.8.</span> <span class="toc-text">系统改进：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#系统实现效果："><span class="toc-number">1.0.0.9.</span> <span class="toc-text">系统实现效果：</span></a></li></ol></li></ol></li></ol></li></ol>
+		
+		</div>
+		
+		<blockquote>
+<p>“世界上有10种人，一种懂二进制，一种不懂二进制” ——匿名</p>
+</blockquote>
+<h1 id="实时日志收集，查询，分析系统"><a href="#实时日志收集，查询，分析系统" class="headerlink" title="实时日志收集，查询，分析系统"></a>实时日志收集，查询，分析系统</h1><p><strong>设计方案：</strong>Flume（日志收集） +　ElasticSearch（日志查询）+ Kibana（日志分析与展示）</p>
+<p><strong>实验使用场景：</strong>通过ambari部署集群后，可以添加自己的日志系统，记录每个组件的产生的日志，实时的查询分析</p>
+<h4 id="一、Flume概述："><a href="#一、Flume概述：" class="headerlink" title="一、Flume概述："></a>一、Flume概述：</h4><p>Apache Flume is a distributed, reliable, and available system for efficiently collecting, aggregating and moving large amounts of log data from many different sources to a centralized data store.</p>
+<p>The use of Apache Flume is not only restricted to log data aggregation. Since data sources are customizable, Flume can be used to transport massive quantities of event data including but not limited to network traffic data, social-media-generated data, email messages and pretty much any data source possible.</p>
+<h4 id="二、Flume架构"><a href="#二、Flume架构" class="headerlink" title="二、Flume架构"></a>二、Flume架构</h4><p>每一个Flume agent包含<strong>三种类型</strong>的组件：source（从数据源获取生成event data），channel（接收source给put来的event data），sink（从channel取走event data）</p>
+<p><em>注意上面写的是一个flume agent包含<strong>三种</strong>而不是<strong>三个</strong></em></p>
+<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/flume_arch.png" width="500" height="260" alt="flume-arch" align="center"></p>
+<p>解释下什么是event data？</p>
+<p>官方解释：A Flume event is defined as a unit of data flow having a byte payload and an optional set of string attributes. </p>
+<p>简单理解：flume event data = headers + body，其中body的类型是byte[]，headers的类型是Map<string, string="">，event代表着一个数据流的最小完整单元，如果是source是从文本文件中读数据，那event的body通常就是每行的内容，headers可以自行添加。</string,></p>
+<h4 id="三、Flume需要理解的内容"><a href="#三、Flume需要理解的内容" class="headerlink" title="三、Flume需要理解的内容"></a>三、Flume需要理解的内容</h4><ol>
+<li><p>如何配好一个最简单的flume.conf，使得flume agent正常工作；</p>
+</li>
+<li><p>Flume的flow的种类和适用场景；</p>
+</li>
+<li><p>Flume的官方提供的sources，channels，sinks，如提供的不满足需求，可自定义适用于自己场景的source、channel和sink；</p>
+</li>
+</ol>
+<h4 id="ElasticSearch概述"><a href="#ElasticSearch概述" class="headerlink" title="ElasticSearch概述"></a>ElasticSearch概述</h4><p>Elasticsearch是一个基于Apache Lucene(TM)的开源的、实时的、分布式的、全文存储、搜索、分析引擎。</p>
+<p>Lucene使用起来非常复杂，ES（ElasticSearch）可以看成对其进行了封装，提供了丰富的REST API，上手非常容易。</p>
+<h4 id="ElasticSearch的数据模型的简单理解"><a href="#ElasticSearch的数据模型的简单理解" class="headerlink" title="ElasticSearch的数据模型的简单理解"></a>ElasticSearch的数据模型的简单理解</h4><p>在Elasticsearch中，有几个概念（关键词），有别于我们使用的关系型数据库中的概念，注意类比：<br><figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">R<span class="function"><span class="title">elational</span> DB	-&gt;</span> D<span class="function"><span class="title">atabases</span> 		-&gt;</span> T<span class="function"><span class="title">ables</span> -&gt;</span> R<span class="function"><span class="title">ows</span> 		-&gt;</span> Columns</span><br><span class="line">E<span class="function"><span class="title">lasticsearch</span>	-&gt;</span> I<span class="function"><span class="title">ndices</span>(Index) 	-&gt;</span> T<span class="function"><span class="title">ypes</span>  -&gt;</span> D<span class="function"><span class="title">ocuments</span> 	-&gt;</span> Fields</span><br></pre></td></tr></table></figure></p>
+<p>Elasticsearch集群可以包含多个索引(indices)（数据库），每一个索引可以包含多个类型(types)（表），每一个类型包含多个文档(documents)（行），然后每个文档包含多个字段(Fields)（列）。</p>
+<p>如何定位es中的一个文档（Document）？</p>
+<p>通过Index（索引:    文档存储的地方） +　Type（类型:文档代表的对象的类）+ Document_ID（唯一标识：文档的唯一标识），在ES内部的元数据表示为：_index + _type + _id。</p>
+<h4 id="Kibana概述"><a href="#Kibana概述" class="headerlink" title="Kibana概述"></a>Kibana概述</h4><p>可以看成是ES的一个插件，提供的功能：</p>
+<ol>
+<li><p>Flexible analytics and visualization platform</p>
+</li>
+<li><p>Real-time summary and charting of streaming data</p>
+</li>
+<li><p>Intuitive interface for a variety of users</p>
+</li>
+<li><p>Instant sharing and embedding of dashboards</p>
+</li>
+</ol>
+<h4 id="系统实现："><a href="#系统实现：" class="headerlink" title="系统实现："></a>系统实现：</h4><p>环境：<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">（1）<span class="selector-tag">JDK</span>版本：<span class="selector-tag">java</span> <span class="selector-tag">-version</span></span><br><span class="line"><span class="selector-tag">java</span> <span class="selector-tag">version</span> "1<span class="selector-class">.7</span><span class="selector-class">.0_75</span>"</span><br><span class="line"><span class="selector-tag">OpenJDK</span> <span class="selector-tag">Runtime</span> <span class="selector-tag">Environment</span> (<span class="selector-tag">rhel-2</span><span class="selector-class">.5</span><span class="selector-class">.4</span><span class="selector-class">.0</span><span class="selector-class">.el6_6-x86_64</span> <span class="selector-tag">u75-b13</span>)</span><br><span class="line"><span class="selector-tag">OpenJDK</span> 64<span class="selector-tag">-Bit</span> <span class="selector-tag">Server</span> <span class="selector-tag">VM</span> (<span class="selector-tag">build</span> 24<span class="selector-class">.75-b04</span>, <span class="selector-tag">mixed</span> <span class="selector-tag">mode</span>)</span><br><span class="line">（2）<span class="selector-tag">Flume1</span><span class="selector-class">.6</span><span class="selector-class">.0</span></span><br><span class="line">（3）<span class="selector-tag">ElasticSearch1</span><span class="selector-class">.7</span><span class="selector-class">.5</span></span><br></pre></td></tr></table></figure></p>
+<p>注意：我这里实验显示Flume1.6.0不能导数据到ES2.2.0</p>
+<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/log_arch.png" width="600" height="330" alt="log-arch" align="center"></p>
+<p>Flume使用的conf，可以简单的设置如下：<br><figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">agent</span>.sources = yarnSrc hbaseSrc</span><br><span class="line"><span class="built_in">agent</span>.channels = memoryChannel</span><br><span class="line"><span class="built_in">agent</span>.sinks = elasticsearch</span><br><span class="line"></span><br><span class="line"><span class="meta"># source1:hdfsSrc</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hdfsSrc.<span class="built_in">type</span> = <span class="built_in">exec</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hdfsSrc.command = tail -F /var/<span class="built_in">log</span>/tbds/hdfs/hdfs/hadoop-hdfs-datanode-<span class="number">10.151</span>.<span class="number">139.111</span>.<span class="built_in">log</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hdfsSrc.channels = memoryChannel</span><br><span class="line"></span><br><span class="line"><span class="meta"># source2:yarnSrc</span></span><br><span class="line"><span class="built_in">agent</span>.sources.yarnSrc.<span class="built_in">type</span> = <span class="built_in">exec</span></span><br><span class="line"><span class="built_in">agent</span>.sources.yarnSrc.command = tail -F /var/<span class="built_in">log</span>/tbds/yarn/yarn/yarn-yarn-nodemanager-<span class="number">10.151</span>.<span class="number">139.111</span>.<span class="built_in">log</span></span><br><span class="line"><span class="built_in">agent</span>.sources.yarnSrc.channels = memoryChannel</span><br><span class="line"></span><br><span class="line"><span class="meta"># source3:hbaseSrc</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hbaseSrc.<span class="built_in">type</span> = <span class="built_in">exec</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hbaseSrc.command = tail -F /var/<span class="built_in">log</span>/tbds/hbase/hbase-hbase-regionserver-<span class="number">10.151</span>.<span class="number">139.111</span>.<span class="built_in">log</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hbaseSrc.channels = memoryChannel</span><br><span class="line"></span><br><span class="line"><span class="meta"># sink1:localSink</span></span><br><span class="line"><span class="built_in">agent</span>.sinks.localSink.<span class="built_in">type</span> = file_roll</span><br><span class="line"><span class="built_in">agent</span>.sinks.localSink.sink.directory = /var/<span class="built_in">log</span>/flume</span><br><span class="line"><span class="built_in">agent</span>.sinks.localSink.sink.rollInterval = <span class="number">0</span></span><br><span class="line"><span class="built_in">agent</span>.sinks.localSink.channel = memoryChannel</span><br><span class="line"></span><br><span class="line"><span class="meta"># sink2:esSink</span></span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.channel = memoryChannel</span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.<span class="built_in">type</span> = org.apache.flume.sink.elasticsearch.ElasticSearchSink</span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.hostNames = <span class="number">10.151</span>.<span class="number">139.111</span>:<span class="number">9300</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.indexName = basis_log_info</span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.batchSize = <span class="number">100</span></span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.indexType = logs</span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.clusterName = my-test-es-cluster</span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.serializer = org.apache.flume.sink.elasticsearch.ElasticSearchLogStashEventSerializer</span><br><span class="line"></span><br><span class="line"><span class="meta"># channel1</span></span><br><span class="line"><span class="built_in">agent</span>.channels.memoryChannel.<span class="built_in">type</span> = memory</span><br><span class="line"><span class="built_in">agent</span>.channels.memoryChannel.capacity = <span class="number">100</span></span><br></pre></td></tr></table></figure></p>
+<p>注意要在flume/lib下加入两个包：<br>lucene-core-4.10.4.jar<br>elasticsearch-1.7.5.jar<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The elasticsearch and lucene-core jars required <span class="keyword">for</span> your environment must be placed in the <span class="class"><span class="keyword">lib</span> <span class="title">directory</span> <span class="title">of</span> <span class="title">the</span> <span class="title">Apache</span> <span class="title">Flume</span> <span class="title">installation</span>.</span></span><br></pre></td></tr></table></figure></p>
+<p>之后分别运行elasticsearch和flume即可。</p>
+<h4 id="系统改进："><a href="#系统改进：" class="headerlink" title="系统改进："></a>系统改进：</h4><ol>
+<li><p>配置flume interceptor加入各类headers，重写ElasticSearchLogStashEventSerializer使得event的header部分可以作为es的文档的field</p>
+</li>
+<li><p>memory channel与file channel的结合，参加美团日志系统的改进</p>
+</li>
+<li><p>日志若是错误信息，并不是每一行都是作为es的一条文档，而是若干行的内容才是es的一个文档的message</p>
+</li>
+</ol>
+<h4 id="系统实现效果："><a href="#系统实现效果：" class="headerlink" title="系统实现效果："></a>系统实现效果：</h4><p>导入es的文档数据结构：</p>
+<p><img src="" width="600" height="330" alt="es-data-structure" align="center"></p>
+<p>Kibana展示：</p>
+<p><img src="" width="600" height="330" alt="kibana-result" align="center"></p>
+<p>References：</p>
+<ol>
+<li><p>Apache Flume：<a href="https://flume.apache.org/" target="_blank" rel="external">https://flume.apache.org/</a></p>
+</li>
+<li><p>elastic.co：<a href="https://www.elastic.co/" target="_blank" rel="external">https://www.elastic.co/</a> </p>
+</li>
+<li><p>Elasticsearch权威指南（中文版）：<a href="https://www.gitbook.com/book/looly/elasticsearch-the-definitive-guide-cn/details" target="_blank" rel="external">https://www.gitbook.com/book/looly/elasticsearch-the-definitive-guide-cn/details</a></p>
+</li>
+<li><p>Kibana ：<a href="https://www.elastic.co/products/kibana" target="_blank" rel="external">https://www.elastic.co/products/kibana</a></p>
+</li>
+</ol>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/flume/">flume</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/flume/">flume</a><a href="/tags/elasticsearch/">elasticsearch</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://qiaowei.xyz/2016/02/27/2016-02-27-shi-shi-ri-zhi-shou-ji-cha-xun-fen-xi-xi-tong-flume-plus-elasticsearch-plus-kibana/" data-title="实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana) | Urey on the way" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2015/11/05/2015-11-05-puppetan-zhuang-yu-ji-ben-shi-yong/"  title="puppet安装与基本使用">
+ <strong>下一篇：</strong><br/> 
+ <span>puppet安装与基本使用
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#实时日志收集，查询，分析系统"><span class="toc-number">1.</span> <span class="toc-text">实时日志收集，查询，分析系统</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、Flume概述："><span class="toc-number">1.0.0.1.</span> <span class="toc-text">一、Flume概述：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、Flume架构"><span class="toc-number">1.0.0.2.</span> <span class="toc-text">二、Flume架构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、Flume需要理解的内容"><span class="toc-number">1.0.0.3.</span> <span class="toc-text">三、Flume需要理解的内容</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ElasticSearch概述"><span class="toc-number">1.0.0.4.</span> <span class="toc-text">ElasticSearch概述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ElasticSearch的数据模型的简单理解"><span class="toc-number">1.0.0.5.</span> <span class="toc-text">ElasticSearch的数据模型的简单理解</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Kibana概述"><span class="toc-number">1.0.0.6.</span> <span class="toc-text">Kibana概述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#系统实现："><span class="toc-number">1.0.0.7.</span> <span class="toc-text">系统实现：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#系统改进："><span class="toc-number">1.0.0.8.</span> <span class="toc-text">系统改进：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#系统实现效果："><span class="toc-number">1.0.0.9.</span> <span class="toc-text">系统实现效果：</span></a></li></ol></li></ol></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/ambari/" title="ambari">ambari<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/flume/" title="flume">flume<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/life/" title="life">life<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/osx/" title="osx">osx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pg/" title="pg">pg<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pgxl/" title="pgxl">pgxl<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/python/" title="python">python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/regex/" title="regex">regex<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tool/" title="tool">tool<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/postgres-xl/" title="postgres-xl">postgres-xl<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/tips/" title="tips">tips<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pgxl/" title="pgxl">pgxl<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/regex/" title="regex">regex<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST-API/" title="REST API">REST API<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ambari/" title="ambari">ambari<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pg/" title="pg">pg<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/puppet/" title="puppet">puppet<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/flume/" title="flume">flume<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/elasticsearch/" title="elasticsearch">elasticsearch<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="/about" target="_blank" title="urey">urey</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

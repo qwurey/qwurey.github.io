@@ -1,0 +1,611 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>puppet安装与基本使用 | Urey on the way</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="urey">
+    
+
+    
+    <meta name="description" content="“Talk is cheap. Show me the code” —— Linux
+
+一、puppet基本介绍puppet是一个开源的软件自动化配置和部署工具。它是典型C／S架构，由puppet master和若干puppet client组成。
+二、安装过程1. 设置hosts：12172.16.14.150	master.hp	# puppet master172.16.14.151	sl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="puppet安装与基本使用">
+<meta property="og:url" content="http://qiaowei.xyz/2015/11/05/2015-11-05-puppetan-zhuang-yu-ji-ben-shi-yong/index.html">
+<meta property="og:site_name" content="Urey on the way">
+<meta property="og:description" content="“Talk is cheap. Show me the code” —— Linux
+
+一、puppet基本介绍puppet是一个开源的软件自动化配置和部署工具。它是典型C／S架构，由puppet master和若干puppet client组成。
+二、安装过程1. 设置hosts：12172.16.14.150	master.hp	# puppet master172.16.14.151	sl">
+<meta property="og:updated_time" content="2015-11-05T10:28:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="puppet安装与基本使用">
+<meta name="twitter:description" content="“Talk is cheap. Show me the code” —— Linux
+
+一、puppet基本介绍puppet是一个开源的软件自动化配置和部署工具。它是典型C／S架构，由puppet master和若干puppet client组成。
+二、安装过程1. 设置hosts：12172.16.14.150	master.hp	# puppet master172.16.14.151	sl">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Urey on the way" title="Urey on the way"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Urey on the way">Urey on the way</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:qiaowei.xyz">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/11/05/2015-11-05-puppetan-zhuang-yu-ji-ben-shi-yong/" title="puppet安装与基本使用" itemprop="url">puppet安装与基本使用</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
+		
+  <p class="article-time">
+    <time datetime="2015-11-05T08:01:14.000Z" itemprop="datePublished"> 发表于 2015-11-05</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、puppet基本介绍"><span class="toc-number">1.</span> <span class="toc-text">一、puppet基本介绍</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、安装过程"><span class="toc-number">2.</span> <span class="toc-text">二、安装过程</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-设置hosts："><span class="toc-number">2.1.</span> <span class="toc-text">1. 设置hosts：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-为了方便，进行前期准备："><span class="toc-number">2.2.</span> <span class="toc-text">2. 为了方便，进行前期准备：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-安装puppet官方源："><span class="toc-number">2.3.</span> <span class="toc-text">3. 安装puppet官方源：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-puppet-master的安装与配置："><span class="toc-number">2.4.</span> <span class="toc-text">4. puppet master的安装与配置：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-puppet-client的安装与配置："><span class="toc-number">2.5.</span> <span class="toc-text">5. puppet client的安装与配置：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#6-puppet-server与puppet-client交互："><span class="toc-number">2.6.</span> <span class="toc-text">6. puppet server与puppet client交互：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#1-关闭server，修改配置文件，使得server添加自动签发证书："><span class="toc-number">2.7.</span> <span class="toc-text">1. 关闭server，修改配置文件，使得server添加自动签发证书：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-关闭client，编辑-etc-puppet-puppet-conf-文件，在-agent-段内加入-listen-true，server-master-com，为客户端指定puppet服务器-并开启Master的推送功能："><span class="toc-number">2.8.</span> <span class="toc-text">2. 关闭client，编辑 /etc/puppet/puppet.conf 文件，在[agent]段内加入 listen = true，server = master.com，为客户端指定puppet服务器,并开启Master的推送功能：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、puppet目录结构"><span class="toc-number">3.</span> <span class="toc-text">三、puppet目录结构</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-server端的目录结构："><span class="toc-number">3.1.</span> <span class="toc-text">1. server端的目录结构：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-client端的目录结构："><span class="toc-number">3.2.</span> <span class="toc-text">2. client端的目录结构：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#四、User-Cases"><span class="toc-number">4.</span> <span class="toc-text">四、User Cases</span></a></li></ol>
+		
+		</div>
+		
+		<blockquote>
+<p>“Talk is cheap. Show me the code” —— Linux</p>
+</blockquote>
+<h4 id="一、puppet基本介绍"><a href="#一、puppet基本介绍" class="headerlink" title="一、puppet基本介绍"></a>一、puppet基本介绍</h4><p>puppet是一个开源的软件自动化配置和部署工具。它是典型C／S架构，由puppet master和若干puppet client组成。</p>
+<h4 id="二、安装过程"><a href="#二、安装过程" class="headerlink" title="二、安装过程"></a>二、安装过程</h4><h5 id="1-设置hosts："><a href="#1-设置hosts：" class="headerlink" title="1. 设置hosts："></a>1. 设置hosts：</h5><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">172<span class="selector-class">.16</span><span class="selector-class">.14</span><span class="selector-class">.150</span>	<span class="selector-tag">master</span><span class="selector-class">.hp</span>	# <span class="selector-tag">puppet</span> <span class="selector-tag">master</span></span><br><span class="line">172<span class="selector-class">.16</span><span class="selector-class">.14</span><span class="selector-class">.151</span>	<span class="selector-tag">slave1</span><span class="selector-class">.hp</span>	# <span class="selector-tag">puppet</span> <span class="selector-tag">client</span></span><br></pre></td></tr></table></figure>
+<h5 id="2-为了方便，进行前期准备："><a href="#2-为了方便，进行前期准备：" class="headerlink" title="2. 为了方便，进行前期准备："></a>2. 为了方便，进行前期准备：</h5><p>(1). 关闭SELinu<br>(2). 关闭防火墙</p>
+<h5 id="3-安装puppet官方源："><a href="#3-安装puppet官方源：" class="headerlink" title="3. 安装puppet官方源："></a>3. 安装puppet官方源：</h5><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget http:<span class="comment">//yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm</span></span><br><span class="line">rpm -ivh puppetlabs-release-<span class="number">6</span>-<span class="number">7</span><span class="selector-class">.noarch</span><span class="selector-class">.rpm</span></span><br><span class="line">yum update</span><br></pre></td></tr></table></figure>
+<h5 id="4-puppet-master的安装与配置："><a href="#4-puppet-master的安装与配置：" class="headerlink" title="4. puppet master的安装与配置："></a>4. puppet master的安装与配置：</h5><p>安装puppet server：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y <span class="keyword">install</span> puppet-<span class="keyword">server</span></span><br></pre></td></tr></table></figure>
+<p>启动puppet server：</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service puppetmaster <span class="literal">start</span></span><br></pre></td></tr></table></figure>
+<p>查看证书，由于puppet默认将server本机当成一个client，所以已经将本机管理起来，自动签发了一个证书：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[urey@master ~]$ sudo puppet cert list --all</span><br><span class="line">+ "master.hp" (SHA256) 89:94:59:7C:85:F2:03:27:82:72:09:63:F4:86:C3:A4:2E:15:EE:7F:A5:31:C1:57:91:29:E4:9A:1B:87:F5:9B (alt names: "DNS:master.hp", "DNS:puppet", "DNS:puppet.hp")</span><br></pre></td></tr></table></figure>
+<h5 id="5-puppet-client的安装与配置："><a href="#5-puppet-client的安装与配置：" class="headerlink" title="5. puppet client的安装与配置："></a>5. puppet client的安装与配置：</h5><p>安装puppet client：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y <span class="keyword">install</span> puppet</span><br></pre></td></tr></table></figure>
+<p>启动puppet client：</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service puppet <span class="literal">start</span></span><br></pre></td></tr></table></figure>
+<h5 id="6-puppet-server与puppet-client交互："><a href="#6-puppet-server与puppet-client交互：" class="headerlink" title="6. puppet server与puppet client交互："></a>6. puppet server与puppet client交互：</h5><p>由于server还没有给client发证书，所以还不能与server通信，但是需要发出请求，一旦server签收，就可以正常通信了。在client运行：</p>
+<figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">puppet</span> <span class="comment">agent</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">no</span><span class="literal">-</span><span class="comment">daemonize</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">onetime</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">verbose</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">debug</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">server=master</span><span class="string">.</span><span class="comment">hp</span></span><br></pre></td></tr></table></figure>
+<p>在server端查看，<code>＋</code> 号代表已经签收，可以看到，目前<code>slave1.hp</code>还没有被签收：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[urey<span class="meta">@master</span> ~]$ sudo puppet cert list --all</span><br><span class="line">  <span class="string">"slave1.hp"</span> (SHA256) <span class="string">F7:</span><span class="string">D4:</span><span class="number">2</span><span class="string">D:</span><span class="number">2</span><span class="string">C:</span><span class="number">6</span><span class="string">D:</span><span class="number">63</span>:<span class="string">A8:</span><span class="number">78</span>:<span class="number">13</span>:<span class="string">CE:</span><span class="string">A7:</span><span class="number">0</span><span class="string">A:</span><span class="number">2</span><span class="string">A:</span><span class="number">4</span><span class="string">E:</span><span class="number">0</span><span class="string">F:</span><span class="string">E0:</span><span class="number">9</span><span class="string">E:</span><span class="string">D7:</span><span class="number">71</span>:<span class="string">BC:</span><span class="number">0</span><span class="string">F:</span><span class="number">3</span><span class="string">F:</span><span class="number">52</span>:<span class="number">68</span>:<span class="number">21</span>:<span class="string">B4:</span><span class="number">17</span>:<span class="number">4</span><span class="string">B:</span><span class="string">B7:</span><span class="number">08</span>:<span class="string">FC:</span><span class="number">6</span>E</span><br><span class="line">+ <span class="string">"master.hp"</span> (SHA256) <span class="number">89</span>:<span class="number">94</span>:<span class="number">59</span>:<span class="number">7</span><span class="string">C:</span><span class="number">85</span>:<span class="string">F2:</span><span class="number">03</span>:<span class="number">27</span>:<span class="number">82</span>:<span class="number">72</span>:<span class="number">09</span>:<span class="number">63</span>:<span class="string">F4:</span><span class="number">86</span>:<span class="string">C3:</span><span class="string">A4:</span><span class="number">2</span><span class="string">E:</span><span class="number">15</span>:<span class="string">EE:</span><span class="number">7</span><span class="string">F:</span><span class="string">A5:</span><span class="number">31</span>:<span class="string">C1:</span><span class="number">57</span>:<span class="number">91</span>:<span class="number">29</span>:<span class="string">E4:</span><span class="number">9</span><span class="string">A:</span><span class="number">1</span><span class="string">B:</span><span class="number">87</span>:<span class="string">F5:</span><span class="number">9</span>B (alt <span class="string">names:</span> <span class="string">"DNS:master.hp"</span>, <span class="string">"DNS:puppet"</span>, <span class="string">"DNS:puppet.hp"</span>)</span><br></pre></td></tr></table></figure>
+<p>server通过 <code>sign</code> 签收：</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">puppet cert <span class="comment">--sign slave1.hp</span></span><br></pre></td></tr></table></figure>
+<p>再次查看：</p>
+<figure class="highlight qml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">puppet cert <span class="built_in">list</span> --all</span><br><span class="line">[urey@master ~]$ sudo puppet cert <span class="built_in">list</span> --all</span><br><span class="line">+ <span class="string">"master.hp"</span> (SHA256) <span class="number">89</span>:<span class="number">94</span>:<span class="number">59</span>:<span class="number">7</span><span class="attribute">C</span>:<span class="number">85</span>:<span class="attribute">F2</span>:<span class="number">03</span>:<span class="number">27</span>:<span class="number">82</span>:<span class="number">72</span>:<span class="number">09</span>:<span class="number">63</span>:<span class="attribute">F4</span>:<span class="number">86</span>:<span class="attribute">C3</span>:<span class="attribute">A4</span>:<span class="number">2</span><span class="attribute">E</span>:<span class="number">15</span>:<span class="attribute">EE</span>:<span class="number">7</span><span class="attribute">F</span>:<span class="attribute">A5</span>:<span class="number">31</span>:<span class="attribute">C1</span>:<span class="number">57</span>:<span class="number">91</span>:<span class="number">29</span>:<span class="attribute">E4</span>:<span class="number">9</span><span class="attribute">A</span>:<span class="number">1</span><span class="attribute">B</span>:<span class="number">87</span>:<span class="attribute">F5</span>:<span class="number">9</span>B (alt <span class="attribute">names</span>: <span class="string">"DNS:master.hp"</span>, <span class="string">"DNS:puppet"</span>, <span class="string">"DNS:puppet.hp"</span>)</span><br><span class="line">+ <span class="string">"slave1.hp"</span> (SHA256) <span class="number">1</span><span class="attribute">A</span>:<span class="number">23</span>:<span class="attribute">D6</span>:<span class="attribute">D4</span>:<span class="number">31</span>:<span class="number">92</span>:<span class="attribute">AF</span>:<span class="number">7</span><span class="attribute">D</span>:<span class="attribute">F4</span>:<span class="attribute">CA</span>:<span class="attribute">A3</span>:<span class="number">83</span>:<span class="number">0</span><span class="attribute">A</span>:<span class="number">68</span>:<span class="attribute">DF</span>:<span class="number">24</span>:<span class="number">11</span>:<span class="attribute">DB</span>:<span class="number">0</span><span class="attribute">A</span>:<span class="attribute">D5</span>:<span class="number">6</span><span class="attribute">C</span>:<span class="attribute">A8</span>:<span class="number">0</span><span class="attribute">A</span>:<span class="number">3</span><span class="attribute">C</span>:<span class="attribute">EE</span>:<span class="number">6</span><span class="attribute">C</span>:<span class="number">9</span><span class="attribute">F</span>:<span class="attribute">E0</span>:<span class="number">62</span>:<span class="attribute">B4</span>:<span class="attribute">D3</span>:<span class="attribute">B0</span></span><br></pre></td></tr></table></figure>
+<p>这样，client和server可以正常通信了。</p>
+<p>如果不想这么麻烦，每次server查看有哪些client发出请求，再一一签收的话，server可以通过编辑配置文件来自动完成签收。</p>
+<h5 id="1-关闭server，修改配置文件，使得server添加自动签发证书："><a href="#1-关闭server，修改配置文件，使得server添加自动签发证书：" class="headerlink" title="1. 关闭server，修改配置文件，使得server添加自动签发证书："></a>1. 关闭server，修改配置文件，使得server添加自动签发证书：</h5><p>编辑 /etc/puppet/puppet.conf 文件， 在[main]段内加入 autosign = true，server = master.com</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">[main]</span><br><span class="line">    <span class="comment"># The Puppet log directory.</span></span><br><span class="line">    <span class="comment"># The default value is '$vardir/log'.</span></span><br><span class="line">    <span class="attr">logdir</span> = /var/log/puppet</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Where Puppet PID files are kept.</span></span><br><span class="line">    <span class="comment"># The default value is '$vardir/run'.</span></span><br><span class="line">    <span class="attr">rundir</span> = /var/run/puppet</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Where SSL certificates are kept.</span></span><br><span class="line">    <span class="comment"># The default value is '$confdir/ssl'.</span></span><br><span class="line">    <span class="attr">ssldir</span> = $vardir/ssl</span><br><span class="line">    <span class="attr">autosign</span> = <span class="literal">true</span></span><br><span class="line">    <span class="attr">server</span> = master.hp</span><br><span class="line"></span><br><span class="line">[agent]</span><br><span class="line">    <span class="comment"># The file in which puppetd stores a list of the classes</span></span><br><span class="line">    <span class="comment"># associated with the retrieved configuratiion.  Can be loaded in</span></span><br><span class="line">    <span class="comment"># the separate ``puppet`` executable using the ``--loadclasses``</span></span><br><span class="line">    <span class="comment"># option.</span></span><br><span class="line">    <span class="comment"># The default value is '$confdir/classes.txt'.</span></span><br><span class="line">    <span class="attr">classfile</span> = $vardir/classes.txt</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Where puppetd caches the local configuration.  An</span></span><br><span class="line">    <span class="comment"># extension indicating the cache format is added automatically.</span></span><br><span class="line">    <span class="comment"># The default value is '$confdir/localconfig'.</span></span><br><span class="line">    <span class="attr">localconfig</span> = $vardir/localconfig</span><br></pre></td></tr></table></figure>
+<p>重启server。</p>
+<h5 id="2-关闭client，编辑-etc-puppet-puppet-conf-文件，在-agent-段内加入-listen-true，server-master-com，为客户端指定puppet服务器-并开启Master的推送功能："><a href="#2-关闭client，编辑-etc-puppet-puppet-conf-文件，在-agent-段内加入-listen-true，server-master-com，为客户端指定puppet服务器-并开启Master的推送功能：" class="headerlink" title="2. 关闭client，编辑 /etc/puppet/puppet.conf 文件，在[agent]段内加入 listen = true，server = master.com，为客户端指定puppet服务器,并开启Master的推送功能："></a>2. 关闭client，编辑 /etc/puppet/puppet.conf 文件，在[agent]段内加入 listen = true，server = master.com，为客户端指定puppet服务器,并开启Master的推送功能：</h5><figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[agent]</span><br><span class="line">    <span class="comment"># The file in which puppetd stores a list of the classes</span></span><br><span class="line">    <span class="comment"># associated with the retrieved configuratiion.  Can be loaded in</span></span><br><span class="line">    <span class="comment"># the separate ``puppet`` executable using the ``--loadclasses``</span></span><br><span class="line">    <span class="comment"># option.</span></span><br><span class="line">    <span class="comment"># The default value is '$confdir/classes.txt'.</span></span><br><span class="line">    <span class="attr">classfile</span> = $vardir/classes.txt</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Where puppetd caches the local configuration.  An</span></span><br><span class="line">    <span class="comment"># extension indicating the cache format is added automatically.</span></span><br><span class="line">    <span class="comment"># The default value is '$confdir/localconfig'.</span></span><br><span class="line">    <span class="attr">localconfig</span> = $vardir/localconfig</span><br><span class="line">    <span class="attr">listen</span> = <span class="literal">true</span></span><br><span class="line">    <span class="attr">server</span> = master.hp</span><br></pre></td></tr></table></figure>
+<p>编辑 /etc/puppet/auth.conf 文件， 在 auth / 最下面加入以下语句：</p>
+<figure class="highlight nimrod"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">path /run</span><br><span class="line"><span class="keyword">method</span> save</span><br><span class="line">allow master.com</span><br></pre></td></tr></table></figure>
+<p>好了，这样，client请求server后，server会自动sign相应的client。</p>
+<h4 id="三、puppet目录结构"><a href="#三、puppet目录结构" class="headerlink" title="三、puppet目录结构"></a>三、puppet目录结构</h4><h5 id="1-server端的目录结构："><a href="#1-server端的目录结构：" class="headerlink" title="1. server端的目录结构："></a>1. server端的目录结构：</h5><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[urey@master ~]$ <span class="keyword">ls</span> /etc/puppet/</span><br><span class="line">auth.<span class="keyword">conf</span>  environments  fileserver.<span class="keyword">conf</span>  manifests  modules  puppet.<span class="keyword">conf</span></span><br></pre></td></tr></table></figure>
+<p>server上代码的目录结构如下：</p>
+<p>|– auth.conf # 访问认证文件</p>
+<p>|– environments # 环境</p>
+<p>|– fileserver.conf # 自带的文件服务器配置文件，用户控制客户端访问文件资源的权限</p>
+<p>|– manifests</p>
+<p>|– |– site.pp # puppet的主入口文件，主要用于全局配置</p>
+<p>|– |– xx.pp # puppet各个模块汇总  如abc.com.pp</p>
+<p>|– |– nodes.pp # 节点配置文件，用于配置客户端节点应用哪些具体的配置</p>
+<p>|– modules # puppet的各个模块所在文件</p>
+<p>|– puppet.conf # 整个puppet的主配置文件，主要由两部分组成：[main]和[agent]，定义了一些基础的文件目录</p>
+<h5 id="2-client端的目录结构："><a href="#2-client端的目录结构：" class="headerlink" title="2. client端的目录结构："></a>2. client端的目录结构：</h5><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[urey@slave1 ~]$ <span class="keyword">ls</span> /etc/puppet/</span><br><span class="line">auth.<span class="keyword">conf</span>  modules  puppet.<span class="keyword">conf</span></span><br></pre></td></tr></table></figure>
+<p>client上代码的目录结构如下：</p>
+<p>|– auth.conf # 访问认证文件</p>
+<p>|– modules # puppet的各个模块所在文件</p>
+<p>|– puppet.conf # puppet主文件所在目录，主要由两部分组成：[main]和[agent]，定义了一些基础的文件目录</p>
+<h4 id="四、User-Cases"><a href="#四、User-Cases" class="headerlink" title="四、User Cases"></a>四、User Cases</h4><p>到这里，终于可以看一下puppet的强大了。</p>
+<p>我们在server端编写一段code：</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[urey@<span class="keyword">master</span> <span class="title">~]$</span> sudo vim /etc/puppet/manifests/site.pp</span><br></pre></td></tr></table></figure>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">node</span> <span class="title">default</span> &#123;</span><br><span class="line">        file &#123;</span><br><span class="line">                <span class="string">"/tmp/helloworld.txt"</span>: content =&gt; <span class="string">"hello, world"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在client端之行puppet，执行后查看对应目录下生成了相应的文件：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[urey<span class="meta">@slave</span>1 ~]$ puppet agent --test --server=master.hp</span><br><span class="line"><span class="string">Info:</span> Caching certificate <span class="keyword">for</span> slave1.hp</span><br><span class="line"><span class="string">Info:</span> Caching certificate_revocation_list <span class="keyword">for</span> ca</span><br><span class="line"><span class="string">Info:</span> Caching certificate <span class="keyword">for</span> slave1.hp</span><br><span class="line"><span class="string">Info:</span> Retrieving pluginfacts</span><br><span class="line"><span class="string">Notice:</span> <span class="regexp">/File[/</span>home<span class="regexp">/urey/</span>.puppet<span class="regexp">/var/</span>facts.d]/<span class="string">mode:</span> mode changed <span class="string">'0775'</span> to <span class="string">'0755'</span></span><br><span class="line"><span class="string">Info:</span> Retrieving plugin</span><br><span class="line"><span class="string">Info:</span> Caching catalog <span class="keyword">for</span> slave1.hp</span><br><span class="line"><span class="string">Info:</span> Applying configuration version <span class="string">'1446715692'</span></span><br><span class="line"><span class="string">Notice:</span> <span class="regexp">/Stage[main]/</span>Main<span class="regexp">/Node[default]/</span>File[<span class="regexp">/tmp/</span>helloworld.txt]/<span class="string">ensure:</span> defined content <span class="keyword">as</span> <span class="string">'&#123;md5&#125;e4d7f1b4ed2e42d15898f4b27b019da4'</span></span><br><span class="line"><span class="string">Info:</span> Creating state file <span class="regexp">/home/</span>urey<span class="regexp">/.puppet/</span>var<span class="regexp">/state/</span>state.yaml</span><br><span class="line"><span class="string">Notice:</span> Finished catalog run <span class="keyword">in</span> <span class="number">0.02</span> seconds</span><br><span class="line">[urey<span class="meta">@slave</span>1 ~]$ cat <span class="regexp">/tmp/</span>helloworld.txt</span><br><span class="line">[urey<span class="meta">@slave</span>1 ~]$ hello,world</span><br></pre></td></tr></table></figure>
+<p>puppet需要学习的还有很多，未完待续。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/tool/">tool</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/puppet/">puppet</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://qiaowei.xyz/2015/11/05/2015-11-05-puppetan-zhuang-yu-ji-ben-shi-yong/" data-title="puppet安装与基本使用 | Urey on the way" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/02/27/2016-02-27-shi-shi-ri-zhi-shou-ji-cha-xun-fen-xi-xi-tong-flume-plus-elasticsearch-plus-kibana/" title="实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)">
+  <strong>上一篇：</strong><br/>
+  <span>
+  实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/11/03/2015-11-03-ambarijian-jie/"  title="Ambari简介">
+ <strong>下一篇：</strong><br/> 
+ <span>Ambari简介
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、puppet基本介绍"><span class="toc-number">1.</span> <span class="toc-text">一、puppet基本介绍</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、安装过程"><span class="toc-number">2.</span> <span class="toc-text">二、安装过程</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-设置hosts："><span class="toc-number">2.1.</span> <span class="toc-text">1. 设置hosts：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-为了方便，进行前期准备："><span class="toc-number">2.2.</span> <span class="toc-text">2. 为了方便，进行前期准备：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-安装puppet官方源："><span class="toc-number">2.3.</span> <span class="toc-text">3. 安装puppet官方源：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-puppet-master的安装与配置："><span class="toc-number">2.4.</span> <span class="toc-text">4. puppet master的安装与配置：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-puppet-client的安装与配置："><span class="toc-number">2.5.</span> <span class="toc-text">5. puppet client的安装与配置：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#6-puppet-server与puppet-client交互："><span class="toc-number">2.6.</span> <span class="toc-text">6. puppet server与puppet client交互：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#1-关闭server，修改配置文件，使得server添加自动签发证书："><span class="toc-number">2.7.</span> <span class="toc-text">1. 关闭server，修改配置文件，使得server添加自动签发证书：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-关闭client，编辑-etc-puppet-puppet-conf-文件，在-agent-段内加入-listen-true，server-master-com，为客户端指定puppet服务器-并开启Master的推送功能："><span class="toc-number">2.8.</span> <span class="toc-text">2. 关闭client，编辑 /etc/puppet/puppet.conf 文件，在[agent]段内加入 listen = true，server = master.com，为客户端指定puppet服务器,并开启Master的推送功能：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、puppet目录结构"><span class="toc-number">3.</span> <span class="toc-text">三、puppet目录结构</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-server端的目录结构："><span class="toc-number">3.1.</span> <span class="toc-text">1. server端的目录结构：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-client端的目录结构："><span class="toc-number">3.2.</span> <span class="toc-text">2. client端的目录结构：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#四、User-Cases"><span class="toc-number">4.</span> <span class="toc-text">四、User Cases</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/ambari/" title="ambari">ambari<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/flume/" title="flume">flume<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/life/" title="life">life<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/osx/" title="osx">osx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pg/" title="pg">pg<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pgxl/" title="pgxl">pgxl<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/python/" title="python">python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/regex/" title="regex">regex<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tool/" title="tool">tool<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/postgres-xl/" title="postgres-xl">postgres-xl<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/tips/" title="tips">tips<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pgxl/" title="pgxl">pgxl<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/regex/" title="regex">regex<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST-API/" title="REST API">REST API<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ambari/" title="ambari">ambari<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pg/" title="pg">pg<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/puppet/" title="puppet">puppet<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/flume/" title="flume">flume<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/elasticsearch/" title="elasticsearch">elasticsearch<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="/about" target="_blank" title="urey">urey</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

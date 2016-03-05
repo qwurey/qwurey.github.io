@@ -1,10 +1,10 @@
 
-  <!DOCTYPE HTML>
+<!DOCTYPE HTML>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   
-    <title>标签 : postgres-xl | Urey on the way</title>
+    <title>search | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
@@ -13,12 +13,13 @@
     
     <meta name="description">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Urey on the way">
-<meta property="og:url" content="http://qiaowei.xyz/tags/postgres-xl/index.html">
+<meta property="og:title" content="search">
+<meta property="og:url" content="http://qiaowei.xyz/search/index.html">
 <meta property="og:site_name" content="Urey on the way">
 <meta property="og:description">
+<meta property="og:updated_time" content="2016-03-05T08:29:45.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Urey on the way">
+<meta name="twitter:title" content="search">
 <meta name="twitter:description">
 
     
@@ -73,56 +74,25 @@
       </header>
       <div id="container">
         
-
-<div class="archive-title" >
-  <h2 class="tag-icon">postgres-xl</h2>
-  
+<div  id="main" class="page">
+  <div id='cse' style='width:100%;text-align:center'>正在加载搜索结果，请稍等。</div>
 </div>
-<div id="main" class="archive-part clearfix">
-  <div id="archive-page">
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/10/09/2015-10-09-pgxlde-jdbcfang-wen/" title="PGXL的JDBC访问" itemprop="url">
-  
-
-    <time datetime="2015-10-09T13:34:17.000Z" itemprop="datePublished">2015-10-09</time>
-
-
-    <h1 itemprop="name">PGXL的JDBC访问</h1>
-
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/10/08/2015-10-08-postgres-xl-de-jie-shao/" title="Postgres-XL介绍" itemprop="url">
-  
-
-    <time datetime="2015-10-08T11:32:26.000Z" itemprop="datePublished">2015-10-08</time>
-
-
-    <h1 itemprop="name">Postgres-XL介绍</h1>
-
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/10/08/2015-10-08-postgres-xlji-qun-de-da-jian/" title="Postgres-XL集群的搭建" itemprop="url">
-  
-
-    <time datetime="2015-10-08T11:32:26.000Z" itemprop="datePublished">2015-10-08</time>
-
-
-    <h1 itemprop="name">Postgres-XL集群的搭建</h1>
-
-  </a>
-</section>
-
-
-  </div>
-</div>
+<script src="http://www.google.com.hk/jsapi" type="text/javascript"></script>
+<script type="text/javascript">
+google.load('search', '1', {language : 'zh-CN',style: google.loader.themes.MINIMALIST});
+google.setOnLoadCallback(function(){
+  var customSearchControl = new google.search.CustomSearchControl('007906514384430331739:v0sq6wikoca');
+  customSearchControl.setResultSetSize(google.search.Search.FILTERED_CSE_RESULTSET);
+  var options = new google.search.DrawOptions();
+  options.setAutoComplete(true);
+  customSearchControl.draw('cse', options);
+  var match = location.search.match(/q=([^&]*)(&|$)/);
+  if(match && match[1]){
+    var search = decodeURIComponent(match[1]); 
+    customSearchControl.execute(search);
+  }
+},true);
+</script>
 
       </div>
       <footer><div id="footer" >
@@ -222,6 +192,18 @@ $(document).ready(function(){
 
 
 
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"urey"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
 
 
 

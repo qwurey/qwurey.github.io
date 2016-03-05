@@ -75,212 +75,52 @@
     <div id="container">
       <div id="main">
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/" title="regex的贪婪与懒惰" itemprop="url">regex的贪婪与懒惰</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2015-09-04T13:07:39.000Z" itemprop="datePublished"> 发表于 2015-09-04</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>　　正则表达式有两种模式：<strong>贪婪模式</strong>与<strong>懒惰模式</strong>。</p>
-<p>　　贪婪模式：匹配尽可能多的字符。</p>
-<p>　　我们一般刚开始学习正则表达式使用到的都是贪婪模式下的表达。</p>
-<p>　　比如：将<strong> a.*b </strong> 应用于串 <strong>“aabab”</strong> ，它会匹配 “aabab”整个串。注意，其实整个串“aabab”中的子串“aab”和“ab”也是匹配的。这就是正则表达式的贪婪模式。</p>
-<p>　　懒惰模式：匹配尽可能少的字符。</p>
-<p>　　正则表达式用<strong>?</strong>来表示懒惰限定符。它要用在重复匹配限定符的后面。</p>
-<p>　　重复匹配限定符：</p>
-<table>
-<thead>
-<tr>
-<th>代码</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>*</td>
-<td>重复零次或更多次</td>
-</tr>
-<tr>
-<td>+</td>
-<td>重复一次或更多次</td>
-</tr>
-<tr>
-<td>?</td>
-<td>重复零次或一次</td>
-</tr>
-<tr>
-<td>{n}</td>
-<td>重复n次</td>
-</tr>
-<tr>
-<td>{n,}</td>
-<td>重复n次或更多次</td>
-</tr>
-<tr>
-<td>{n,m}</td>
-<td>重复n到m次</td>
-</tr>
-</tbody>
-</table>
-<p>　　加入懒惰限定符的重复匹配限定符：　　</p>
-<table>
-<thead>
-<tr>
-<th>代码</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>*?</td>
-<td>重复零次或更多次，但尽可能少重复</td>
-</tr>
-<tr>
-<td>+?</td>
-<td>重复一次或更多次，但尽可能少重复</td>
-</tr>
-<tr>
-<td>??</td>
-<td>重复零次或一次，但尽可能少重复</td>
-</tr>
-<tr>
-<td>{n,}?</td>
-<td>重复n次或更多次，但尽可能少重复</td>
-</tr>
-<tr>
-<td>{n,m}?</td>
-<td>重复n到m次，但尽可能少重复</td>
-</tr>
-</tbody>
-</table>
-<p>　　还是上面那个例子：将<strong> a.*?b </strong> 应用于串 <strong>“aabab”</strong> ，它会匹配 “aab”这个子串（对应于原串的前三个字符）和 “ab”这个子串（对应于原串的最后两个字符）。注意：懒惰模式在匹配好了以后会记录该匹配串，如果还有剩余的字符，会继续往下匹配，直到结束，返回所有匹配成功的串。</p>
-<p>　　实战例子: 在python的爬虫应用中，我们常常遇见需要在整个html页面中找到我们需要的内容，这时就要用到regex。比如我们想要找到所有的img标签中的src属性的内容：</p>
-<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;img pic_type=<span class="string">"0"</span> <span class="keyword">class</span>=<span class="string">"BDE_Image"</span> src=<span class="string">"http://imgsrc.baidu.com/forum/w%3D580/sign=294db374d462853592e0d229a0ee76f2/e732c895d143ad4b630e8f4683025aafa40f0611.jpg"</span> pic_ext=<span class="string">"bmp"</span> <span class="built_in">height</span>=<span class="string">"328"</span> <span class="built_in">width</span>=<span class="string">"560"</span>&gt;</span><br></pre></td></tr></table></figure>
-<p>　　用到的正则表达式：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg = <span class="string">r'src="(.+?\.jpg)" pic_ext'</span></span><br></pre></td></tr></table></figure>
-<p>　　注意，这里就运用了懒惰规则，如果写成这样：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg = <span class="string">r'src="(.+\.jpg)" pic_ext'</span></span><br></pre></td></tr></table></figure>
-<p>　　如果有不止一个img标签的话，就会匹配第一个img标签的开始部分和最后一个img标签的结束部分的全部字符，这样就没有了意义。
-　</p>
-<p>　　上式中，“( )”中的内容表示待提取的字符。</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/regex/">regex</a>
-</div>
-
-
-  <div class="article-tags">
   
-  <span></span> <a href="/tags/python/">python</a><a href="/tags/regex/">regex</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/08/31/2015-08-31-ban-jia-la/" title="搬家啦" itemprop="url">搬家啦</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2015-08-31T09:15:31.000Z" itemprop="datePublished"> 发表于 2015-08-31</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>　　以前一直把博客的家安在CSDN上(<a href="http://blog.csdn.net/yeruby" target="_blank" rel="external">http://blog.csdn.net/yeruby</a>)，它记录了我从大一开始，一直到研一生活结束的点点滴滴，这也是我一直不断前进的动力，但就像一直住在别人家里一样，有点别扭。</p>
-<p>　　因此赶在2015年的8月末，我决定将博客迁移到github上，并且从以前的技术为主转变为：写写技术、还要再聊聊生活。</p>
-<p>　　脚踏实地，仰望星空。</p>
-<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/1.png" alt="BlueSky"></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/life/">life</a>
-</div>
-
-
-  <div class="article-tags">
+<section class="post" itemscope itemprop="blogitem">
   
-  <span></span> <a href="/tags/tips/">tips</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
+    <a href="/2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/" title="regex的贪婪与懒惰" itemprop="url">
+  
+    <h1 itemprop="name">regex的贪婪与懒惰</h1>
+    
+     
+           <p itemprop="description" >正则表达式有两种模式：贪婪模式与懒惰模式。
+　　贪婪模式：匹配尽可能多的字符。
+　　我们一般刚开始学习正则表达式使用到的都是贪婪模式下的表达。
+　　比如：将 a.*b  应用于串 “aabab” ，它会匹配 “aabab”整个串。注意，其实整个串“aabab”中的子串“aab”和</p>
+        
+    
+    <time datetime="2015-09-04T13:07:39.000Z" itemprop="datePublished">2015-09-04</time>
+  </a>
+</section>
 
 
 
 
 
 
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2015/08/31/2015-08-31-ban-jia-la/" title="搬家啦" itemprop="url">
+  
+    <h1 itemprop="name">搬家啦</h1>
+    
+     
+           <p itemprop="description" >以前一直把博客的家安在CSDN上(http://blog.csdn.net/yeruby)，它记录了我从大一开始，一直到研一生活结束的点点滴滴，这也是我一直不断前进的动力，但就像一直住在别人家里一样，有点别扭。
+　　因此赶在2015年的8月末，我决定将博客迁移到github上，并</p>
+        
+    
+    <time datetime="2015-08-31T09:15:31.000Z" itemprop="datePublished">2015-08-31</time>
+  </a>
+</section>
 
-  <nav id="page-nav" class="clearfix">
+
+
+
+
+
+
+  <nav id="page-nav" class="clearfix unexpand">
     <a class="extend prev" rel="prev" href="/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
   </nav>
 
@@ -361,19 +201,19 @@
 			
 		
 			
-				<li><a href="/tags/regex/" title="regex">regex<sup>1</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/REST-API/" title="REST API">REST API<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/ambari/" title="ambari">ambari<sup>1</sup></a></li>
+				<li><a href="/tags/regex/" title="regex">regex<sup>1</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/pg/" title="pg">pg<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ambari/" title="ambari">ambari<sup>1</sup></a></li>
 			
 		
 			
@@ -436,13 +276,13 @@
 	
 	
 	<section class="info">
-		<p> Hello ,I&#39;m Larry Page in Google. <br/>
-			This is my blog,believe it or not.</p>
+		<p> Hello ,I&#39;m Urey. <br/>
+			null</p>
 	</section>
 	 
 	<div class="social-font" class="clearfix">
 		
-		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		<a href="http://weibo.com/qiaoweiblog" target="_blank" class="icon-weibo" title="微博"></a>
 		
 		
 		
@@ -451,7 +291,11 @@
 		
 		
 		
+		<a href="http://www.zhihu.com/people/urey" target="_blank" class="icon-zhihu" title="知乎"></a>
 		
+		
+		
+		<a href="mailto:qiaowei@pku.edu.cn" target="_blank" class="icon-email" title="Email Me"></a>
 		
 	</div>
 			

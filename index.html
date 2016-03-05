@@ -75,1037 +75,233 @@
     <div id="container">
       <div id="main">
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/02/27/2016-02-27-shi-shi-ri-zhi-shou-ji-cha-xun-fen-xi-xi-tong-flume-plus-elasticsearch-plus-kibana/" title="实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)" itemprop="url">实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2016-02-27T09:22:17.000Z" itemprop="datePublished"> 发表于 2016-02-27</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <blockquote>
-<p>“世界上有10种人，一种懂二进制，一种不懂二进制” ——匿名</p>
-</blockquote>
-<h1 id="实时日志收集，查询，分析系统"><a href="#实时日志收集，查询，分析系统" class="headerlink" title="实时日志收集，查询，分析系统"></a>实时日志收集，查询，分析系统</h1><p><strong>设计方案：</strong>Flume（日志收集） +　ElasticSearch（日志查询）+ Kibana（日志分析与展示）</p>
-<p><strong>实验使用场景：</strong>通过ambari部署集群后，可以添加自己的日志系统，记录每个组件的产生的日志，实时的查询分析</p>
-<h4 id="一、Flume概述："><a href="#一、Flume概述：" class="headerlink" title="一、Flume概述："></a>一、Flume概述：</h4><p>Apache Flume is a distributed, reliable, and available system for efficiently collecting, aggregating and moving large amounts of log data from many different sources to a centralized data store.</p>
-<p>The use of Apache Flume is not only restricted to log data aggregation. Since data sources are customizable, Flume can be used to transport massive quantities of event data including but not limited to network traffic data, social-media-generated data, email messages and pretty much any data source possible.</p>
-<h4 id="二、Flume架构"><a href="#二、Flume架构" class="headerlink" title="二、Flume架构"></a>二、Flume架构</h4><p>每一个Flume agent包含<strong>三种类型</strong>的组件：source（从数据源获取生成event data），channel（接收source给put来的event data），sink（从channel取走event data）</p>
-<p><em>注意上面写的是一个flume agent包含<strong>三种</strong>而不是<strong>三个</strong></em></p>
-<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/flume_arch.png" width="500" height="260" alt="flume-arch" align="center"></p>
-<p>解释下什么是event data？</p>
-<p>官方解释：A Flume event is defined as a unit of data flow having a byte payload and an optional set of string attributes. </p>
-<p>简单理解：flume event data = headers + body，其中body的类型是byte[]，headers的类型是Map<string, string="">，event代表着一个数据流的最小完整单元，如果是source是从文本文件中读数据，那event的body通常就是每行的内容，headers可以自行添加。</string,></p>
-<h4 id="三、Flume需要理解的内容"><a href="#三、Flume需要理解的内容" class="headerlink" title="三、Flume需要理解的内容"></a>三、Flume需要理解的内容</h4><ol>
-<li><p>如何配好一个最简单的flume.conf，使得flume agent正常工作；</p>
-</li>
-<li><p>Flume的flow的种类和适用场景；</p>
-</li>
-<li><p>Flume的官方提供的sources，channels，sinks，如提供的不满足需求，可自定义适用于自己场景的source、channel和sink；</p>
-</li>
-</ol>
-<h4 id="ElasticSearch概述"><a href="#ElasticSearch概述" class="headerlink" title="ElasticSearch概述"></a>ElasticSearch概述</h4><p>Elasticsearch是一个基于Apache Lucene(TM)的开源的、实时的、分布式的、全文存储、搜索、分析引擎。</p>
-<p>Lucene使用起来非常复杂，ES（ElasticSearch）可以看成对其进行了封装，提供了丰富的REST API，上手非常容易。</p>
-<h4 id="ElasticSearch的数据模型的简单理解"><a href="#ElasticSearch的数据模型的简单理解" class="headerlink" title="ElasticSearch的数据模型的简单理解"></a>ElasticSearch的数据模型的简单理解</h4><p>在Elasticsearch中，有几个概念（关键词），有别于我们使用的关系型数据库中的概念，注意类比：<br><figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">R<span class="function"><span class="title">elational</span> DB	-&gt;</span> D<span class="function"><span class="title">atabases</span> 		-&gt;</span> T<span class="function"><span class="title">ables</span> -&gt;</span> R<span class="function"><span class="title">ows</span> 		-&gt;</span> Columns</span><br><span class="line">E<span class="function"><span class="title">lasticsearch</span>	-&gt;</span> I<span class="function"><span class="title">ndices</span>(Index) 	-&gt;</span> T<span class="function"><span class="title">ypes</span>  -&gt;</span> D<span class="function"><span class="title">ocuments</span> 	-&gt;</span> Fields</span><br></pre></td></tr></table></figure></p>
-<p>Elasticsearch集群可以包含多个索引(indices)（数据库），每一个索引可以包含多个类型(types)（表），每一个类型包含多个文档(documents)（行），然后每个文档包含多个字段(Fields)（列）。</p>
-<p>如何定位es中的一个文档（Document）？</p>
-<p>通过Index（索引:    文档存储的地方） +　Type（类型:文档代表的对象的类）+ Document_ID（唯一标识：文档的唯一标识），在ES内部的元数据表示为：_index + _type + _id。</p>
-<h4 id="Kibana概述"><a href="#Kibana概述" class="headerlink" title="Kibana概述"></a>Kibana概述</h4><p>可以看成是ES的一个插件，提供的功能：</p>
-<ol>
-<li><p>Flexible analytics and visualization platform</p>
-</li>
-<li><p>Real-time summary and charting of streaming data</p>
-</li>
-<li><p>Intuitive interface for a variety of users</p>
-</li>
-<li><p>Instant sharing and embedding of dashboards</p>
-</li>
-</ol>
-<h4 id="系统实现："><a href="#系统实现：" class="headerlink" title="系统实现："></a>系统实现：</h4><p>环境：<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">（1）<span class="selector-tag">JDK</span>版本：<span class="selector-tag">java</span> <span class="selector-tag">-version</span></span><br><span class="line"><span class="selector-tag">java</span> <span class="selector-tag">version</span> "1<span class="selector-class">.7</span><span class="selector-class">.0_75</span>"</span><br><span class="line"><span class="selector-tag">OpenJDK</span> <span class="selector-tag">Runtime</span> <span class="selector-tag">Environment</span> (<span class="selector-tag">rhel-2</span><span class="selector-class">.5</span><span class="selector-class">.4</span><span class="selector-class">.0</span><span class="selector-class">.el6_6-x86_64</span> <span class="selector-tag">u75-b13</span>)</span><br><span class="line"><span class="selector-tag">OpenJDK</span> 64<span class="selector-tag">-Bit</span> <span class="selector-tag">Server</span> <span class="selector-tag">VM</span> (<span class="selector-tag">build</span> 24<span class="selector-class">.75-b04</span>, <span class="selector-tag">mixed</span> <span class="selector-tag">mode</span>)</span><br><span class="line">（2）<span class="selector-tag">Flume1</span><span class="selector-class">.6</span><span class="selector-class">.0</span></span><br><span class="line">（3）<span class="selector-tag">ElasticSearch1</span><span class="selector-class">.7</span><span class="selector-class">.5</span></span><br></pre></td></tr></table></figure></p>
-<p>注意：我这里实验显示Flume1.6.0不能导数据到ES2.2.0</p>
-<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/log_arch.png" width="600" height="330" alt="log-arch" align="center"></p>
-<p>Flume使用的conf，可以简单的设置如下：<br><figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">agent</span>.sources = yarnSrc hbaseSrc</span><br><span class="line"><span class="built_in">agent</span>.channels = memoryChannel</span><br><span class="line"><span class="built_in">agent</span>.sinks = elasticsearch</span><br><span class="line"></span><br><span class="line"><span class="meta"># source1:hdfsSrc</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hdfsSrc.<span class="built_in">type</span> = <span class="built_in">exec</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hdfsSrc.command = tail -F /var/<span class="built_in">log</span>/tbds/hdfs/hdfs/hadoop-hdfs-datanode-<span class="number">10.151</span>.<span class="number">139.111</span>.<span class="built_in">log</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hdfsSrc.channels = memoryChannel</span><br><span class="line"></span><br><span class="line"><span class="meta"># source2:yarnSrc</span></span><br><span class="line"><span class="built_in">agent</span>.sources.yarnSrc.<span class="built_in">type</span> = <span class="built_in">exec</span></span><br><span class="line"><span class="built_in">agent</span>.sources.yarnSrc.command = tail -F /var/<span class="built_in">log</span>/tbds/yarn/yarn/yarn-yarn-nodemanager-<span class="number">10.151</span>.<span class="number">139.111</span>.<span class="built_in">log</span></span><br><span class="line"><span class="built_in">agent</span>.sources.yarnSrc.channels = memoryChannel</span><br><span class="line"></span><br><span class="line"><span class="meta"># source3:hbaseSrc</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hbaseSrc.<span class="built_in">type</span> = <span class="built_in">exec</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hbaseSrc.command = tail -F /var/<span class="built_in">log</span>/tbds/hbase/hbase-hbase-regionserver-<span class="number">10.151</span>.<span class="number">139.111</span>.<span class="built_in">log</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hbaseSrc.channels = memoryChannel</span><br><span class="line"></span><br><span class="line"><span class="meta"># sink1:localSink</span></span><br><span class="line"><span class="built_in">agent</span>.sinks.localSink.<span class="built_in">type</span> = file_roll</span><br><span class="line"><span class="built_in">agent</span>.sinks.localSink.sink.directory = /var/<span class="built_in">log</span>/flume</span><br><span class="line"><span class="built_in">agent</span>.sinks.localSink.sink.rollInterval = <span class="number">0</span></span><br><span class="line"><span class="built_in">agent</span>.sinks.localSink.channel = memoryChannel</span><br><span class="line"></span><br><span class="line"><span class="meta"># sink2:esSink</span></span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.channel = memoryChannel</span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.<span class="built_in">type</span> = org.apache.flume.sink.elasticsearch.ElasticSearchSink</span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.hostNames = <span class="number">10.151</span>.<span class="number">139.111</span>:<span class="number">9300</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.indexName = basis_log_info</span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.batchSize = <span class="number">100</span></span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.indexType = logs</span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.clusterName = my-test-es-cluster</span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.serializer = org.apache.flume.sink.elasticsearch.ElasticSearchLogStashEventSerializer</span><br><span class="line"></span><br><span class="line"><span class="meta"># channel1</span></span><br><span class="line"><span class="built_in">agent</span>.channels.memoryChannel.<span class="built_in">type</span> = memory</span><br><span class="line"><span class="built_in">agent</span>.channels.memoryChannel.capacity = <span class="number">100</span></span><br></pre></td></tr></table></figure></p>
-<p>注意要在flume/lib下加入两个包：<br>lucene-core-4.10.4.jar<br>elasticsearch-1.7.5.jar<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The elasticsearch and lucene-core jars required <span class="keyword">for</span> your environment must be placed in the <span class="class"><span class="keyword">lib</span> <span class="title">directory</span> <span class="title">of</span> <span class="title">the</span> <span class="title">Apache</span> <span class="title">Flume</span> <span class="title">installation</span>.</span></span><br></pre></td></tr></table></figure></p>
-<p>之后分别运行elasticsearch和flume即可。</p>
-<h4 id="系统改进："><a href="#系统改进：" class="headerlink" title="系统改进："></a>系统改进：</h4><ol>
-<li><p>配置flume interceptor加入各类headers，重写ElasticSearchLogStashEventSerializer使得event的header部分可以作为es的文档的field</p>
-</li>
-<li><p>memory channel与file channel的结合，参加美团日志系统的改进</p>
-</li>
-<li><p>日志若是错误信息，并不是每一行都是作为es的一条文档，而是若干行的内容才是es的一个文档的message</p>
-</li>
-</ol>
-<h4 id="系统实现效果："><a href="#系统实现效果：" class="headerlink" title="系统实现效果："></a>系统实现效果：</h4><p>导入es的文档数据结构：</p>
-<p><img src="" width="600" height="330" alt="es-data-structure" align="center"></p>
-<p>Kibana展示：</p>
-<p><img src="" width="600" height="330" alt="kibana-result" align="center"></p>
-<p>References：</p>
-<ol>
-<li><p>Apache Flume：<a href="https://flume.apache.org/" target="_blank" rel="external">https://flume.apache.org/</a></p>
-</li>
-<li><p>elastic.co：<a href="https://www.elastic.co/" target="_blank" rel="external">https://www.elastic.co/</a> </p>
-</li>
-<li><p>Elasticsearch权威指南（中文版）：<a href="https://www.gitbook.com/book/looly/elasticsearch-the-definitive-guide-cn/details" target="_blank" rel="external">https://www.gitbook.com/book/looly/elasticsearch-the-definitive-guide-cn/details</a></p>
-</li>
-<li><p>Kibana ：<a href="https://www.elastic.co/products/kibana" target="_blank" rel="external">https://www.elastic.co/products/kibana</a></p>
-</li>
-</ol>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/flume/">flume</a>
-</div>
-
-
-  <div class="article-tags">
   
-  <span></span> <a href="/tags/flume/">flume</a><a href="/tags/elasticsearch/">elasticsearch</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/11/05/2015-11-05-puppetan-zhuang-yu-ji-ben-shi-yong/" title="puppet安装与基本使用" itemprop="url">puppet安装与基本使用</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2015-11-05T08:01:14.000Z" itemprop="datePublished"> 发表于 2015-11-05</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <blockquote>
-<p>“Talk is cheap. Show me the code” —— Linux</p>
-</blockquote>
-<h4 id="一、puppet基本介绍"><a href="#一、puppet基本介绍" class="headerlink" title="一、puppet基本介绍"></a>一、puppet基本介绍</h4><p>puppet是一个开源的软件自动化配置和部署工具。它是典型C／S架构，由puppet master和若干puppet client组成。</p>
-<h4 id="二、安装过程"><a href="#二、安装过程" class="headerlink" title="二、安装过程"></a>二、安装过程</h4><h5 id="1-设置hosts："><a href="#1-设置hosts：" class="headerlink" title="1. 设置hosts："></a>1. 设置hosts：</h5><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">172<span class="selector-class">.16</span><span class="selector-class">.14</span><span class="selector-class">.150</span>	<span class="selector-tag">master</span><span class="selector-class">.hp</span>	# <span class="selector-tag">puppet</span> <span class="selector-tag">master</span></span><br><span class="line">172<span class="selector-class">.16</span><span class="selector-class">.14</span><span class="selector-class">.151</span>	<span class="selector-tag">slave1</span><span class="selector-class">.hp</span>	# <span class="selector-tag">puppet</span> <span class="selector-tag">client</span></span><br></pre></td></tr></table></figure>
-<h5 id="2-为了方便，进行前期准备："><a href="#2-为了方便，进行前期准备：" class="headerlink" title="2. 为了方便，进行前期准备："></a>2. 为了方便，进行前期准备：</h5><p>(1). 关闭SELinu<br>(2). 关闭防火墙</p>
-<h5 id="3-安装puppet官方源："><a href="#3-安装puppet官方源：" class="headerlink" title="3. 安装puppet官方源："></a>3. 安装puppet官方源：</h5><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget http:<span class="comment">//yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm</span></span><br><span class="line">rpm -ivh puppetlabs-release-<span class="number">6</span>-<span class="number">7</span><span class="selector-class">.noarch</span><span class="selector-class">.rpm</span></span><br><span class="line">yum update</span><br></pre></td></tr></table></figure>
-<h5 id="4-puppet-master的安装与配置："><a href="#4-puppet-master的安装与配置：" class="headerlink" title="4. puppet master的安装与配置："></a>4. puppet master的安装与配置：</h5><p>安装puppet server：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y <span class="keyword">install</span> puppet-<span class="keyword">server</span></span><br></pre></td></tr></table></figure>
-<p>启动puppet server：</p>
-<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service puppetmaster <span class="literal">start</span></span><br></pre></td></tr></table></figure>
-<p>查看证书，由于puppet默认将server本机当成一个client，所以已经将本机管理起来，自动签发了一个证书：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[urey@master ~]$ sudo puppet cert list --all</span><br><span class="line">+ "master.hp" (SHA256) 89:94:59:7C:85:F2:03:27:82:72:09:63:F4:86:C3:A4:2E:15:EE:7F:A5:31:C1:57:91:29:E4:9A:1B:87:F5:9B (alt names: "DNS:master.hp", "DNS:puppet", "DNS:puppet.hp")</span><br></pre></td></tr></table></figure>
-<h5 id="5-puppet-client的安装与配置："><a href="#5-puppet-client的安装与配置：" class="headerlink" title="5. puppet client的安装与配置："></a>5. puppet client的安装与配置：</h5><p>安装puppet client：</p>
-<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y <span class="keyword">install</span> puppet</span><br></pre></td></tr></table></figure>
-<p>启动puppet client：</p>
-<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service puppet <span class="literal">start</span></span><br></pre></td></tr></table></figure>
-<h5 id="6-puppet-server与puppet-client交互："><a href="#6-puppet-server与puppet-client交互：" class="headerlink" title="6. puppet server与puppet client交互："></a>6. puppet server与puppet client交互：</h5><p>由于server还没有给client发证书，所以还不能与server通信，但是需要发出请求，一旦server签收，就可以正常通信了。在client运行：</p>
-<figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">puppet</span> <span class="comment">agent</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">no</span><span class="literal">-</span><span class="comment">daemonize</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">onetime</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">verbose</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">debug</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">server=master</span><span class="string">.</span><span class="comment">hp</span></span><br></pre></td></tr></table></figure>
-<p>在server端查看，<code>＋</code> 号代表已经签收，可以看到，目前<code>slave1.hp</code>还没有被签收：</p>
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[urey<span class="meta">@master</span> ~]$ sudo puppet cert list --all</span><br><span class="line">  <span class="string">"slave1.hp"</span> (SHA256) <span class="string">F7:</span><span class="string">D4:</span><span class="number">2</span><span class="string">D:</span><span class="number">2</span><span class="string">C:</span><span class="number">6</span><span class="string">D:</span><span class="number">63</span>:<span class="string">A8:</span><span class="number">78</span>:<span class="number">13</span>:<span class="string">CE:</span><span class="string">A7:</span><span class="number">0</span><span class="string">A:</span><span class="number">2</span><span class="string">A:</span><span class="number">4</span><span class="string">E:</span><span class="number">0</span><span class="string">F:</span><span class="string">E0:</span><span class="number">9</span><span class="string">E:</span><span class="string">D7:</span><span class="number">71</span>:<span class="string">BC:</span><span class="number">0</span><span class="string">F:</span><span class="number">3</span><span class="string">F:</span><span class="number">52</span>:<span class="number">68</span>:<span class="number">21</span>:<span class="string">B4:</span><span class="number">17</span>:<span class="number">4</span><span class="string">B:</span><span class="string">B7:</span><span class="number">08</span>:<span class="string">FC:</span><span class="number">6</span>E</span><br><span class="line">+ <span class="string">"master.hp"</span> (SHA256) <span class="number">89</span>:<span class="number">94</span>:<span class="number">59</span>:<span class="number">7</span><span class="string">C:</span><span class="number">85</span>:<span class="string">F2:</span><span class="number">03</span>:<span class="number">27</span>:<span class="number">82</span>:<span class="number">72</span>:<span class="number">09</span>:<span class="number">63</span>:<span class="string">F4:</span><span class="number">86</span>:<span class="string">C3:</span><span class="string">A4:</span><span class="number">2</span><span class="string">E:</span><span class="number">15</span>:<span class="string">EE:</span><span class="number">7</span><span class="string">F:</span><span class="string">A5:</span><span class="number">31</span>:<span class="string">C1:</span><span class="number">57</span>:<span class="number">91</span>:<span class="number">29</span>:<span class="string">E4:</span><span class="number">9</span><span class="string">A:</span><span class="number">1</span><span class="string">B:</span><span class="number">87</span>:<span class="string">F5:</span><span class="number">9</span>B (alt <span class="string">names:</span> <span class="string">"DNS:master.hp"</span>, <span class="string">"DNS:puppet"</span>, <span class="string">"DNS:puppet.hp"</span>)</span><br></pre></td></tr></table></figure>
-<p>server通过 <code>sign</code> 签收：</p>
-<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">puppet cert <span class="comment">--sign slave1.hp</span></span><br></pre></td></tr></table></figure>
-<p>再次查看：</p>
-<figure class="highlight qml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">puppet cert <span class="built_in">list</span> --all</span><br><span class="line">[urey@master ~]$ sudo puppet cert <span class="built_in">list</span> --all</span><br><span class="line">+ <span class="string">"master.hp"</span> (SHA256) <span class="number">89</span>:<span class="number">94</span>:<span class="number">59</span>:<span class="number">7</span><span class="attribute">C</span>:<span class="number">85</span>:<span class="attribute">F2</span>:<span class="number">03</span>:<span class="number">27</span>:<span class="number">82</span>:<span class="number">72</span>:<span class="number">09</span>:<span class="number">63</span>:<span class="attribute">F4</span>:<span class="number">86</span>:<span class="attribute">C3</span>:<span class="attribute">A4</span>:<span class="number">2</span><span class="attribute">E</span>:<span class="number">15</span>:<span class="attribute">EE</span>:<span class="number">7</span><span class="attribute">F</span>:<span class="attribute">A5</span>:<span class="number">31</span>:<span class="attribute">C1</span>:<span class="number">57</span>:<span class="number">91</span>:<span class="number">29</span>:<span class="attribute">E4</span>:<span class="number">9</span><span class="attribute">A</span>:<span class="number">1</span><span class="attribute">B</span>:<span class="number">87</span>:<span class="attribute">F5</span>:<span class="number">9</span>B (alt <span class="attribute">names</span>: <span class="string">"DNS:master.hp"</span>, <span class="string">"DNS:puppet"</span>, <span class="string">"DNS:puppet.hp"</span>)</span><br><span class="line">+ <span class="string">"slave1.hp"</span> (SHA256) <span class="number">1</span><span class="attribute">A</span>:<span class="number">23</span>:<span class="attribute">D6</span>:<span class="attribute">D4</span>:<span class="number">31</span>:<span class="number">92</span>:<span class="attribute">AF</span>:<span class="number">7</span><span class="attribute">D</span>:<span class="attribute">F4</span>:<span class="attribute">CA</span>:<span class="attribute">A3</span>:<span class="number">83</span>:<span class="number">0</span><span class="attribute">A</span>:<span class="number">68</span>:<span class="attribute">DF</span>:<span class="number">24</span>:<span class="number">11</span>:<span class="attribute">DB</span>:<span class="number">0</span><span class="attribute">A</span>:<span class="attribute">D5</span>:<span class="number">6</span><span class="attribute">C</span>:<span class="attribute">A8</span>:<span class="number">0</span><span class="attribute">A</span>:<span class="number">3</span><span class="attribute">C</span>:<span class="attribute">EE</span>:<span class="number">6</span><span class="attribute">C</span>:<span class="number">9</span><span class="attribute">F</span>:<span class="attribute">E0</span>:<span class="number">62</span>:<span class="attribute">B4</span>:<span class="attribute">D3</span>:<span class="attribute">B0</span></span><br></pre></td></tr></table></figure>
-<p>这样，client和server可以正常通信了。</p>
-<p>如果不想这么麻烦，每次server查看有哪些client发出请求，再一一签收的话，server可以通过编辑配置文件来自动完成签收。</p>
-<h5 id="1-关闭server，修改配置文件，使得server添加自动签发证书："><a href="#1-关闭server，修改配置文件，使得server添加自动签发证书：" class="headerlink" title="1. 关闭server，修改配置文件，使得server添加自动签发证书："></a>1. 关闭server，修改配置文件，使得server添加自动签发证书：</h5><p>编辑 /etc/puppet/puppet.conf 文件， 在[main]段内加入 autosign = true，server = master.com</p>
-<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">[main]</span><br><span class="line">    <span class="comment"># The Puppet log directory.</span></span><br><span class="line">    <span class="comment"># The default value is '$vardir/log'.</span></span><br><span class="line">    <span class="attr">logdir</span> = /var/log/puppet</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Where Puppet PID files are kept.</span></span><br><span class="line">    <span class="comment"># The default value is '$vardir/run'.</span></span><br><span class="line">    <span class="attr">rundir</span> = /var/run/puppet</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Where SSL certificates are kept.</span></span><br><span class="line">    <span class="comment"># The default value is '$confdir/ssl'.</span></span><br><span class="line">    <span class="attr">ssldir</span> = $vardir/ssl</span><br><span class="line">    <span class="attr">autosign</span> = <span class="literal">true</span></span><br><span class="line">    <span class="attr">server</span> = master.hp</span><br><span class="line"></span><br><span class="line">[agent]</span><br><span class="line">    <span class="comment"># The file in which puppetd stores a list of the classes</span></span><br><span class="line">    <span class="comment"># associated with the retrieved configuratiion.  Can be loaded in</span></span><br><span class="line">    <span class="comment"># the separate ``puppet`` executable using the ``--loadclasses``</span></span><br><span class="line">    <span class="comment"># option.</span></span><br><span class="line">    <span class="comment"># The default value is '$confdir/classes.txt'.</span></span><br><span class="line">    <span class="attr">classfile</span> = $vardir/classes.txt</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Where puppetd caches the local configuration.  An</span></span><br><span class="line">    <span class="comment"># extension indicating the cache format is added automatically.</span></span><br><span class="line">    <span class="comment"># The default value is '$confdir/localconfig'.</span></span><br><span class="line">    <span class="attr">localconfig</span> = $vardir/localconfig</span><br></pre></td></tr></table></figure>
-<p>重启server。</p>
-<h5 id="2-关闭client，编辑-etc-puppet-puppet-conf-文件，在-agent-段内加入-listen-true，server-master-com，为客户端指定puppet服务器-并开启Master的推送功能："><a href="#2-关闭client，编辑-etc-puppet-puppet-conf-文件，在-agent-段内加入-listen-true，server-master-com，为客户端指定puppet服务器-并开启Master的推送功能：" class="headerlink" title="2. 关闭client，编辑 /etc/puppet/puppet.conf 文件，在[agent]段内加入 listen = true，server = master.com，为客户端指定puppet服务器,并开启Master的推送功能："></a>2. 关闭client，编辑 /etc/puppet/puppet.conf 文件，在[agent]段内加入 listen = true，server = master.com，为客户端指定puppet服务器,并开启Master的推送功能：</h5><figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[agent]</span><br><span class="line">    <span class="comment"># The file in which puppetd stores a list of the classes</span></span><br><span class="line">    <span class="comment"># associated with the retrieved configuratiion.  Can be loaded in</span></span><br><span class="line">    <span class="comment"># the separate ``puppet`` executable using the ``--loadclasses``</span></span><br><span class="line">    <span class="comment"># option.</span></span><br><span class="line">    <span class="comment"># The default value is '$confdir/classes.txt'.</span></span><br><span class="line">    <span class="attr">classfile</span> = $vardir/classes.txt</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Where puppetd caches the local configuration.  An</span></span><br><span class="line">    <span class="comment"># extension indicating the cache format is added automatically.</span></span><br><span class="line">    <span class="comment"># The default value is '$confdir/localconfig'.</span></span><br><span class="line">    <span class="attr">localconfig</span> = $vardir/localconfig</span><br><span class="line">    <span class="attr">listen</span> = <span class="literal">true</span></span><br><span class="line">    <span class="attr">server</span> = master.hp</span><br></pre></td></tr></table></figure>
-<p>编辑 /etc/puppet/auth.conf 文件， 在 auth / 最下面加入以下语句：</p>
-<figure class="highlight nimrod"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">path /run</span><br><span class="line"><span class="keyword">method</span> save</span><br><span class="line">allow master.com</span><br></pre></td></tr></table></figure>
-<p>好了，这样，client请求server后，server会自动sign相应的client。</p>
-<h4 id="三、puppet目录结构"><a href="#三、puppet目录结构" class="headerlink" title="三、puppet目录结构"></a>三、puppet目录结构</h4><h5 id="1-server端的目录结构："><a href="#1-server端的目录结构：" class="headerlink" title="1. server端的目录结构："></a>1. server端的目录结构：</h5><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[urey@master ~]$ <span class="keyword">ls</span> /etc/puppet/</span><br><span class="line">auth.<span class="keyword">conf</span>  environments  fileserver.<span class="keyword">conf</span>  manifests  modules  puppet.<span class="keyword">conf</span></span><br></pre></td></tr></table></figure>
-<p>server上代码的目录结构如下：</p>
-<p>|– auth.conf # 访问认证文件</p>
-<p>|– environments # 环境</p>
-<p>|– fileserver.conf # 自带的文件服务器配置文件，用户控制客户端访问文件资源的权限</p>
-<p>|– manifests</p>
-<p>|– |– site.pp # puppet的主入口文件，主要用于全局配置</p>
-<p>|– |– xx.pp # puppet各个模块汇总  如abc.com.pp</p>
-<p>|– |– nodes.pp # 节点配置文件，用于配置客户端节点应用哪些具体的配置</p>
-<p>|– modules # puppet的各个模块所在文件</p>
-<p>|– puppet.conf # 整个puppet的主配置文件，主要由两部分组成：[main]和[agent]，定义了一些基础的文件目录</p>
-<h5 id="2-client端的目录结构："><a href="#2-client端的目录结构：" class="headerlink" title="2. client端的目录结构："></a>2. client端的目录结构：</h5><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[urey@slave1 ~]$ <span class="keyword">ls</span> /etc/puppet/</span><br><span class="line">auth.<span class="keyword">conf</span>  modules  puppet.<span class="keyword">conf</span></span><br></pre></td></tr></table></figure>
-<p>client上代码的目录结构如下：</p>
-<p>|– auth.conf # 访问认证文件</p>
-<p>|– modules # puppet的各个模块所在文件</p>
-<p>|– puppet.conf # puppet主文件所在目录，主要由两部分组成：[main]和[agent]，定义了一些基础的文件目录</p>
-<h4 id="四、User-Cases"><a href="#四、User-Cases" class="headerlink" title="四、User Cases"></a>四、User Cases</h4><p>到这里，终于可以看一下puppet的强大了。</p>
-<p>我们在server端编写一段code：</p>
-<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[urey@<span class="keyword">master</span> <span class="title">~]$</span> sudo vim /etc/puppet/manifests/site.pp</span><br></pre></td></tr></table></figure>
-<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">node</span> <span class="title">default</span> &#123;</span><br><span class="line">        file &#123;</span><br><span class="line">                <span class="string">"/tmp/helloworld.txt"</span>: content =&gt; <span class="string">"hello, world"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在client端之行puppet，执行后查看对应目录下生成了相应的文件：</p>
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[urey<span class="meta">@slave</span>1 ~]$ puppet agent --test --server=master.hp</span><br><span class="line"><span class="string">Info:</span> Caching certificate <span class="keyword">for</span> slave1.hp</span><br><span class="line"><span class="string">Info:</span> Caching certificate_revocation_list <span class="keyword">for</span> ca</span><br><span class="line"><span class="string">Info:</span> Caching certificate <span class="keyword">for</span> slave1.hp</span><br><span class="line"><span class="string">Info:</span> Retrieving pluginfacts</span><br><span class="line"><span class="string">Notice:</span> <span class="regexp">/File[/</span>home<span class="regexp">/urey/</span>.puppet<span class="regexp">/var/</span>facts.d]/<span class="string">mode:</span> mode changed <span class="string">'0775'</span> to <span class="string">'0755'</span></span><br><span class="line"><span class="string">Info:</span> Retrieving plugin</span><br><span class="line"><span class="string">Info:</span> Caching catalog <span class="keyword">for</span> slave1.hp</span><br><span class="line"><span class="string">Info:</span> Applying configuration version <span class="string">'1446715692'</span></span><br><span class="line"><span class="string">Notice:</span> <span class="regexp">/Stage[main]/</span>Main<span class="regexp">/Node[default]/</span>File[<span class="regexp">/tmp/</span>helloworld.txt]/<span class="string">ensure:</span> defined content <span class="keyword">as</span> <span class="string">'&#123;md5&#125;e4d7f1b4ed2e42d15898f4b27b019da4'</span></span><br><span class="line"><span class="string">Info:</span> Creating state file <span class="regexp">/home/</span>urey<span class="regexp">/.puppet/</span>var<span class="regexp">/state/</span>state.yaml</span><br><span class="line"><span class="string">Notice:</span> Finished catalog run <span class="keyword">in</span> <span class="number">0.02</span> seconds</span><br><span class="line">[urey<span class="meta">@slave</span>1 ~]$ cat <span class="regexp">/tmp/</span>helloworld.txt</span><br><span class="line">[urey<span class="meta">@slave</span>1 ~]$ hello,world</span><br></pre></td></tr></table></figure>
-<p>puppet需要学习的还有很多，未完待续。</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/tool/">tool</a>
-</div>
-
-
-  <div class="article-tags">
+<section class="post" itemscope itemprop="blogitem">
   
-  <span></span> <a href="/tags/puppet/">puppet</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/11/03/2015-11-03-ambarijian-jie/" title="Ambari简介" itemprop="url">Ambari简介</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2015-11-03T11:03:57.000Z" itemprop="datePublished"> 发表于 2015-11-03</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <blockquote>
-<p>“计算机没什么用。他们只会告诉你答案。” —— 巴勃罗·毕加索，画家</p>
-</blockquote>
-<h4 id="一、Apache-Ambari"><a href="#一、Apache-Ambari" class="headerlink" title="一、Apache Ambari"></a><strong>一、Apache Ambari</strong></h4><p>Apache Ambari项目通过提供配置部署、管理、监控功能，目的在使Hadoop的管理更简单。它提供了一个直观的,易于使用的web UI和其背后的一套RESTful api。</p>
-<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Ambari enables System Administrators <span class="built_in">to</span>:</span><br><span class="line"></span><br><span class="line">Provision <span class="keyword">a</span> Hadoop Cluster</span><br><span class="line">Ambari provides <span class="keyword">a</span> step-<span class="keyword">by</span>-step wizard <span class="keyword">for</span> installing Hadoop services across <span class="keyword">any</span> <span class="built_in">number</span> <span class="keyword">of</span> hosts.</span><br><span class="line">Ambari handles configuration <span class="keyword">of</span> Hadoop services <span class="keyword">for</span> <span class="keyword">the</span> cluster.</span><br><span class="line">Manage <span class="keyword">a</span> Hadoop Cluster</span><br><span class="line">Ambari provides central management <span class="keyword">for</span> starting, stopping, <span class="keyword">and</span> reconfiguring Hadoop services across <span class="keyword">the</span> entire cluster.</span><br><span class="line">Monitor <span class="keyword">a</span> Hadoop Cluster</span><br><span class="line">Ambari provides <span class="keyword">a</span> dashboard <span class="keyword">for</span> monitoring health <span class="keyword">and</span> status <span class="keyword">of</span> <span class="keyword">the</span> Hadoop cluster.</span><br><span class="line">Ambari leverages Ambari Metrics System <span class="keyword">for</span> metrics collection.</span><br><span class="line">Ambari leverages Ambari Alert Framework <span class="keyword">for</span> <span class="keyword">system</span> alerting <span class="keyword">and</span> will notify you when your attention is needed (e.g., <span class="keyword">a</span> node goes down, remaining disk <span class="literal">space</span> is low, etc).</span><br><span class="line">Ambari enables Application Developers <span class="keyword">and</span> System Integrators <span class="built_in">to</span>:</span><br><span class="line"></span><br><span class="line">Easily integrate Hadoop provisioning, management, <span class="keyword">and</span> monitoring capabilities <span class="built_in">to</span> their own applications <span class="keyword">with</span> <span class="keyword">the</span> Ambari REST APIs.</span><br></pre></td></tr></table></figure>
-<h4 id="二、Ambari设计目标"><a href="#二、Ambari设计目标" class="headerlink" title="二、Ambari设计目标"></a><strong>二、Ambari设计目标</strong></h4><ol>
-<li>Platform Independence：系统需要有平台无关，支持大多数的操作系统。</li>
-<li>Pluggable Components：可增添的组件</li>
-<li>Version Management &amp; Upgrade：支持组件的多版本管理和升级</li>
-<li>Extensibility：可扩展性</li>
-<li>Failure Recovery：错误恢复</li>
-<li>Security：安全性</li>
-<li>Error Trace：错误追踪，给用户足够的细节处理错误</li>
-<li>Near Real-Time and Intermediate Feedback for Operations：对于长时间的操作，给用户展示中间过程，提供更好的体验</li>
-</ol>
-<p>详细介绍可以参看官网的：Ambari-Architecture.pdf</p>
-<h4 id="三、Ambari术语理解"><a href="#三、Ambari术语理解" class="headerlink" title="三、Ambari术语理解"></a><strong>三、Ambari术语理解</strong></h4><ol>
-<li>Hadoop Stack：Ambari被认为是用来快速部署、管理、监控Hadoop生态系统各个组件的工具，或者将来可以定义为一个管理大数据平台（不仅仅限于Hadoop生态系统），所以有若干个支持的组件，形象化的成为Hadoop Stack（Hadoop栈 或 Hadoop组件栈）。</li>
-<li>Service：Hadoo Stack中提供的一个栈（服务），比如：Hive、Spark等等，一个Service可以包含若干个Component，比如：HDFS Service包含NameNode、Secondary NameNode（SNameNode）、DataNode。当然，Service也可能只是一个client library，比如：Pig不包含任何的daemon services，只包含一个client library。</li>
-<li>Component：上面已经介绍。这里要说明的是一个Component可能跨多个节点，比如：DataNode。</li>
-<li>Node\Host：集群中的一个机器。</li>
-<li>Node-Component：特定机器上的特定组件，比如：一台机器上的DataNode。</li>
-<li>Operation：一个操作。一个操作可能包含若干个Action（动作）。</li>
-<li>Task：发送给Node执行的任务，一个Action可能包含若干个Task。</li>
-<li>Stage：一系列Task的集合。</li>
-<li>Action：一个动作包含一个Task或多个Task。每个动作都有一个action id。若不特别说明，Stage和Action一一对应。比如：HDFS rebalancing，HBase smoke test等等。</li>
-<li>Stage Plan：一个Operation包含很多个Task，需要在不同的节点上执行，这就需要一个调用顺序。可以并行执行的tasks是一个Stage Plan，即每一个Stage Plan时流水线工作。</li>
-<li>Manifest：用来定义一个Task，它会被发送到节点上去执行，因此一个manifest必须是可序列化的。Manifest当然必须可以被永久存储在磁盘上用来recovery或者record。</li>
-<li>Role：可以对应一个组件，比如：NameNode或者DataNode等等，也可以对应一个Action，比如：HDFS rebalancing或者HBase smoke test等等。</li>
-</ol>
-<h4 id="四、Ambari架构"><a href="#四、Ambari架构" class="headerlink" title="四、Ambari架构"></a><strong>四、Ambari架构</strong></h4><p>Ambari由Ambari server和若干个Ambari agent组成。类似于master-slave架构。server通过给agent发送命令控制agent的配置、安装和管理。agent定期汇报heartbeat。server还暴露出api供外接访问，server将系统的数据存在默认的postgres db中。</p>
-<p><strong>Ambari整体架构图：</strong></p>
-<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/ambari.png" width="600" height="400" alt="Ambari-arch" align="center"></p>
-<p><strong>Ambari Server的架构：</strong><br><img src="http://7xlhna.com1.z0.glb.clouddn.com/ambari-server.png" width="600" height="400" alt="ambari-server" align="center"></p>
-<p><strong>Ambari Agent的架构：</strong></p>
-<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/ambari-agent.png" width="600" height="400" alt="ambari-agent" align="center"></p>
-<h4 id="五、Some-Use-cases"><a href="#五、Some-Use-cases" class="headerlink" title="五、Some Use cases"></a><strong>五、Some Use cases</strong></h4><p>通过几个实例来了解server和agent如何交互以及server内部各组件工作的流程：</p>
-<p><strong>I 以给现有cluster增加一个HBase service为例</strong><br>HBase的master和slaves将会部署在现有cluster的若干nodes上</p>
-<ol>
-<li><p>API请求调用到达Coordinator的API handler。</p>
-</li>
-<li><p>API handler构建steps用来开始一个service，steps包含：检查prerequisites，顺序安装服务的各个Components，重新配置Nagios server增加对新服务的监视，这里是对HBase server的监视。</p>
-</li>
-<li><p>Coordinator与Dependency Tracker通信确定prerequisites：HBase需要HDFS和ZooKeeper Component，需要Nagios Server提供的对HBase的监视client，和这些required component的required state。至此，Coordinator获得了它想要知道的全部信息，最后它将这些component的desired state写进DB。</p>
-</li>
-<li><p>在上一步，Coordinator还可能获得API提供的其它信息。这种情况这里不再讨论。</p>
-</li>
-<li>Coordinator将components list以及它们的desired state发送给Stage Planner。Stage Planner返回每个node应该执行的操作序列。Stage Planner还会通过Manifest Generator生成manifest。</li>
-<li>Coordinator将<code>this ordered list of stages</code>发送给Action Manager，使用的是同一个request id。</li>
-<li>Action Manager更新FSM中的每个node的state。</li>
-<li>Action Manger对每个操作构建一个action id，并写入Plan，将这些操作集合放入队列，等待发送给相应的agent。</li>
-<li>Heartbeat Handler收集agent报上来的信息，将action的response发送给Action Manager，Action Manger更新FSM。当所有nodes执行完毕对应的action后，这个action才宣告执行完毕；当一个Stage的所有actions都执行完毕后，这个Stage才宣告执行完毕。</li>
-</ol>
-<p><strong>II</strong></p>
-<ul>
-<li><p>a1</p>
-<ul>
-<li><p>1</p>
-</li>
-<li><p>2</p>
-</li>
-</ul>
-</li>
-<li><p>b2</p>
-</li>
-</ul>
-<p>参考资料：</p>
-<ol>
-<li><a href="http://ambari.apache.org/" target="_blank" rel="external">http://ambari.apache.org/</a></li>
-</ol>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/ambari/">ambari</a>
-</div>
-
-
-  <div class="article-tags">
+    <a href="/2016/02/27/2016-02-27-shi-shi-ri-zhi-shou-ji-cha-xun-fen-xi-xi-tong-flume-plus-elasticsearch-plus-kibana/" title="实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)" itemprop="url">
   
-  <span></span> <a href="/tags/ambari/">ambari</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
+    <h1 itemprop="name">实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)</h1>
     
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
+     
+           <p itemprop="description" >“世界上有10种人，一种懂二进制，一种不懂二进制” ——匿名
+
+实时日志收集，查询，分析系统设计方案：Flume（日志收集） +　ElasticSearch（日志查询）+ Kibana（日志分析与展示）
+实验使用场景：通过ambari部署集群后，可以添加自己的日志系统，记录每个组</p>
+        
     
-      <a href="/2015/10/26/2015-10-26-bug-no-such-file-or-directory-jekyll/" title="BUG:No Such File or Directory - Jekyll" itemprop="url">BUG:No Such File or Directory - Jekyll</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2015-10-26T13:34:17.000Z" itemprop="datePublished"> 发表于 2015-10-26</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <blockquote>
-<p>“版本管理是一个艰巨的任务” —— 无名</p>
-</blockquote>
-<h4 id="当Octopress遇上OSX-EI-Captain"><a href="#当Octopress遇上OSX-EI-Captain" class="headerlink" title="当Octopress遇上OSX EI Captain"></a><strong>当Octopress遇上OSX EI Captain</strong></h4><p>前一阶段升级了最新的OSX系统，谁知写完日志好端端的<code>rake generate</code>失效了，下意识的<code>rake preview</code>，报错：</p>
-<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Errno::ENOENT: <span class="keyword">No</span> Such <span class="keyword">File</span> <span class="keyword">or</span> Directory - Jekyll</span><br></pre></td></tr></table></figure>
-<p>这下慌乱了，本来对<code>ruby</code>就不熟，这怎么调错，还好前人早已总结：</p>
-<p><a href="http://schalkneethling.github.io/blog/2015/10/16/errno-enoent-no-such-file-or-directory-jekyll-octopress-el-capitan/" target="_blank" rel="external">Errno::ENOENT: No Such File or Directory - Jekyll ~ Octopress and El Capitan</a></p>
-<p>我小结一下：是新系统下，需要新的依赖库，而这些库需要ruby2.2.3的版本安装，而系统默认是2.2.0。</p>
-<p>我在安装完ruby2.2.3后，<code>ruby -v</code>后仍是2.2.0，也没有折腾，直接改了<code>~/.bash_profile</code>里面的<code>PATH</code>路径，加上了新安装好的ruby所在的<code>bin</code>目录，之后升级完+安装完相应的包后就可以<code>rake generate &amp;&amp; deploy</code>了。</p>
-<p>在CSDN上写文章很方便，移到这里好多细节需要自己处理，图片啊，表格啊，markdown语言啊，着实不容易，但是能增加一点点成就感呢。😄</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/life/">life</a>
-</div>
+    <time datetime="2016-02-27T09:22:17.000Z" itemprop="datePublished">2016-02-27</time>
+  </a>
+</section>
 
 
-  <div class="article-tags">
+
+
+
+
   
-  <span></span> <a href="/tags/tips/">tips</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/10/09/2015-10-09-pgxlde-jdbcfang-wen/" title="PGXL的JDBC访问" itemprop="url">PGXL的JDBC访问</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2015-10-09T13:34:17.000Z" itemprop="datePublished"> 发表于 2015-10-09</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <blockquote>
-<p>“任何傻瓜都能写出计算机可以理解的代码。好的程序员能写出人能读懂的代码” —— Martin Fowler</p>
-</blockquote>
-<h4 id="PGXL集群的配置"><a href="#PGXL集群的配置" class="headerlink" title="PGXL集群的配置"></a><strong>PGXL集群的配置</strong></h4><p>见前面的博文<a href="http://blog.csdn.net/yeruby/article/details/48996027" target="_blank" rel="external">《Postgres-XL集群的搭建》</a>。</p>
-<h4 id="JDBC连接PGXL集群"><a href="#JDBC连接PGXL集群" class="headerlink" title="JDBC连接PGXL集群"></a><strong>JDBC连接PGXL集群</strong></h4><p>PGXL底层为PostgreSQL，这意味着它支持所有支持PostgresSQL类型的驱动，包括： JDBC, ODBC, OLE DB, Python, Ruby, perl DBI, Tcl, and Erlang.</p>
-<p>这里在cnode5上连接cnode5的Coordinator进行操作：</p>
-<p>建立Java Project，导入相应的PostgreSQL的jdbc驱动；</p>
-<p>编写代码，注意以下变量含义：</p>
-<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">String</span> url = <span class="string">"jdbc:postgresql://172.16.15.135:20004/test"</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">String</span> usr = <span class="string">"postgres"</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">String</span> psd = <span class="string">"333333"</span>;</span><br></pre></td></tr></table></figure>
-<p>Coordinator的port为20004，数据库test，user为postgres；</p>
-<p>完整code：</p>
-<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">package indi.qw.pgxljdbc.demo<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">import java.sql.Connection<span class="comment">;</span></span><br><span class="line">import java.sql.DriverManager<span class="comment">;</span></span><br><span class="line">import java.sql.ResultSet<span class="comment">;</span></span><br><span class="line">import java.sql.Statement<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">public class PGXLJDBCDemo &#123;</span><br><span class="line">	static String url = <span class="string">"jdbc:postgresql://172.16.15.135:20004/test"</span><span class="comment">;</span></span><br><span class="line">    static String usr = <span class="string">"postgres"</span><span class="comment">;</span></span><br><span class="line">    static String psd = <span class="string">"333333"</span><span class="comment">;</span></span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		Connection conn = null<span class="comment">;</span></span><br><span class="line">        try &#123;</span><br><span class="line">            Class.forName(<span class="string">"org.postgresql.Driver"</span>)<span class="comment">;</span></span><br><span class="line">            conn = DriverManager.getConnection(url, usr, psd)<span class="comment">;</span></span><br><span class="line">            Statement st = conn.createStatement()<span class="comment">;</span></span><br><span class="line">            ResultSet rs = st.executeQuery(<span class="string">"SELECT * FROM TEST"</span>)<span class="comment">;</span></span><br><span class="line">            <span class="keyword">while</span> (rs.<span class="keyword">next</span>()) &#123;</span><br><span class="line">               <span class="keyword">System</span>.out.<span class="keyword">print</span>(rs.getString(<span class="number">1</span>))<span class="comment">;</span></span><br><span class="line">               <span class="keyword">System</span>.out.<span class="keyword">print</span>(<span class="string">"\n"</span>)<span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">            rs.close()<span class="comment">;</span></span><br><span class="line">            st.close()<span class="comment">;</span></span><br><span class="line">            conn.close()<span class="comment">;</span></span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            e.printStackTrace()<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/pg/">pg</a>
-</div>
-
-
-  <div class="article-tags">
+<section class="post" itemscope itemprop="blogitem">
   
-  <span></span> <a href="/tags/pgxl/">pgxl</a><a href="/tags/postgres-xl/">postgres-xl</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/10/09/2015-10-09-postgresqlde-jdbcfang-wen/" title="PostgreSQL的JDBC访问" itemprop="url">PostgreSQL的JDBC访问</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2015-10-09T12:45:33.000Z" itemprop="datePublished"> 发表于 2015-10-09</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <blockquote>
-<p>“过去的代码都是未经测试的代码” —— 无名</p>
-</blockquote>
-<h4 id="JDBC的版本选择"><a href="#JDBC的版本选择" class="headerlink" title="JDBC的版本选择"></a><strong>JDBC的版本选择</strong></h4><p>官网有给出具体的jdk与postgresql driver的版本对应关系：<a href="https://jdbc.postgresql.org/download.html" target="_blank" rel="external">https://jdbc.postgresql.org/download.html</a></p>
-<p>这里使用jdk1.7，对应：JDBC41 Postgresql Driver, Version 9.4-1203</p>
-<h4 id="连接数据库"><a href="#连接数据库" class="headerlink" title="连接数据库"></a><strong>连接数据库</strong></h4><p>导入jar包</p>
-<p>在shell终端进入psql：</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">psql</span> -U urey</span><br></pre></td></tr></table></figure>
-<p>新建数据库testdb并切换到该数据库下：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">DATABASE</span> testdb;</span><br><span class="line">\c testdb</span><br></pre></td></tr></table></figure></p>
-<p>新建表test并插入一条数据：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">test</span>(<span class="keyword">id</span> <span class="built_in">int</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">test</span> <span class="keyword">VALUES</span>(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
-<p>查看刚插入的数据：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">test</span>;</span><br></pre></td></tr></table></figure>
-<p>编辑java代码连接：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">package</span> indi.qw.pgjdbc.demo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.sql.Connection;</span><br><span class="line"><span class="keyword">import</span> java.sql.DriverManager;</span><br><span class="line"><span class="keyword">import</span> java.sql.ResultSet;</span><br><span class="line"><span class="keyword">import</span> java.sql.Statement;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PGJDBCDemo</span> </span>&#123;</span><br><span class="line">	<span class="keyword">static</span> String url = <span class="string">"jdbc:postgresql://127.0.0.1:5432/testdb"</span>;</span><br><span class="line">    <span class="keyword">static</span> String usr = <span class="string">"urey"</span>;</span><br><span class="line">    <span class="keyword">static</span> String psd = <span class="string">"urey"</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span> </span>&#123;</span><br><span class="line">        Connection conn = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Class.forName(<span class="string">"org.postgresql.Driver"</span>);</span><br><span class="line">            conn = DriverManager.getConnection(url, usr, psd);</span><br><span class="line">            Statement st = conn.createStatement();</span><br><span class="line">            ResultSet rs = st.executeQuery(<span class="string">"SELECT * FROM TEST"</span>);</span><br><span class="line">            <span class="keyword">while</span> (rs.next()) &#123;</span><br><span class="line">               System.out.print(rs.getString(<span class="number">1</span>));</span><br><span class="line">            &#125;</span><br><span class="line">            rs.close();</span><br><span class="line">            st.close();</span><br><span class="line">            conn.close();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>OK,测试成功。</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/pg/">pg</a>
-</div>
-
-
-  <div class="article-tags">
+    <a href="/2015/11/05/2015-11-05-puppetan-zhuang-yu-ji-ben-shi-yong/" title="puppet安装与基本使用" itemprop="url">
   
-  <span></span> <a href="/tags/pg/">pg</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
+    <h1 itemprop="name">puppet安装与基本使用</h1>
     
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
+     
+           <p itemprop="description" >“Talk is cheap. Show me the code” —— Linux
+
+一、puppet基本介绍puppet是一个开源的软件自动化配置和部署工具。它是典型C／S架构，由puppet master和若干puppet client组成。
+二、安装过程1. 设置host</p>
+        
     
-      <a href="/2015/10/08/2015-10-08-postgres-xl-de-jie-shao/" title="Postgres-XL介绍" itemprop="url">Postgres-XL介绍</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2015-10-08T11:32:26.000Z" itemprop="datePublished"> 发表于 2015-10-08</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <blockquote>
-<p>“沉默即赞同” —— 无名</p>
-</blockquote>
-<h4 id="什么是Postgres-XL"><a href="#什么是Postgres-XL" class="headerlink" title="什么是Postgres-XL"></a><strong>什么是Postgres-XL</strong></h4><p>XL的意思是：eXtensible Lattice，可以扩展的格子，即将PostgreSQL应用在多机器上的分布式数据库的形象化表达。</p>
-<p>Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩展的、多租户安全的、基于PostgreSQL的数据库解决方案。</p>
-<p>Postgres-XL 可非常灵活的应付各种负载，比如：</p>
-<ul>
-<li>OLAP（通过MPP并行化）</li>
-<li>OLTP</li>
-<li>OLAP &amp; OLTP</li>
-<li>操作数据存储</li>
-<li>Key-value存储，包括JSON格式</li>
-</ul>
-<p>不同的应用场景：</p>
-<ul>
-<li>支持商业智能应用（数据仓库&amp;数据集市），因为PGXL支持MPP(Massively Parallel Processing)</li>
-<li>Web2.0，数据库扩容的解决方案</li>
-<li>遗留系统的数据库扩容的解决方案</li>
-<li>新应用，可以先使用PostgreSQL，之后随着数据库变大使用PGXL扩容</li>
-</ul>
-<p>PGXL底层为PostgreSQL，这意味着它支持所有支持PostgresSQL类型的驱动，包括： JDBC, ODBC, OLE DB, Python, Ruby, perl DBI, Tcl, and Erlang.</p>
-<h4 id="PostgreSQL与Postgres-XL"><a href="#PostgreSQL与Postgres-XL" class="headerlink" title="PostgreSQL与Postgres-XL"></a><strong>PostgreSQL与Postgres-XL</strong></h4><p>1994年，Postgre95发布，开源。<br>1996年，PostgreSQL继承了Postgre95，发布。<br>2010年，Postgres-XC发布。<br>2012年，前PGXC核心开发者创建StormDB公司，进行了一些改进，包括对MPP并行化的性能改进和多租户安全。<br>2013年，TransLattice收购了StormDB。<br>2014年，将项目开源，命名为Postgres-XL。</p>
-<h4 id="Postgres-XC与Postgres-XL"><a href="#Postgres-XC与Postgres-XL" class="headerlink" title="Postgres-XC与Postgres-XL"></a><strong>Postgres-XC与Postgres-XL</strong></h4><p>PGXL的架构师和开发者    很多都是以前做PGXC的，PGXL的部分代码是从PGXC移植过来的。</p>
-<p>比起功能性，PGXL更强调稳定性, 正确性和性能. </p>
-<p>PGXL增加了一些重要的性能提升，比如MPP和replan avoidance on the data nodes，这些都是PGXC没有的。</p>
-<p>PGXC目前集中在OLTP的业务上面，PGXL则更加灵活，可以应用于很多不同种类的业务上，比如可以用在大数据处理领域，除此，在多租户的环境中，PGXL也更加安全。</p>
-<p>PGXL的社区非常开放。</p>
-<h4 id="PGXL架构基本知识"><a href="#PGXL架构基本知识" class="headerlink" title="PGXL架构基本知识"></a><strong>PGXL架构基本知识</strong></h4><p>PGXL是一系列PostgreSQL数据库的集群，在上层看来就像使用一个数据库一样。根据设计方案的不同，每张表可以是replicated或是distributed的形式。</p>
-<p>PGXL有三个主要组件，分别是GTM，Coordinator和Datanode。</p>
-<ul>
-<li>GTM(Gloable Transaction Manager)负责提供事务的ACID属性；</li>
-<li>Datanode负责存储表的数据和本地执行由Coordinator派发的SQL任务；</li>
-<li>Coordinator负责处理每个来自Application的SQL任务，并且决定由哪个Datanode执行，然后将任务计划派发给相应的Datanode，根据需要收集结果返还给Application；</li>
-</ul>
-<p>GTM通常由一台独立的服务器承担，因为GTM需要处理来自所有Coordinator和Datanode的事务请求。为了将Coordinator和Datanode上进程的请求和响应聚集到一台机器上，可以配置GTM-Proxy。GTM-Proxy会减少GTM的负载，同时会帮助处理GTM失效的情况。即便如此，GTM还是可能会发生单点失效问题，这时可以配置一个GTM-Standby节点作为GTM的备用节点。</p>
-<p>每台机器最好同时配置一个Coordinator和一个Datanode，这样既不用担心二者的负载均衡，而且可以降低网络流量。</p>
-<h4 id="如何实现High-Availability"><a href="#如何实现High-Availability" class="headerlink" title="如何实现High Availability"></a><strong>如何实现High Availability</strong></h4><p>可以对每个节点增加slave，就类似PostgreSQL的streaming replication一样。</p>
-<p>GTM可以有一个GTM Standby。</p>
-<p>针对自动的failover，目前可以使用Corosync/Pacemaker，虽然它们现在还不是核心项目。</p>
-<h4 id="PGXL的license"><a href="#PGXL的license" class="headerlink" title="PGXL的license"></a><strong>PGXL的license</strong></h4><p>PGXL和PostgreSQL使用相同的LICENSE，截止到2015年，使用的还是Mozilla Public License.</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/pgxl/">pgxl</a>
-</div>
+    <time datetime="2015-11-05T08:01:14.000Z" itemprop="datePublished">2015-11-05</time>
+  </a>
+</section>
 
 
-  <div class="article-tags">
+
+
+
+
   
-  <span></span> <a href="/tags/pgxl/">pgxl</a><a href="/tags/postgres-xl/">postgres-xl</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/10/08/2015-10-08-postgres-xlji-qun-de-da-jian/" title="Postgres-XL集群的搭建" itemprop="url">Postgres-XL集群的搭建</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2015-10-08T11:32:26.000Z" itemprop="datePublished"> 发表于 2015-10-08</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <blockquote>
-<p>“如果你惟一的工具是一把锤子，你往往会把一切问题看成钉子” —— 无名</p>
-</blockquote>
-<h4 id="集群规划"><a href="#集群规划" class="headerlink" title="集群规划"></a><strong>集群规划</strong></h4><p>建立5个虚拟机构成的集群，虚拟机的os均为centos6.5，依次命名为cnode1，cnode2，cnode3，cnode4，cnode5，其中cnode1为gtm，其余4个节点均为coordinator和datanode。</p>
-<table>
-<thead>
-<tr>
-<th>hostname</th>
-<th>ip</th>
-<th>function</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>cnode1</td>
-<td>172.16.15.131</td>
-<td>gtm</td>
-</tr>
-<tr>
-<td>cnode2</td>
-<td>172.16.15.132</td>
-<td>coordinator &amp; datanode</td>
-</tr>
-<tr>
-<td>cnode3</td>
-<td>172.16.15.133</td>
-<td>coordinator &amp; datanode</td>
-</tr>
-<tr>
-<td>cnode4</td>
-<td>172.16.15.134</td>
-<td>coordinator &amp; datanode</td>
-</tr>
-<tr>
-<td>cnode5</td>
-<td>172.16.15.135</td>
-<td>coordinator &amp; datanode</td>
-</tr>
-</tbody>
-</table>
-<h4 id="建立用户"><a href="#建立用户" class="headerlink" title="建立用户"></a><strong>建立用户</strong></h4><p>每个节点(<code>cnode1~cnode5</code>)都建立用户<code>postgres</code>，并且建立<code>.ssh</code>目录，并配置相应的权限：</p>
-<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">useradd postgres</span><br><span class="line">passwd postgres</span><br><span class="line"><span class="keyword">su</span> - postgres</span><br><span class="line"><span class="keyword">mkdir</span> ~/.ssh</span><br><span class="line">chmod 700 ~/.ssh</span><br></pre></td></tr></table></figure>
-<h4 id="ssh免密码登录"><a href="#ssh免密码登录" class="headerlink" title="ssh免密码登录"></a><strong>ssh免密码登录</strong></h4><p>在cnode1节点配置：</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">su - postgres</span><br><span class="line">ssh-keygen -t rsa</span><br><span class="line">cat ~<span class="regexp">/.ssh/id</span>_rsa.pub <span class="meta">&gt;&gt; </span>~<span class="regexp">/.ssh/authorized</span>_keys</span><br><span class="line">chmod <span class="number">600</span> ~<span class="regexp">/.ssh/authorized</span>_keys</span><br></pre></td></tr></table></figure>
-<p>将刚生成的认证文件拷贝到cnode2到cnode5中，使得cnode1可以免密码登录cnode2~cnode5的任意一个节点：</p>
-<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp ~<span class="regexp">/.ssh/authorized</span>_keys postgres<span class="variable">@cnode2</span><span class="symbol">:~/</span>.ssh/</span><br></pre></td></tr></table></figure>
-<h4 id="安装postgres-xl"><a href="#安装postgres-xl" class="headerlink" title="安装postgres-xl"></a><strong>安装postgres-xl</strong></h4><p>每个节点安装编译pgxl所需的依赖包：</p>
-<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y flex bison <span class="built_in">readline</span>-devel zlib-devel openjade docbook-<span class="built_in">style</span>-dsssl</span><br></pre></td></tr></table></figure>
-<p>每个节点安装postgres-xl和pgxc_ctl，我这里使用的版本是：<code>postgres-xl-v9.2-src.tar.gz</code>：</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf postgres-xl-v9.<span class="number">2</span>-src.tar.gz</span><br><span class="line"><span class="keyword">cd</span> postgres-xl</span><br><span class="line">./configure --prefix=/home/postgres/pgxl/</span><br><span class="line"><span class="keyword">make</span></span><br><span class="line"><span class="keyword">make</span> install</span><br><span class="line"><span class="keyword">cd</span> contrib/</span><br><span class="line"><span class="keyword">make</span></span><br><span class="line"><span class="keyword">make</span> install</span><br></pre></td></tr></table></figure>
-<p>每个节点编辑环境变量：</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">vim</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
-<p>添加如下内容：</p>
-<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">export PGHOME=/home/postgres/pgxl</span><br><span class="line">export PGUSER=postgres</span><br><span class="line">export LD_LIBRARY_PATH=$PGHOME/lib:$LD_LIBRARY_PATH</span><br><span class="line">export PATH=$PGHOME/bin:$PATH</span><br></pre></td></tr></table></figure>
-<p>使之生效：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
-<h4 id="配置集群"><a href="#配置集群" class="headerlink" title="配置集群"></a><strong>配置集群</strong></h4><p>关闭防火墙或者放开相应的端口，这里我直接关闭了每个虚拟机的防火墙，并且重启它们：</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">chkconfig</span> iptables <span class="literal">off</span>   --重启后生效</span><br></pre></td></tr></table></figure>
-<p>选择cnode1(gtm)，进入/home/pgxc/postgres-xl/contrib/pgxc_ctl目录中，执行pgxc_ctl命令来生成配置集群的模板文件：</p>
-<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./pgxc_ctl				<span class="comment">---会提示Error说没有配置文件，忽略即可</span></span><br><span class="line">PGXC <span class="built_in">prepare</span>			<span class="comment">---执行该命令将会生成一份配置文件模板</span></span><br><span class="line">PGXC ^C</span><br></pre></td></tr></table></figure>
-<p>根据自己的集群配置该文件：</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">vim</span> ~/pgxc_ctl/pgxc_ctl.<span class="keyword">conf</span></span><br></pre></td></tr></table></figure>
-<p>我这里简单的进行了如下的配置：</p>
-<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#user and path</span></span><br><span class="line"><span class="attr">pgxcInstallDir=$HOME/pgxl</span></span><br><span class="line"><span class="attr">pgxcOwner=postgres</span></span><br><span class="line"><span class="attr">pgxcUser=$pgxcOwner</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#gtm</span></span><br><span class="line"><span class="attr">gtmName=gtm</span></span><br><span class="line"><span class="attr">gtmMasterServer=cnode1</span></span><br><span class="line"><span class="attr">gtmMasterPort=20001</span></span><br><span class="line"><span class="attr">gtmMasterDir=$HOME/pgxl/nodes/gtm</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#---- Configuration ---</span></span><br><span class="line"><span class="attr">gtmExtraConfig=none</span>                     <span class="comment"># Will be added gtm.conf for both Master and Slave (done at initilization only)</span></span><br><span class="line"><span class="attr">gtmMasterSpecificExtraConfig=none</span>       <span class="comment"># Will be added to Master's gtm.conf (done at initialization only)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="attr">gtmSlave=n</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#gtm proxy</span></span><br><span class="line"><span class="attr">gtmProxy=n</span></span><br><span class="line"><span class="comment">#gtmProxyDir=$HOME/pgxl/nodes/gtm_pxy</span></span><br><span class="line"><span class="comment">#gtmProxyNames=(gtm_pxy1 gtm_pxy2 gtm_pxy3 gtm_pxy4)</span></span><br><span class="line"><span class="comment">#gtmProxyServers=(cnode2 cnode3 cnode4 cnode5)</span></span><br><span class="line"><span class="comment">#gtmProxyPorts=(20001 20001 20001 20001)</span></span><br><span class="line"><span class="comment">#gtmProxyDirs=($gtmProxyDir $gtmProxyDir $gtmProxyDir $gtmProxyDir)</span></span><br><span class="line"><span class="comment">#gtmPxyExtraConfig=none</span></span><br><span class="line"><span class="comment">#gtmPxySpecificExtraConfig=(none none none none)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#coordinator</span></span><br><span class="line"><span class="attr">coordMasterDir=$HOME/pgxl/nodes/coord</span></span><br><span class="line"><span class="attr">coordNames=(coord1</span> coord2 coord3 coord4)</span><br><span class="line"><span class="attr">coordPorts=(20004</span> <span class="number">20004</span> <span class="number">20004</span> <span class="number">20004</span>)</span><br><span class="line"><span class="attr">poolerPorts=(20010</span> <span class="number">20010</span> <span class="number">20010</span> <span class="number">20010</span>)</span><br><span class="line"><span class="attr">coordPgHbaEntries=(0.0.0.0/0)</span></span><br><span class="line"><span class="attr">coordMasterServers=(cnode2</span> cnode3 cnode4 cnode5)</span><br><span class="line"><span class="attr">coordMasterDirs=($coordMasterDir</span> $coordMasterDir $coordMasterDir $coordMasterDir)</span><br><span class="line"><span class="attr">coordMaxWALsernder=0</span></span><br><span class="line"><span class="attr">coordMaxWALSenders=($coordMaxWALsernder</span> $coordMaxWALsernder $coordMaxWALsernder $coordMaxWALsernder)</span><br><span class="line"><span class="attr">coordSlave=n</span></span><br><span class="line"><span class="attr">coordSpecificExtraConfig=(none</span> none none none)</span><br><span class="line"><span class="attr">coordSpecificExtraPgHba=(none</span> none none none)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#datanode</span></span><br><span class="line"><span class="attr">datanodeNames=(datanode1</span> datanode2 datanode3 datanode4)</span><br><span class="line"><span class="attr">datanodePorts=(20008</span> <span class="number">20008</span> <span class="number">20008</span> <span class="number">20008</span>)</span><br><span class="line"><span class="attr">datanodePoolerPorts=(20012</span> <span class="number">20012</span> <span class="number">20012</span> <span class="number">20012</span>)</span><br><span class="line"><span class="attr">datanodePgHbaEntries=(0.0.0.0/0)</span></span><br><span class="line"><span class="attr">datanodeMasterServers=(cnode2</span> cnode3 cnode4 cnode5)</span><br><span class="line"><span class="attr">datanodeMasterDir=$HOME/pgxl/nodes/dn_master</span></span><br><span class="line"><span class="attr">datanodeMasterDirs=($datanodeMasterDir</span> $datanodeMasterDir $datanodeMasterDir $datanodeMasterDir)</span><br><span class="line"><span class="attr">datanodeMaxWalSender=0</span></span><br><span class="line"><span class="attr">datanodeMaxWALSenders=($datanodeMaxWalSender</span> $datanodeMaxWalSender $datanodeMaxWalSender $datanodeMaxWalSender)</span><br><span class="line"><span class="attr">datanodeSlave=n</span></span><br><span class="line"><span class="attr">primaryDatanode=datanode1</span></span><br></pre></td></tr></table></figure>
-<p>以上各配置项的具体含义可以参考：<a href="http://files.postgres-xl.org/documentation/pgxc_ctl.html" target="_blank" rel="external">http://files.postgres-xl.org/documentation/pgxc_ctl.html</a></p>
-<h4 id="初始化-启动集群"><a href="#初始化-启动集群" class="headerlink" title="初始化+启动集群"></a><strong>初始化+启动集群</strong></h4><p>在cnode1（gtm）执行命令，这个命令会初始化（配置）各个节点，并且启动相应的进程：</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pgxc_ctl -c pgxc_ctl<span class="selector-class">.conf</span> init all    --初始化完成后会自动启动</span><br></pre></td></tr></table></figure>
-<p>可以在每个节点上查看对应的进程：</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ps</span> -ef | <span class="keyword">grep</span> gtm</span><br><span class="line"><span class="keyword">ps</span> -ef | <span class="keyword">grep</span> postgres</span><br></pre></td></tr></table></figure>
-<h4 id="测试集群"><a href="#测试集群" class="headerlink" title="测试集群"></a><strong>测试集群</strong></h4><p>可以在任意节点上输入以下命令，查看除gtm以外的所有节点的配置情况：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> pgxc_node;</span><br></pre></td></tr></table></figure>
-<p>简单的测试，在cnode2节点上创建一个数据库test，并创建一个表test，插入数据：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">psql -p 20004 -U postgres </span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">DATABASE</span> <span class="keyword">test</span>;</span><br><span class="line">\c test</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">test</span>(<span class="keyword">id</span> <span class="built_in">int</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">test</span> <span class="keyword">VALUES</span>(<span class="number">1</span>);</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">test</span>;</span><br><span class="line">\q</span><br></pre></td></tr></table></figure>
-<p>在cnode3节点上查看刚刚在cnode2节点的更改：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">psql -p 20004 -U postgres  </span><br><span class="line">\c test</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">test</span>;</span><br><span class="line">\q</span><br></pre></td></tr></table></figure>
-<p>发现有刚刚插入的数据，验证成功！</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/pgxl/">pgxl</a>
-</div>
-
-
-  <div class="article-tags">
+<section class="post" itemscope itemprop="blogitem">
   
-  <span></span> <a href="/tags/pgxl/">pgxl</a><a href="/tags/postgres-xl/">postgres-xl</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/09/30/2015-09-30-python-flask-rest-apide-shi-yong/" title="python Flask REST API的使用" itemprop="url">python Flask REST API的使用</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2015-09-30T07:43:21.000Z" itemprop="datePublished"> 发表于 2015-09-30</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <blockquote>
-<p>“简单不先于复杂，而是在复杂之后” —— Alan Perlis</p>
-</blockquote>
-<p>本文参考：Designing a RESTful API using Flask-RESTful<br>Posted by Miguel Grinberg under Python, Programming, REST, Flask.</p>
-<h4 id="使用Flask的扩展构建REST-API"><a href="#使用Flask的扩展构建REST-API" class="headerlink" title="使用Flask的扩展构建REST API"></a><strong>使用Flask的扩展构建REST API</strong></h4><p>Flask-RESTful扩展简化了构建REST API服务器的过程，在开始之前，我们先来看一下本文中会使用到的几个api：</p>
-<table>
-<thead>
-<tr>
-<th>HTTP Method</th>
-<th>URI</th>
-<th>Action</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>GET</td>
-<td><a href="http://[hostname]/todo/api/v1.0/tasks" target="_blank" rel="external">http://[hostname]/todo/api/v1.0/tasks</a></td>
-<td>Retrieve list of tasks</td>
-</tr>
-<tr>
-<td>GET</td>
-<td><a href="http://[hostname]/todo/api/v1.0/tasks/[task_id" target="_blank" rel="external">http://[hostname]/todo/api/v1.0/tasks/[task_id</a>]</td>
-<td>Retrieve a task</td>
-</tr>
-<tr>
-<td>POST</td>
-<td><a href="http://[hostname]/todo/api/v1.0/tasks" target="_blank" rel="external">http://[hostname]/todo/api/v1.0/tasks</a></td>
-<td>Create a new task</td>
-</tr>
-<tr>
-<td>PUT</td>
-<td><a href="http://[hostname]/todo/api/v1.0/tasks/[task_id" target="_blank" rel="external">http://[hostname]/todo/api/v1.0/tasks/[task_id</a>]</td>
-<td>Update an existing task</td>
-</tr>
-<tr>
-<td>DELETE</td>
-<td><a href="http://[hostname]/todo/api/v1.0/tasks/[task_id" target="_blank" rel="external">http://[hostname]/todo/api/v1.0/tasks/[task_id</a>]</td>
-<td>Delete a task</td>
-</tr>
-</tbody>
-</table>
-<p>本文的web service提供的服务使用的资源是task，它包含如下字段：</p>
-<ul>
-<li>uri: unique URI for the task. String type.</li>
-<li>title: short task description. String type.</li>
-<li>description: long task description. Text type.</li>
-<li>done: task completion state. Boolean type.</li>
-</ul>
-<h4 id="路由"><a href="#路由" class="headerlink" title="路由"></a><strong>路由</strong></h4><p>Flask-RESTful提供<code>Resource</code>基类用来定义一个给定的URL的不同的HTTP请求的响应方法，比如，在我们的例子中，可以继承<code>Resource</code>基类定义一个<code>TaskListAPI</code>类来实现<code>Tasks</code>资源的<code>GET</code>，<code>POST</code>等方法，另外可以继承<code>Resource</code>基类定义一个<code>TaskAPI</code>类来实现<code>Task</code>资源的<code>GET</code>，<code>PUT</code>，<code>DELETE</code>等方法：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</span><br><span class="line"><span class="keyword">from</span> flask.ext.restful <span class="keyword">import</span> Api, Resource</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskListAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self)</span>:</span></span><br><span class="line">		<span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self, id)</span>:</span></span><br><span class="line">		<span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">put</span><span class="params">(self, id)</span>:</span></span><br><span class="line">		<span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">delete</span><span class="params">(self, id)</span>:</span></span><br><span class="line">		<span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">api.add_resource(TaskListAPI, <span class="string">'/todo/api/v1.0/tasks'</span>, endpoint = <span class="string">'tasks'</span>)</span><br><span class="line">api.add_resource(TaskAPI, <span class="string">'/todo/api/v1.0/tasks/&lt;int:id&gt;'</span>, endpoint = <span class="string">'task'</span>)</span><br></pre></td></tr></table></figure>
-<p><code>api.add_resource</code>方法使用指定的<code>endpoint</code>注册路由到相应的<code>资源API类</code>上，对应HTTP请求的动作会指定使用相应<code>资源API类</code>下面的相应方法。</p>
-<h4 id="验证请求及约束"><a href="#验证请求及约束" class="headerlink" title="验证请求及约束"></a><strong>验证请求及约束</strong></h4><p>当请求的数据不符合要求时，需要拒绝。Flask-RESTful 提供了一个方式来处理数据验证，它叫做<code>RequestParser</code>类。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask.ext.restful <span class="keyword">import</span> reqparse</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskListAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.reqparse = reqparse.RequestParser()</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'title'</span>, type = str, required = <span class="keyword">True</span>,</span><br><span class="line">            help = <span class="string">'No task title provided'</span>, location = <span class="string">'json'</span>)</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'description'</span>, type = str, default = <span class="string">""</span>, location = <span class="string">'json'</span>)</span><br><span class="line">        super(TaskListAPI, self).__init__()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.reqparse = reqparse.RequestParser()</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'title'</span>, type = str, location = <span class="string">'json'</span>)</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'description'</span>, type = str, location = <span class="string">'json'</span>)</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'done'</span>, type = bool, location = <span class="string">'json'</span>)</span><br><span class="line">        super(TaskAPI, self).__init__()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># ...</span></span><br></pre></td></tr></table></figure>
-<p>先获得<code>reqparse.RequestParser</code>对象，对每一个参数进行约束验证。比如，对于创建一个<code>Task</code>来说，<code>title</code>字段是必须的，且必须是json格式的。</p>
-<h4 id="生成响应"><a href="#生成响应" class="headerlink" title="生成响应"></a><strong>生成响应</strong></h4><p>Flask-RESTFul会自动将return的内容作为响应response发出:</p>
-<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> &#123; <span class="string">'task'</span>: make_public_task(task) &#125;</span><br></pre></td></tr></table></figure>
-<p>另外，还可以加入自定义状态码：</p>
-<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> &#123; <span class="string">'task'</span>: make_public_task(task) &#125;, 201</span><br></pre></td></tr></table></figure>
-<h4 id="生成外部可定位格式"><a href="#生成外部可定位格式" class="headerlink" title="生成外部可定位格式"></a><strong>生成外部可定位格式</strong></h4><p>每一个请求的资源都有一个固定的URI，通常会将这个URI绑定在相应的资源中：</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"tasks"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"description"</span>: <span class="string">"Need to find a good Python tutorial on the web"</span>,</span><br><span class="line">            <span class="attr">"done"</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="attr">"title"</span>: <span class="string">"Learn Python"</span>,</span><br><span class="line">            <span class="attr">"uri"</span>: <span class="string">"/todo/api/v1.0/tasks/2"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"description"</span>: <span class="string">"Hello,world"</span>,</span><br><span class="line">            <span class="attr">"done"</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="attr">"title"</span>: <span class="string">"Hello,Urey"</span>,</span><br><span class="line">            <span class="attr">"uri"</span>: <span class="string">"/todo/api/v1.0/tasks/3"</span></span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>但是，我们创建资源的时候是使用的<code>id</code>标明，所以需要将内部的<code>id</code>转换成外部可定位的<code>URI</code>，Flask-RESTful提供了一个辅助函数能够很优雅地做到这样的转换，不仅仅能够把<code>id</code>转成<code>URI</code>并且能够转换其他的参数:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask.ext.restful <span class="keyword">import</span> fields, marshal</span><br><span class="line"></span><br><span class="line">task_fields = &#123;</span><br><span class="line">    <span class="string">'title'</span>: fields.String,</span><br><span class="line">    <span class="string">'description'</span>: fields.String,</span><br><span class="line">    <span class="string">'done'</span>: fields.Boolean,</span><br><span class="line">    <span class="string">'uri'</span>: fields.Url(<span class="string">'task'</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">put</span><span class="params">(self, id)</span>:</span></span><br><span class="line">        <span class="comment"># ...</span></span><br><span class="line">        <span class="keyword">return</span> &#123; <span class="string">'task'</span>: marshal(task, task_fields) &#125;</span><br><span class="line">        </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskListAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span><span class="params">(self, id)</span>:</span></span><br><span class="line">        <span class="comment"># ...</span></span><br><span class="line">        <span class="keyword">return</span> &#123;<span class="string">'task'</span>: marshal(task, task_fields)&#125;, <span class="number">201</span></span><br></pre></td></tr></table></figure>
-<p>其中，<code>task_fields</code>结构用于作为<code>marshal</code>函数的模板。fields.Uri 是一个用于生成一个<code>URL</code>的特定的参数。它需要的参数是<code>endpoint</code>。这样，当<code>PUT</code>更新一个资源或者<code>POST</code>上传一个资源时，会自动进行相应的转换（在本例中，将内部资源转换为外部资源）。</p>
-<h4 id="安全认证"><a href="#安全认证" class="headerlink" title="安全认证"></a><strong>安全认证</strong></h4><p>Flask-RESTful提供了一个扩展<code>Flask-HTTPAuth</code>进行认证。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask.ext.httpauth <span class="keyword">import</span> HTTPBasicAuth</span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line">auth = HTTPBasicAuth()</span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line">    decorators = [auth.login_required]</span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line">    decorators = [auth.login_required]</span><br><span class="line">    <span class="comment"># ...</span></span><br></pre></td></tr></table></figure>
-<p>使用<code>auth</code>获得一个<code>HTTPBasicAuth</code>类型的对象，之后，在需要认证的<code>资源API</code>中加入一个装饰器，这样，每一个方法都必须在认证的前提下进行访问。</p>
-<p>最简单的认证方式如下，提供相应的账户和密码。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@auth.get_password</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_password</span><span class="params">(username)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> username == <span class="string">'miguel'</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'python'</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">None</span></span><br></pre></td></tr></table></figure>
-<p>如果认证失败的处理方法：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@auth.error_handler</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">unauthorized</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># return 403 instead of 401 to prevent browsers from displaying the default</span></span><br><span class="line">    <span class="comment"># auth dialog</span></span><br><span class="line">    <span class="keyword">return</span> make_response(jsonify(&#123;<span class="string">'message'</span>: <span class="string">'Unauthorized access'</span>&#125;), <span class="number">401</span>)</span><br></pre></td></tr></table></figure>
-<p><strong>全部代码：</strong></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!flask/bin/python</span></span><br><span class="line"></span><br><span class="line"><span class="string">"""Alternative version of the ToDo RESTful server implemented using the</span><br><span class="line">Flask-RESTful extension."""</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, jsonify, abort, make_response</span><br><span class="line"><span class="keyword">from</span> flask.ext.restful <span class="keyword">import</span> Api, Resource, reqparse, fields, marshal</span><br><span class="line"><span class="keyword">from</span> flask.ext.httpauth <span class="keyword">import</span> HTTPBasicAuth</span><br><span class="line"></span><br><span class="line">app = Flask(__name__, static_url_path=<span class="string">""</span>)</span><br><span class="line">api = Api(app)</span><br><span class="line">auth = HTTPBasicAuth()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@auth.get_password</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_password</span><span class="params">(username)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> username == <span class="string">'miguel'</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'python'</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">None</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@auth.error_handler</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">unauthorized</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># return 403 instead of 401 to prevent browsers from displaying the default</span></span><br><span class="line">    <span class="comment"># auth dialog</span></span><br><span class="line">    <span class="keyword">return</span> make_response(jsonify(&#123;<span class="string">'message'</span>: <span class="string">'Unauthorized access'</span>&#125;), <span class="number">401</span>)</span><br><span class="line"></span><br><span class="line">tasks = [</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">'id'</span>: <span class="number">1</span>,</span><br><span class="line">        <span class="string">'title'</span>: <span class="string">u'Buy groceries'</span>,</span><br><span class="line">        <span class="string">'description'</span>: <span class="string">u'Milk, Cheese, Pizza, Fruit, Tylenol'</span>,</span><br><span class="line">        <span class="string">'done'</span>: <span class="keyword">False</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">'id'</span>: <span class="number">2</span>,</span><br><span class="line">        <span class="string">'title'</span>: <span class="string">u'Learn Python'</span>,</span><br><span class="line">        <span class="string">'description'</span>: <span class="string">u'Need to find a good Python tutorial on the web'</span>,</span><br><span class="line">        <span class="string">'done'</span>: <span class="keyword">False</span></span><br><span class="line">    &#125;</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">task_fields = &#123;</span><br><span class="line">    <span class="string">'title'</span>: fields.String,</span><br><span class="line">    <span class="string">'description'</span>: fields.String,</span><br><span class="line">    <span class="string">'done'</span>: fields.Boolean,</span><br><span class="line">    <span class="string">'uri'</span>: fields.Url(<span class="string">'task'</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskListAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line">    decorators = [auth.login_required]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.reqparse = reqparse.RequestParser()</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'title'</span>, type=str, required=<span class="keyword">True</span>,</span><br><span class="line">                                   help=<span class="string">'No task title provided'</span>,</span><br><span class="line">                                   location=<span class="string">'json'</span>)</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'description'</span>, type=str, default=<span class="string">""</span>,</span><br><span class="line">                                   location=<span class="string">'json'</span>)</span><br><span class="line">        super(TaskListAPI, self).__init__()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> &#123;<span class="string">'tasks'</span>: [marshal(task, task_fields) <span class="keyword">for</span> task <span class="keyword">in</span> tasks]&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span><span class="params">(self)</span>:</span></span><br><span class="line">        args = self.reqparse.parse_args()</span><br><span class="line">        task = &#123;</span><br><span class="line">            <span class="string">'id'</span>: tasks[<span class="number">-1</span>][<span class="string">'id'</span>] + <span class="number">1</span>,</span><br><span class="line">            <span class="string">'title'</span>: args[<span class="string">'title'</span>],</span><br><span class="line">            <span class="string">'description'</span>: args[<span class="string">'description'</span>],</span><br><span class="line">            <span class="string">'done'</span>: <span class="keyword">False</span></span><br><span class="line">        &#125;</span><br><span class="line">        tasks.append(task)</span><br><span class="line">        <span class="keyword">return</span> &#123;<span class="string">'task'</span>: marshal(task, task_fields)&#125;, <span class="number">201</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line">    decorators = [auth.login_required]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.reqparse = reqparse.RequestParser()</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'title'</span>, type=str, location=<span class="string">'json'</span>)</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'description'</span>, type=str, location=<span class="string">'json'</span>)</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'done'</span>, type=bool, location=<span class="string">'json'</span>)</span><br><span class="line">        super(TaskAPI, self).__init__()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self, id)</span>:</span></span><br><span class="line">        task = [task <span class="keyword">for</span> task <span class="keyword">in</span> tasks <span class="keyword">if</span> task[<span class="string">'id'</span>] == id]</span><br><span class="line">        <span class="keyword">if</span> len(task) == <span class="number">0</span>:</span><br><span class="line">            abort(<span class="number">404</span>)</span><br><span class="line">        <span class="keyword">return</span> &#123;<span class="string">'task'</span>: marshal(task[<span class="number">0</span>], task_fields)&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">put</span><span class="params">(self, id)</span>:</span></span><br><span class="line">        task = [task <span class="keyword">for</span> task <span class="keyword">in</span> tasks <span class="keyword">if</span> task[<span class="string">'id'</span>] == id]</span><br><span class="line">        <span class="keyword">if</span> len(task) == <span class="number">0</span>:</span><br><span class="line">            abort(<span class="number">404</span>)</span><br><span class="line">        task = task[<span class="number">0</span>]</span><br><span class="line">        args = self.reqparse.parse_args()</span><br><span class="line">        <span class="keyword">for</span> k, v <span class="keyword">in</span> args.items():</span><br><span class="line">            <span class="keyword">if</span> v <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">                task[k] = v</span><br><span class="line">        <span class="keyword">return</span> &#123;<span class="string">'task'</span>: marshal(task, task_fields)&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">delete</span><span class="params">(self, id)</span>:</span></span><br><span class="line">        task = [task <span class="keyword">for</span> task <span class="keyword">in</span> tasks <span class="keyword">if</span> task[<span class="string">'id'</span>] == id]</span><br><span class="line">        <span class="keyword">if</span> len(task) == <span class="number">0</span>:</span><br><span class="line">            abort(<span class="number">404</span>)</span><br><span class="line">        tasks.remove(task[<span class="number">0</span>])</span><br><span class="line">        <span class="keyword">return</span> &#123;<span class="string">'result'</span>: <span class="keyword">True</span>&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">api.add_resource(TaskListAPI, <span class="string">'/todo/api/v1.0/tasks'</span>, endpoint=<span class="string">'tasks'</span>)</span><br><span class="line">api.add_resource(TaskAPI, <span class="string">'/todo/api/v1.0/tasks/&lt;int:id&gt;'</span>, endpoint=<span class="string">'task'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run(debug=<span class="keyword">True</span>)</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/python/">python</a>
-</div>
-
-
-  <div class="article-tags">
+    <a href="/2015/11/03/2015-11-03-ambarijian-jie/" title="Ambari简介" itemprop="url">
   
-  <span></span> <a href="/tags/REST-API/">REST API</a><a href="/tags/python/">python</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
+    <h1 itemprop="name">Ambari简介</h1>
     
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
+     
+           <p itemprop="description" >“计算机没什么用。他们只会告诉你答案。” —— 巴勃罗·毕加索，画家
+
+一、Apache AmbariApache Ambari项目通过提供配置部署、管理、监控功能，目的在使Hadoop的管理更简单。它提供了一个直观的,易于使用的web UI和其背后的一套RESTful api。</p>
+        
     
-      <a href="/2015/09/07/2015-09-07-osx-plist-ding-shi-ren-wu/" title="osx plist 定时任务" itemprop="url">osx plist 定时任务</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2015-09-07T01:56:18.000Z" itemprop="datePublished"> 发表于 2015-09-07</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>osx下定时任务是通过写plist脚本实现的，plist要比linux/osx下使用crontab更为简单、方便、细粒度。</p>
-<p>可以通过两种方式来设置脚本的执行时间。一个是使用StartInterval，它指定脚本每间隔多长时间（单位：秒）执行一次；另外一个使用StartCalendarInterval，它可以指定脚本在多少分钟、小时、天、星期几、月时间上执行，类似如crontab的中的设置。</p>
-<p>比如：</p>
-<p>写一个名为“com.urey.test.plist”的脚本保存在目录“/Users/urey/data/”下面。</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="php"><span class="meta">&lt;?</span>xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span><span class="meta">?&gt;</span></span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">plist</span> <span class="attr">version</span>=<span class="string">"1.0"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">key</span>&gt;</span>Label<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">string</span>&gt;</span>com.urey.test.plist<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">key</span>&gt;</span>ProgramArguments<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">array</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">string</span>&gt;</span>/Users/urey/data/test.sh<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">array</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">key</span>&gt;</span>KeepAlive<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">false</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">key</span>&gt;</span>RunAtLoad<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">true</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">key</span>&gt;</span>StartInterval<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">integer</span>&gt;</span>5<span class="tag">&lt;/<span class="name">integer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plist</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>其中，key是plist对应的属性名，相应的为该属性名对应的属性值（即key/value，plist为一种特殊的xml文件）。</p>
-<p>比如，上面我们定于了该定时任务叫“com.urey.test.plist”，定时执行的脚本是“/Users/urey/data/test.sh”，载入时开始执行，执行间隔是每5s一次。</p>
-<p>/Users/urey/data/test.sh是shell脚本，我写的测试脚本如下：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"><span class="built_in">cd</span> /Users/urey/data/</span><br><span class="line">LOG=`date +<span class="string">"%Y-%m-%d %H:%M:%S"</span>`</span><br><span class="line">LOGFILE=`date + <span class="string">"log-%Y%m%d-%H:%M:%S.log"</span>`</span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$LOG</span> &gt; <span class="variable">$LOGFILE</span></span><br></pre></td></tr></table></figure>
-<p>好，下面我们就可以通过命令：</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo launchctl load com<span class="selector-class">.urey</span><span class="selector-class">.test</span><span class="selector-class">.plist</span></span><br><span class="line">sudo launchctl unload com<span class="selector-class">.urey</span><span class="selector-class">.test</span><span class="selector-class">.plist</span></span><br></pre></td></tr></table></figure>
-<p>来载入或者取消载入对应的定时任务。</p>
-<p>值得注意的是，我们还必须明确com.urey.test.plist的权限和所有者：</p>
-<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/plist.png" width="600" height="200" alt="图片名称" align="center"></p>
-<p>即需要操作：</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo chmod <span class="number">600</span> com<span class="selector-class">.urey</span><span class="selector-class">.test</span><span class="selector-class">.plist</span></span><br><span class="line">sudo chown root com<span class="selector-class">.urey</span><span class="selector-class">.test</span><span class="selector-class">.plist</span></span><br></pre></td></tr></table></figure>
-<p>至此，一个简单的定时任务就做好了。</p>
-<p>我们可以把plist脚本存放在路径为/Library/LaunchDaemons或/Library/LaunchAgents，其区别是后一个路径的脚本当用户登陆系统后才会被执行，前一个只要系统启动了，哪怕用户不登陆系统也会被执行。</p>
-<p>当然，我们也可以存放在任意的其它路径上，这时就不会有上面的限制且会根据具体的属性值进行限制。</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/osx/">osx</a>
-</div>
+    <time datetime="2015-11-03T11:03:57.000Z" itemprop="datePublished">2015-11-03</time>
+  </a>
+</section>
 
 
-  <div class="article-tags">
+
+
+
+
   
-  <span></span> <a href="/tags/tips/">tips</a>
-  </div>
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2015/10/26/2015-10-26-bug-no-such-file-or-directory-jekyll/" title="BUG:No Such File or Directory - Jekyll" itemprop="url">
+  
+    <h1 itemprop="name">BUG:No Such File or Directory - Jekyll</h1>
+    
+     
+           <p itemprop="description" >“版本管理是一个艰巨的任务” —— 无名
 
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
+当Octopress遇上OSX EI Captain前一阶段升级了最新的OSX系统，谁知写完日志好端端的rake generate失效了，下意识的rake preview，报错：
+1Errno::ENOENT: No Such File</p>
+        
+    
+    <time datetime="2015-10-26T13:34:17.000Z" itemprop="datePublished">2015-10-26</time>
+  </a>
+</section>
 
 
 
 
 
-  <nav id="page-nav" class="clearfix">
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2015/10/09/2015-10-09-pgxlde-jdbcfang-wen/" title="PGXL的JDBC访问" itemprop="url">
+  
+    <h1 itemprop="name">PGXL的JDBC访问</h1>
+    
+     
+           <p itemprop="description" >“任何傻瓜都能写出计算机可以理解的代码。好的程序员能写出人能读懂的代码” —— Martin Fowler
+
+PGXL集群的配置见前面的博文《Postgres-XL集群的搭建》。
+JDBC连接PGXL集群PGXL底层为PostgreSQL，这意味着它支持所有支持PostgresS</p>
+        
+    
+    <time datetime="2015-10-09T13:34:17.000Z" itemprop="datePublished">2015-10-09</time>
+  </a>
+</section>
+
+
+
+
+
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2015/10/09/2015-10-09-postgresqlde-jdbcfang-wen/" title="PostgreSQL的JDBC访问" itemprop="url">
+  
+    <h1 itemprop="name">PostgreSQL的JDBC访问</h1>
+    
+     
+           <p itemprop="description" >“过去的代码都是未经测试的代码” —— 无名
+
+JDBC的版本选择官网有给出具体的jdk与postgresql driver的版本对应关系：https://jdbc.postgresql.org/download.html
+这里使用jdk1.7，对应：JDBC41 Postgre</p>
+        
+    
+    <time datetime="2015-10-09T12:45:33.000Z" itemprop="datePublished">2015-10-09</time>
+  </a>
+</section>
+
+
+
+
+
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2015/10/08/2015-10-08-postgres-xlji-qun-de-da-jian/" title="Postgres-XL集群的搭建" itemprop="url">
+  
+    <h1 itemprop="name">Postgres-XL集群的搭建</h1>
+    
+     
+           <p itemprop="description" >“如果你惟一的工具是一把锤子，你往往会把一切问题看成钉子” —— 无名
+
+集群规划建立5个虚拟机构成的集群，虚拟机的os均为centos6.5，依次命名为cnode1，cnode2，cnode3，cnode4，cnode5，其中cnode1为gtm，其余4个节点均为coordin</p>
+        
+    
+    <time datetime="2015-10-08T11:32:26.000Z" itemprop="datePublished">2015-10-08</time>
+  </a>
+</section>
+
+
+
+
+
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2015/10/08/2015-10-08-postgres-xl-de-jie-shao/" title="Postgres-XL介绍" itemprop="url">
+  
+    <h1 itemprop="name">Postgres-XL介绍</h1>
+    
+     
+           <p itemprop="description" >“沉默即赞同” —— 无名
+
+什么是Postgres-XLXL的意思是：eXtensible Lattice，可以扩展的格子，即将PostgreSQL应用在多机器上的分布式数据库的形象化表达。
+Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩展的、多租户</p>
+        
+    
+    <time datetime="2015-10-08T11:32:26.000Z" itemprop="datePublished">2015-10-08</time>
+  </a>
+</section>
+
+
+
+
+
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2015/09/30/2015-09-30-python-flask-rest-apide-shi-yong/" title="python Flask REST API的使用" itemprop="url">
+  
+    <h1 itemprop="name">python Flask REST API的使用</h1>
+    
+     
+           <p itemprop="description" >“简单不先于复杂，而是在复杂之后” —— Alan Perlis
+
+本文参考：Designing a RESTful API using Flask-RESTfulPosted by Miguel Grinberg under Python, Programming, REST,</p>
+        
+    
+    <time datetime="2015-09-30T07:43:21.000Z" itemprop="datePublished">2015-09-30</time>
+  </a>
+</section>
+
+
+
+
+
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2015/09/07/2015-09-07-osx-plist-ding-shi-ren-wu/" title="osx plist 定时任务" itemprop="url">
+  
+    <h1 itemprop="name">osx plist 定时任务</h1>
+    
+     
+           <p itemprop="description" >osx下定时任务是通过写plist脚本实现的，plist要比linux/osx下使用crontab更为简单、方便、细粒度。
+可以通过两种方式来设置脚本的执行时间。一个是使用StartInterval，它指定脚本每间隔多长时间（单位：秒）执行一次；另外一个使用StartCalend</p>
+        
+    
+    <time datetime="2015-09-07T01:56:18.000Z" itemprop="datePublished">2015-09-07</time>
+  </a>
+</section>
+
+
+
+
+
+
+
+  <nav id="page-nav" class="clearfix unexpand">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next<span></span></a>
   </nav>
 
@@ -1186,19 +382,19 @@
 			
 		
 			
-				<li><a href="/tags/regex/" title="regex">regex<sup>1</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/REST-API/" title="REST API">REST API<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/ambari/" title="ambari">ambari<sup>1</sup></a></li>
+				<li><a href="/tags/regex/" title="regex">regex<sup>1</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/pg/" title="pg">pg<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ambari/" title="ambari">ambari<sup>1</sup></a></li>
 			
 		
 			
@@ -1261,13 +457,13 @@
 	
 	
 	<section class="info">
-		<p> Hello ,I&#39;m Larry Page in Google. <br/>
-			This is my blog,believe it or not.</p>
+		<p> Hello ,I&#39;m Urey. <br/>
+			null</p>
 	</section>
 	 
 	<div class="social-font" class="clearfix">
 		
-		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		<a href="http://weibo.com/qiaoweiblog" target="_blank" class="icon-weibo" title="微博"></a>
 		
 		
 		
@@ -1276,7 +472,11 @@
 		
 		
 		
+		<a href="http://www.zhihu.com/people/urey" target="_blank" class="icon-zhihu" title="知乎"></a>
 		
+		
+		
+		<a href="mailto:qiaowei@pku.edu.cn" target="_blank" class="icon-email" title="Email Me"></a>
 		
 	</div>
 			

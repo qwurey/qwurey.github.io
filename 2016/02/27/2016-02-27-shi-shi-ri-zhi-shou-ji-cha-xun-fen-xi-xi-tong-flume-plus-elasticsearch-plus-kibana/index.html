@@ -27,7 +27,7 @@
 一、Flume概述：Apache Flume is a distributed, rel">
 <meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/flume_arch.png">
 <meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/log_arch.png">
-<meta property="og:updated_time" content="2016-03-05T11:19:02.000Z">
+<meta property="og:updated_time" content="2016-03-06T03:10:25.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)">
 <meta name="twitter:description" content="“世界上有2种人，一种懂二进制，一种不懂二进制” ——匿名
@@ -161,7 +161,7 @@
 <h4 id="八、系统改进："><a href="#八、系统改进：" class="headerlink" title="八、系统改进："></a>八、系统改进：</h4><ol>
 <li><p>配置flume interceptor加入各类headers，重写ElasticSearchLogStashEventSerializer使得event的header部分可以作为es的文档的field</p>
 </li>
-<li><p>memory channel与file channel的结合，参加美团日志系统的改进</p>
+<li><p>memory channel与file channel的结合，参见美团日志系统的改进</p>
 </li>
 <li><p>日志若是错误信息，并不是每一行都是作为es的一条文档，而是若干行的内容才是es的一个文档的message</p>
 </li>

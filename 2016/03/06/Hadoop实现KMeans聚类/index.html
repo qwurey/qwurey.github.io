@@ -31,7 +31,7 @@
 评价输出结果;
 
 中文分词文本由大量字符所构成的字符串组成,它属于一种非结构化的数据,为了将其变为计算机机可以处理的形式,必须进行预处理。预处理的第一个关键步骤就 是分词。将连续的字序列按一定规则分隔为分散的有独立意义的词序列">
-<meta property="og:updated_time" content="2016-03-06T14:26:56.000Z">
+<meta property="og:updated_time" content="2016-03-06T14:34:34.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hadoop实现KMeans聚类">
 <meta name="twitter:description" content="中文文本聚类的一般过程文本聚类一般包括以下几个过程：
@@ -120,21 +120,25 @@
 		
 		</div>
 		
-		<h4 id="中文文本聚类的一般过程"><a href="#中文文本聚类的一般过程" class="headerlink" title="中文文本聚类的一般过程"></a>中文文本聚类的一般过程</h4><p>文本聚类一般包括以下几个过程：</p>
+		<h4 id="中文文本聚类的一般过程"><a href="#中文文本聚类的一般过程" class="headerlink" title="中文文本聚类的一般过程"></a><strong>中文文本聚类的一般过程</strong></h4><p>文本聚类一般包括以下几个过程：</p>
 <ol>
 <li>模式表示：包括特征抽取及选择，把数据对象表示成适合于算法的可计算<br>形式;</li>
 <li>定义模式之间的距离测量公式;</li>
 <li>聚类算法实现;</li>
 <li>评价输出结果;</li>
 </ol>
-<h4 id="中文分词"><a href="#中文分词" class="headerlink" title="中文分词"></a>中文分词</h4><p>文本由大量字符所构成的字符串组成,它属于一种非结构化的数据,为了将其变为计算机机可以处理的形式,必须进行预处理。预处理的第一个关键步骤就 是分词。将连续的字序列按一定规则分隔为分散的有独立意义的词序列,然后过滤其中的停用词(Stop word),得到文本的关键词集合,这些关键词构成了初始特征项(词)集合。</p>
+<h4 id="中文分词"><a href="#中文分词" class="headerlink" title="中文分词"></a><strong>中文分词</strong></h4><p>文本由大量字符所构成的字符串组成,它属于一种非结构化的数据,为了将其变为计算机机可以处理的形式,必须进行预处理。预处理的第一个关键步骤就 是分词。将连续的字序列按一定规则分隔为分散的有独立意义的词序列,然后过滤其中的停用词(Stop word),得到文本的关键词集合,这些关键词构成了初始特征项(词)集合。</p>
 <p>本实验使用的 IKAnalyzer2012 进行分词,IKAnalyzer 是一个开源的,基于java语言开发的轻量级的中文分词工具包。对分好的词语进行去停词处理,一共使用了 1208 个常见的停用词。</p>
-<h4 id="TF-IDF-模型"><a href="#TF-IDF-模型" class="headerlink" title="TF-IDF 模型"></a>TF-IDF 模型</h4><p>TF-IDF(term frequency–inverse document frequency)是一种用于资讯 检索与文本挖掘的常用加权技术。TF-IDF 是一种统计方法,用以评估一个字词(term)对于一个文件集(docs)或一个语料库中的其中一份文件(doc)的重要程度。</p>
+<h4 id="TF-IDF-模型"><a href="#TF-IDF-模型" class="headerlink" title="TF-IDF 模型"></a><strong>TF-IDF 模型</strong></h4><p>TF-IDF(term frequency–inverse document frequency)是一种用于资讯 检索与文本挖掘的常用加权技术。TF-IDF 是一种统计方法,用以评估一个字词(term)对于一个文件集(docs)或一个语料库中的其中一份文件(doc)的重要程度。</p>
 <p>TF-IDF 的主要思想是:如果某个词或短语在一篇文章中出现的频率(TF)高, 并且在其他文章中很少出现,则认为此词或者短语具有很好的类别区分能力,适合用来分类。</p>
-<p>TF-IDF 实际上是:TF * IDF,TF 是词频(Term Frequency),IDF 是逆向文件 频率(Inverse Document Frequency)。TF-IDF 的计算也由这两部分组成。</p>
-<p>词频(term frequency,TF)指的是某一个给定的词语在该文件中出现的频 率。这个数字是对词数(term count)的归一化,以防止它偏向长的文件。(同一 个词语在长文件里可能会比短文件有更高的词数,而不管该词语重要与否。)提 取文档中所有出现的词语形成 textVector,统计textVector 中每一个词语在每一篇文档中的频率 TF( i, j),其中 i 指的是 textVector 中的第 i 个词语, j 指的是第j 篇文档。对于在某一特定文件里的词语ti来说,它的重要性可表示为:</p>
+<p>TF-IDF 实际上是:TF * IDF,TF 是词频(Term Frequency),IDF 是逆向文件 频率(Inverse Document Frequency)。TF-IDF 的计算也由这两部分组成:</p>
+<ol>
+<li>词频(term frequency,TF)指的是某一个给定的词语在该文件中出现的频 率。这个数字是对词数(term count)的归一化,以防止它偏向长的文件。(同一 个词语在长文件里可能会比短文件有更高的词数,而不管该词语重要与否。)提 取文档中所有出现的词语形成 textVector,统计textVector 中每一个词语在每一篇文档中的频率 TF( i, j),其中 i 指的是 textVector 中的第 i 个词语, j 指的是第j 篇文档。对于在某一特定文件里的词语ti来说,它的重要性可表示为:</li>
+</ol>
 <p>$TF<em>{reg}(i,j)=\frac{TF(i,j)}{max</em>{k\varepsilon textVector(TF(k,j))}}$</p>
-<p>逆向文件频率(inverse document frequency,IDF)是一个词语普遍重要性 的度量。某一特定词语的 IDF,可以由总文件数目除以包含该词语之文件的数目, 再将得到的商取对数得到,计算 IDF 的公式为:</p>
+<ol>
+<li>逆向文件频率(inverse document frequency,IDF)是一个词语普遍重要性 的度量。某一特定词语的 IDF,可以由总文件数目除以包含该词语之文件的数目, 再将得到的商取对数得到,计算 IDF 的公式为:</li>
+</ol>
 <p>$IDF(i)=log\frac{N}{N_{i}}$</p>
 <p>其中,N 为文档的总数,Ni 指的是 textVector 中第 i 个词语在多少篇文档中 出现。</p>
 <p>所以计算特征向量方法为公式:</p>
@@ -143,7 +147,7 @@
 <p>$(X<em>{i})</em>{1}^{n}$ 和 $(Y<em>{i})</em>{1}^{n}$</p>
 <p>则两个文档的相似度计算方法为:</p>
 <p>$sim(d<em>{x},d</em>{y})= \frac{\sum<em>{1}^{n}x</em>{i}y<em>{i}}{\sqrt{\sum</em>{1}^{n}x<em>{i}^{2}}\ast \sqrt{\sum</em>{1}^{n}y_{i}^{2}}}$</p>
-<h4 id="KMeans算法"><a href="#KMeans算法" class="headerlink" title="KMeans算法"></a>KMeans算法</h4><p>未完待续</p>
+<h4 id="KMeans算法"><a href="#KMeans算法" class="headerlink" title="KMeans算法"></a><strong>KMeans算法</strong></h4><p>未完待续</p>
   
 	</div>
 		<footer class="article-footer clearfix">

@@ -33,7 +33,7 @@
 
 
 中文分词文本由大量字符所构成的字符串组成,它属于一种非结构化的数据,为了将其变为计算机机可以处理的形式,必须进行预处理。预处理的第一个关键步骤就 是分词。将连续的字序列按一定规则分隔为分散的有独">
-<meta property="og:updated_time" content="2016-03-06T14:46:14.000Z">
+<meta property="og:updated_time" content="2016-03-06T14:50:17.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hadoop实现KMeans聚类">
 <meta name="twitter:description" content="中文文本聚类的一般过程文本聚类一般包括以下几个过程：
@@ -147,8 +147,7 @@
 <p>其中,N 为文档的总数,Ni 指的是 textVector 中第 i 个词语在多少篇文档中 出现。</p>
 <p>所以计算特征向量方法为公式:</p>
 <p>$$TextVector(i,j)=TF_{reg}(i,j)\ast IDF(i)$$</p>
-<p>假设两个文档 dx、dy 的特征向量的值分别为:</p>
-<p>$$ $(X_{i})_{1}^{n}$ 和 $(Y_{i})_{1}^{n}$ $$</p>
+<p>假设两个文档 dx、dy 的特征向量的值分别为:$(X_{i})_{1}^{n}$ 和 $(Y_{i})_{1}^{n}$</p>
 <p>则两个文档的相似度计算方法为:</p>
 <p>$$sim(d_{x},d_{y})= \frac{\sum_{1}^{n}x_{i}y_{i}}{\sqrt{\sum_{1}^{n}x_{i}^{2}}\ast \sqrt{\sum_{1}^{n}y_{i}^{2}}}$$   </p>
 <p><br></p>

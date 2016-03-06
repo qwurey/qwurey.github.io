@@ -4,41 +4,44 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>PostgreSQL的JDBC访问 | Urey on the way</title>
+    <title>Hadoop实现KMeans聚类 | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="“过去的代码都是未经测试的代码” —— 无名
+    <meta name="description" content="中文文本聚类的一般过程文本聚类一般包括以下几个过程：
 
-JDBC的版本选择官网有给出具体的jdk与postgresql driver的版本对应关系：https://jdbc.postgresql.org/download.html
-这里使用jdk1.7，对应：JDBC41 Postgresql Driver, Version 9.4-1203
-连接数据库导入jar包
-在shell终端进入psql：
-1p">
+模式表示：包括特征抽取及选择，把数据对象表示成适合于算法的可计算形式;
+定义模式之间的距离测量公式;
+聚类算法实现;
+评价输出结果;
+
+中文分词文本由大量字符所构成的字符串组成,它属于一种非结构化的数据,为了将其变为计算机机可以处理的形式,必须进行预处理。预处理的第一个关键步骤就 是分词。将连续的字序列按一定规则分隔为分散的有独立意义的词序列">
 <meta property="og:type" content="article">
-<meta property="og:title" content="PostgreSQL的JDBC访问">
-<meta property="og:url" content="http://qiaowei.xyz/2015/10/09/2015-10-09-postgresqlde-jdbcfang-wen/index.html">
+<meta property="og:title" content="Hadoop实现KMeans聚类">
+<meta property="og:url" content="http://qiaowei.xyz/2016/03/06/Hadoop实现KMeans聚类/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="“过去的代码都是未经测试的代码” —— 无名
+<meta property="og:description" content="中文文本聚类的一般过程文本聚类一般包括以下几个过程：
 
-JDBC的版本选择官网有给出具体的jdk与postgresql driver的版本对应关系：https://jdbc.postgresql.org/download.html
-这里使用jdk1.7，对应：JDBC41 Postgresql Driver, Version 9.4-1203
-连接数据库导入jar包
-在shell终端进入psql：
-1p">
-<meta property="og:updated_time" content="2016-03-05T03:50:57.000Z">
+模式表示：包括特征抽取及选择，把数据对象表示成适合于算法的可计算形式;
+定义模式之间的距离测量公式;
+聚类算法实现;
+评价输出结果;
+
+中文分词文本由大量字符所构成的字符串组成,它属于一种非结构化的数据,为了将其变为计算机机可以处理的形式,必须进行预处理。预处理的第一个关键步骤就 是分词。将连续的字序列按一定规则分隔为分散的有独立意义的词序列">
+<meta property="og:updated_time" content="2016-03-06T14:26:56.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="PostgreSQL的JDBC访问">
-<meta name="twitter:description" content="“过去的代码都是未经测试的代码” —— 无名
+<meta name="twitter:title" content="Hadoop实现KMeans聚类">
+<meta name="twitter:description" content="中文文本聚类的一般过程文本聚类一般包括以下几个过程：
 
-JDBC的版本选择官网有给出具体的jdk与postgresql driver的版本对应关系：https://jdbc.postgresql.org/download.html
-这里使用jdk1.7，对应：JDBC41 Postgresql Driver, Version 9.4-1203
-连接数据库导入jar包
-在shell终端进入psql：
-1p">
+模式表示：包括特征抽取及选择，把数据对象表示成适合于算法的可计算形式;
+定义模式之间的距离测量公式;
+聚类算法实现;
+评价输出结果;
+
+中文分词文本由大量字符所构成的字符串组成,它属于一种非结构化的数据,为了将其变为计算机机可以处理的形式,必须进行预处理。预处理的第一个关键步骤就 是分词。将连续的字序列按一定规则分隔为分散的有独立意义的词序列">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -97,14 +100,14 @@ JDBC的版本选择官网有给出具体的jdk与postgresql driver的版本对�
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/10/09/2015-10-09-postgresqlde-jdbcfang-wen/" title="PostgreSQL的JDBC访问" itemprop="url">PostgreSQL的JDBC访问</a>
+      <a href="/2016/03/06/Hadoop实现KMeans聚类/" title="Hadoop实现KMeans聚类" itemprop="url">Hadoop实现KMeans聚类</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2015-10-09T12:45:33.000Z" itemprop="datePublished"> 发表于 2015-10-09</time>
+    <time datetime="2016-03-06T13:21:34.000Z" itemprop="datePublished"> 发表于 2016-03-06</time>
     
   </p>
 </header>
@@ -113,41 +116,39 @@ JDBC的版本选择官网有给出具体的jdk与postgresql driver的版本对�
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#JDBC的版本选择"><span class="toc-number">1.</span> <span class="toc-text">JDBC的版本选择</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#连接数据库"><span class="toc-number">2.</span> <span class="toc-text">连接数据库</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#中文文本聚类的一般过程"><span class="toc-number">1.</span> <span class="toc-text">中文文本聚类的一般过程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#中文分词"><span class="toc-number">2.</span> <span class="toc-text">中文分词</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#TF-IDF-模型"><span class="toc-number">3.</span> <span class="toc-text">TF-IDF 模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#KMeans算法"><span class="toc-number">4.</span> <span class="toc-text">KMeans算法</span></a></li></ol>
 		
 		</div>
 		
-		<blockquote>
-<p>“过去的代码都是未经测试的代码” —— 无名</p>
-</blockquote>
-<h4 id="JDBC的版本选择"><a href="#JDBC的版本选择" class="headerlink" title="JDBC的版本选择"></a><strong>JDBC的版本选择</strong></h4><p>官网有给出具体的jdk与postgresql driver的版本对应关系：<a href="https://jdbc.postgresql.org/download.html" target="_blank" rel="external">https://jdbc.postgresql.org/download.html</a></p>
-<p>这里使用jdk1.7，对应：JDBC41 Postgresql Driver, Version 9.4-1203</p>
-<h4 id="连接数据库"><a href="#连接数据库" class="headerlink" title="连接数据库"></a><strong>连接数据库</strong></h4><p>导入jar包</p>
-<p>在shell终端进入psql：</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">psql</span> -U urey</span><br></pre></td></tr></table></figure>
-<p>新建数据库testdb并切换到该数据库下：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">DATABASE</span> testdb;</span><br><span class="line">\c testdb</span><br></pre></td></tr></table></figure></p>
-<p>新建表test并插入一条数据：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">test</span>(<span class="keyword">id</span> <span class="built_in">int</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">test</span> <span class="keyword">VALUES</span>(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
-<p>查看刚插入的数据：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">test</span>;</span><br></pre></td></tr></table></figure>
-<p>编辑java代码连接：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">package</span> indi.qw.pgjdbc.demo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.sql.Connection;</span><br><span class="line"><span class="keyword">import</span> java.sql.DriverManager;</span><br><span class="line"><span class="keyword">import</span> java.sql.ResultSet;</span><br><span class="line"><span class="keyword">import</span> java.sql.Statement;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PGJDBCDemo</span> </span>&#123;</span><br><span class="line">	<span class="keyword">static</span> String url = <span class="string">"jdbc:postgresql://127.0.0.1:5432/testdb"</span>;</span><br><span class="line">    <span class="keyword">static</span> String usr = <span class="string">"urey"</span>;</span><br><span class="line">    <span class="keyword">static</span> String psd = <span class="string">"urey"</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span> </span>&#123;</span><br><span class="line">        Connection conn = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Class.forName(<span class="string">"org.postgresql.Driver"</span>);</span><br><span class="line">            conn = DriverManager.getConnection(url, usr, psd);</span><br><span class="line">            Statement st = conn.createStatement();</span><br><span class="line">            ResultSet rs = st.executeQuery(<span class="string">"SELECT * FROM TEST"</span>);</span><br><span class="line">            <span class="keyword">while</span> (rs.next()) &#123;</span><br><span class="line">               System.out.print(rs.getString(<span class="number">1</span>));</span><br><span class="line">            &#125;</span><br><span class="line">            rs.close();</span><br><span class="line">            st.close();</span><br><span class="line">            conn.close();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>OK,测试成功。</p>
+		<h4 id="中文文本聚类的一般过程"><a href="#中文文本聚类的一般过程" class="headerlink" title="中文文本聚类的一般过程"></a>中文文本聚类的一般过程</h4><p>文本聚类一般包括以下几个过程：</p>
+<ol>
+<li>模式表示：包括特征抽取及选择，把数据对象表示成适合于算法的可计算<br>形式;</li>
+<li>定义模式之间的距离测量公式;</li>
+<li>聚类算法实现;</li>
+<li>评价输出结果;</li>
+</ol>
+<h4 id="中文分词"><a href="#中文分词" class="headerlink" title="中文分词"></a>中文分词</h4><p>文本由大量字符所构成的字符串组成,它属于一种非结构化的数据,为了将其变为计算机机可以处理的形式,必须进行预处理。预处理的第一个关键步骤就 是分词。将连续的字序列按一定规则分隔为分散的有独立意义的词序列,然后过滤其中的停用词(Stop word),得到文本的关键词集合,这些关键词构成了初始特征项(词)集合。</p>
+<p>本实验使用的 IKAnalyzer2012 进行分词,IKAnalyzer 是一个开源的,基于java语言开发的轻量级的中文分词工具包。对分好的词语进行去停词处理,一共使用了 1208 个常见的停用词。</p>
+<h4 id="TF-IDF-模型"><a href="#TF-IDF-模型" class="headerlink" title="TF-IDF 模型"></a>TF-IDF 模型</h4><p>TF-IDF(term frequency–inverse document frequency)是一种用于资讯 检索与文本挖掘的常用加权技术。TF-IDF 是一种统计方法,用以评估一个字词(term)对于一个文件集(docs)或一个语料库中的其中一份文件(doc)的重要程度。</p>
+<p>TF-IDF 的主要思想是:如果某个词或短语在一篇文章中出现的频率(TF)高, 并且在其他文章中很少出现,则认为此词或者短语具有很好的类别区分能力,适合用来分类。</p>
+<p>TF-IDF 实际上是:TF * IDF,TF 是词频(Term Frequency),IDF 是逆向文件 频率(Inverse Document Frequency)。TF-IDF 的计算也由这两部分组成。</p>
+<p>词频(term frequency,TF)指的是某一个给定的词语在该文件中出现的频 率。这个数字是对词数(term count)的归一化,以防止它偏向长的文件。(同一 个词语在长文件里可能会比短文件有更高的词数,而不管该词语重要与否。)提 取文档中所有出现的词语形成 textVector,统计textVector 中每一个词语在每一篇文档中的频率 TF( i, j),其中 i 指的是 textVector 中的第 i 个词语, j 指的是第j 篇文档。对于在某一特定文件里的词语ti来说,它的重要性可表示为:</p>
+<p>$TF<em>{reg}(i,j)=\frac{TF(i,j)}{max</em>{k\varepsilon textVector(TF(k,j))}}$</p>
+<p>逆向文件频率(inverse document frequency,IDF)是一个词语普遍重要性 的度量。某一特定词语的 IDF,可以由总文件数目除以包含该词语之文件的数目, 再将得到的商取对数得到,计算 IDF 的公式为:</p>
+<p>$IDF(i)=log\frac{N}{N_{i}}$</p>
+<p>其中,N 为文档的总数,Ni 指的是 textVector 中第 i 个词语在多少篇文档中 出现。</p>
+<p>所以计算特征向量方法为公式:</p>
+<p>$TextVector(i,j)=TF_{reg}(i,j)\ast IDF(i)$</p>
+<p>假设两个文档 dx、dy 的特征向量的值分别为:</p>
+<p>$(X<em>{i})</em>{1}^{n}$ 和 $(Y<em>{i})</em>{1}^{n}$</p>
+<p>则两个文档的相似度计算方法为:</p>
+<p>$sim(d<em>{x},d</em>{y})= \frac{\sum<em>{1}^{n}x</em>{i}y<em>{i}}{\sqrt{\sum</em>{1}^{n}x<em>{i}^{2}}\ast \sqrt{\sum</em>{1}^{n}y_{i}^{2}}}$</p>
+<h4 id="KMeans算法"><a href="#KMeans算法" class="headerlink" title="KMeans算法"></a>KMeans算法</h4><p>未完待续</p>
   
 	</div>
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
 
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/pg/">pg</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/pg/">pg</a>
-  </div>
 
 </div>
 
@@ -155,7 +156,7 @@ JDBC的版本选择官网有给出具体的jdk与postgresql driver的版本对�
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2015/10/09/2015-10-09-postgresqlde-jdbcfang-wen/" data-title="PostgreSQL的JDBC访问 | Urey on the way" data-tsina="null" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2016/03/06/Hadoop实现KMeans聚类/" data-title="Hadoop实现KMeans聚类 | Urey on the way" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -168,19 +169,11 @@ JDBC的版本选择官网有给出具体的jdk与postgresql driver的版本对�
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/10/09/2015-10-09-pgxlde-jdbcfang-wen/" title="PGXL的JDBC访问">
-  <strong>上一篇：</strong><br/>
-  <span>
-  PGXL的JDBC访问</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/10/08/2015-10-08-postgres-xlji-qun-de-da-jian/"  title="Postgres-XL集群的搭建">
+<a href="/2016/02/27/2016-02-27-shi-shi-ri-zhi-shou-ji-cha-xun-fen-xi-xi-tong-flume-plus-elasticsearch-plus-kibana/"  title="实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)">
  <strong>下一篇：</strong><br/> 
- <span>Postgres-XL集群的搭建
+ <span>实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)
 </span>
 </a>
 </div>
@@ -189,7 +182,7 @@ JDBC的版本选择官网有给出具体的jdk与postgresql driver的版本对�
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2015/10/09/2015-10-09-postgresqlde-jdbcfang-wen/" data-title="PostgreSQL的JDBC访问" data-url="http://qiaowei.xyz/2015/10/09/2015-10-09-postgresqlde-jdbcfang-wen/"></div>
+	<div class="ds-thread" data-thread-key="2016/03/06/Hadoop实现KMeans聚类/" data-title="Hadoop实现KMeans聚类" data-url="http://qiaowei.xyz/2016/03/06/Hadoop实现KMeans聚类/"></div>
 </section>
 
 
@@ -199,7 +192,7 @@ JDBC的版本选择官网有给出具体的jdk与postgresql driver的版本对�
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#JDBC的版本选择"><span class="toc-number">1.</span> <span class="toc-text">JDBC的版本选择</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#连接数据库"><span class="toc-number">2.</span> <span class="toc-text">连接数据库</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#中文文本聚类的一般过程"><span class="toc-number">1.</span> <span class="toc-text">中文文本聚类的一般过程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#中文分词"><span class="toc-number">2.</span> <span class="toc-text">中文分词</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#TF-IDF-模型"><span class="toc-number">3.</span> <span class="toc-text">TF-IDF 模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#KMeans算法"><span class="toc-number">4.</span> <span class="toc-text">KMeans算法</span></a></li></ol>
  
   </div>
 
@@ -594,6 +587,35 @@ var _hmt = _hmt || [];
 
 <!-- MathJax Begin -->
 <!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
 
 
 <!-- MathJax End -->

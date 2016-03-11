@@ -11,31 +11,28 @@
     
 
     
-    <meta name="description" content="repository使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。
+    <meta name="description" content="一、repository用法使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。
 maven中的repo有两种类型：
 
 remote repository：相当于公共的仓库，大家都能访问到，一般可以用URL的形式访问
-
-local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:\Us">
+local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Maven：mirror和repository区别">
 <meta property="og:url" content="http://qiaowei.xyz/2016/03/11/Maven：mirror和repository区别/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="repository使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。
+<meta property="og:description" content="一、repository用法使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。
 maven中的repo有两种类型：
 
 remote repository：相当于公共的仓库，大家都能访问到，一般可以用URL的形式访问
-
-local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:\Us">
-<meta property="og:updated_time" content="2016-03-11T14:16:51.000Z">
+local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:">
+<meta property="og:updated_time" content="2016-03-11T14:19:10.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Maven：mirror和repository区别">
-<meta name="twitter:description" content="repository使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。
+<meta name="twitter:description" content="一、repository用法使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。
 maven中的repo有两种类型：
 
 remote repository：相当于公共的仓库，大家都能访问到，一般可以用URL的形式访问
-
-local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:\Us">
+local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -110,30 +107,25 @@ local repository：存放在本地磁盘的一个文件夹，例如，windows上
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#repository"><span class="toc-number">1.</span> <span class="toc-text">repository</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mirror"><span class="toc-number">2.</span> <span class="toc-text">mirror</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、repository用法"><span class="toc-number">1.</span> <span class="toc-text">一、repository用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、mirror用法"><span class="toc-number">2.</span> <span class="toc-text">二、mirror用法</span></a></li></ol>
 		
 		</div>
 		
-		<h3 id="repository"><a href="#repository" class="headerlink" title="repository"></a><strong>repository</strong></h3><p>使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。</p>
+		<h3 id="一、repository用法"><a href="#一、repository用法" class="headerlink" title="一、repository用法"></a><strong>一、repository用法</strong></h3><p>使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。</p>
 <p>maven中的repo有两种类型：</p>
 <ol>
-<li><p>remote repository：相当于公共的仓库，大家都能访问到，一般可以用URL的形式访问</p>
-</li>
-<li><p>local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:\Users\｛用户名｝.m2\repository目录</p>
-</li>
+<li>remote repository：相当于公共的仓库，大家都能访问到，一般可以用URL的形式访问</li>
+<li>local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:\Users\｛用户名｝.m2\repository目录</li>
 </ol>
 <p>自动下载原则：repository里存放的都是各种jar包和maven插件。当向仓库请求插件或依赖的时候，会先检查local repository，如果local repository有则直接返回，否则会向remote repository请求，并缓存到local repository。也可以把做的东西放到本地仓库，仅供本地使用；或上传到远程仓库，供大家使用。</p>
 <p>其中，remote repository主要有3种类型：</p>
 <ol>
-<li><p>中央仓库：<a href="http://repo1.maven.org/maven2/" target="_blank" rel="external">http://repo1.maven.org/maven2/</a> </p>
-</li>
-<li><p>私服：内网自建的maven repository，其URL是一个内部网址 </p>
-</li>
-<li><p>其他公共仓库：其他可以互联网公共访问maven repository，例如 jboss repository等</p>
-</li>
+<li>中央仓库：<a href="http://repo1.maven.org/maven2/" target="_blank" rel="external">http://repo1.maven.org/maven2/</a> </li>
+<li>私服：内网自建的maven repository，其URL是一个内部网址 </li>
+<li>其他公共仓库：其他可以互联网公共访问maven repository，例如 jboss repository等</li>
 </ol>
 <p>一个repo的定义如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">repository</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">id</span>&gt;</span>central<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">url</span>&gt;</span>http://maven.oa.com/nexus/content/groups/public<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">releases</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">enabled</span>&gt;</span>true<span class="tag">&lt;/<span class="name">enabled</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">releases</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">snapshots</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">enabled</span>&gt;</span>false<span class="tag">&lt;/<span class="name">enabled</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">snapshots</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">repository</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<h3 id="mirror"><a href="#mirror" class="headerlink" title="mirror"></a><strong>mirror</strong></h3><p>mirror相当于一个拦截器，可以拦截去往指定remote repository id的请求，把请求里的remote repository url，重定向到mirror里配置的地址。</p>
+<h3 id="二、mirror用法"><a href="#二、mirror用法" class="headerlink" title="二、mirror用法"></a><strong>二、mirror用法</strong></h3><p>mirror相当于一个拦截器，可以拦截去往指定remote repository id的请求，把请求里的remote repository url，重定向到mirror里配置的地址。</p>
 <p>那么为什么要这么用呢？</p>
 <p>配置两个Repository之间的镜像关系，一般是出于访问速度和下载速度考虑。<br>例如， 有一个项目，需要在公司和住所都编码，并在项目pom.xml配置了A Maven库。在公司，是电信网络，访问A库很快，所以maven管理依赖和插件都从A库下载；在住所，是网通网络，访问A库很慢，但是访问B库很快。这时，在住所的setting.xml里，只要配置一下<mirrors><mirror>….</mirror></mirrors>，让B库成为A库的mirror，即可不用更改项目pom.xml里对于A库的相关配置。</p>
 <p>但是需要注意的是，如果配置了A库的镜像B库，那么当B库不稳定、不可访问或者停止服务的时候，maven此时也不会去访问A库，因而无法下载所需的构件。</p>
@@ -199,7 +191,7 @@ local repository：存放在本地磁盘的一个文件夹，例如，windows上
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#repository"><span class="toc-number">1.</span> <span class="toc-text">repository</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mirror"><span class="toc-number">2.</span> <span class="toc-text">mirror</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、repository用法"><span class="toc-number">1.</span> <span class="toc-text">一、repository用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、mirror用法"><span class="toc-number">2.</span> <span class="toc-text">二、mirror用法</span></a></li></ol>
  
   </div>
 

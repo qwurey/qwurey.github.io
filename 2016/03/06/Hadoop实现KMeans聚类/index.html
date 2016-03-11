@@ -11,40 +11,56 @@
     
 
     
-    <meta name="description" content="中文文本聚类的一般过程文本聚类一般包括以下几个过程：
+    <meta name="description" content="一、中文文本聚类的一般过程文本聚类一般包括以下几个过程：
 
 模式表示：包括特征抽取及选择，把数据对象表示成适合于算法的可计算形式;
 定义模式之间的距离测量公式;
 聚类算法实现;
 评价输出结果;      
 
+具体过程如下图所示：
 
-中文分词文本由大量字符所构成的字符串组成,它属于一种非结构化的数据,为了将其变为计算机机可以处理的形式,必须进行预处理。预处理的第一个关键步骤就 是分词。将连续的字序列按一定规则分隔为分散的有独">
+二、中文分词文本由大量字符所构成的字符串组成,它属于一种非结构化的数据,为了将其变为计算机机可以处理的形式,必须进行预处理。预处理的第一个关键步骤就 是分词。将连续的字">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hadoop实现KMeans聚类">
 <meta property="og:url" content="http://qiaowei.xyz/2016/03/06/Hadoop实现KMeans聚类/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="中文文本聚类的一般过程文本聚类一般包括以下几个过程：
+<meta property="og:description" content="一、中文文本聚类的一般过程文本聚类一般包括以下几个过程：
 
 模式表示：包括特征抽取及选择，把数据对象表示成适合于算法的可计算形式;
 定义模式之间的距离测量公式;
 聚类算法实现;
 评价输出结果;      
 
+具体过程如下图所示：
 
-中文分词文本由大量字符所构成的字符串组成,它属于一种非结构化的数据,为了将其变为计算机机可以处理的形式,必须进行预处理。预处理的第一个关键步骤就 是分词。将连续的字序列按一定规则分隔为分散的有独">
-<meta property="og:updated_time" content="2016-03-06T14:51:09.000Z">
+二、中文分词文本由大量字符所构成的字符串组成,它属于一种非结构化的数据,为了将其变为计算机机可以处理的形式,必须进行预处理。预处理的第一个关键步骤就 是分词。将连续的字">
+<meta property="og:image" content="http://qiaowei.xyz/images/13/arch.png">
+<meta property="og:image" content="http://qiaowei.xyz/images/13/process.png">
+<meta property="og:image" content="http://qiaowei.xyz/images/13/class.png">
+<meta property="og:image" content="http://qiaowei.xyz/images/13/detail.png">
+<meta property="og:image" content="http://qiaowei.xyz/images/13/p1.png">
+<meta property="og:image" content="http://qiaowei.xyz/images/13/p2.png">
+<meta property="og:image" content="http://qiaowei.xyz/images/13/p3.png">
+<meta property="og:image" content="http://qiaowei.xyz/images/13/p4.png">
+<meta property="og:image" content="http://qiaowei.xyz/images/13/p5.png">
+<meta property="og:image" content="http://qiaowei.xyz/images/13/file_struc.png">
+<meta property="og:image" content="http://qiaowei.xyz/images/13/output.png">
+<meta property="og:image" content="http://qiaowei.xyz/images/13/iteration.png">
+<meta property="og:updated_time" content="2016-03-11T14:51:32.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hadoop实现KMeans聚类">
-<meta name="twitter:description" content="中文文本聚类的一般过程文本聚类一般包括以下几个过程：
+<meta name="twitter:description" content="一、中文文本聚类的一般过程文本聚类一般包括以下几个过程：
 
 模式表示：包括特征抽取及选择，把数据对象表示成适合于算法的可计算形式;
 定义模式之间的距离测量公式;
 聚类算法实现;
 评价输出结果;      
 
+具体过程如下图所示：
 
-中文分词文本由大量字符所构成的字符串组成,它属于一种非结构化的数据,为了将其变为计算机机可以处理的形式,必须进行预处理。预处理的第一个关键步骤就 是分词。将连续的字序列按一定规则分隔为分散的有独">
+二、中文分词文本由大量字符所构成的字符串组成,它属于一种非结构化的数据,为了将其变为计算机机可以处理的形式,必须进行预处理。预处理的第一个关键步骤就 是分词。将连续的字">
+<meta name="twitter:image" content="http://qiaowei.xyz/images/13/arch.png">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -119,22 +135,23 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#中文文本聚类的一般过程"><span class="toc-number">1.</span> <span class="toc-text">中文文本聚类的一般过程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#中文分词"><span class="toc-number">2.</span> <span class="toc-text">中文分词</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#TF-IDF-模型"><span class="toc-number">3.</span> <span class="toc-text">TF-IDF 模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#KMeans算法"><span class="toc-number">4.</span> <span class="toc-text">KMeans算法</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、中文文本聚类的一般过程"><span class="toc-number">1.</span> <span class="toc-text">一、中文文本聚类的一般过程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、中文分词"><span class="toc-number">2.</span> <span class="toc-text">二、中文分词</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、TF-IDF-模型"><span class="toc-number">3.</span> <span class="toc-text">三、TF-IDF 模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#四、KMeans算法"><span class="toc-number">4.</span> <span class="toc-text">四、KMeans算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#五、MapReduce实现-K-means-算法"><span class="toc-number">5.</span> <span class="toc-text">五、MapReduce实现 K-means 算法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#I、详细设计方案"><span class="toc-number">5.1.</span> <span class="toc-text">I、详细设计方案</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#II、MR过程设计"><span class="toc-number">5.2.</span> <span class="toc-text">II、MR过程设计</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#III、结果分析"><span class="toc-number">6.</span> <span class="toc-text">III、结果分析</span></a></li></ol>
 		
 		</div>
 		
-		<h4 id="中文文本聚类的一般过程"><a href="#中文文本聚类的一般过程" class="headerlink" title="中文文本聚类的一般过程"></a><strong>中文文本聚类的一般过程</strong></h4><p>文本聚类一般包括以下几个过程：</p>
+		<h4 id="一、中文文本聚类的一般过程"><a href="#一、中文文本聚类的一般过程" class="headerlink" title="一、中文文本聚类的一般过程"></a><strong>一、中文文本聚类的一般过程</strong></h4><p>文本聚类一般包括以下几个过程：</p>
 <ol>
 <li>模式表示：包括特征抽取及选择，把数据对象表示成适合于算法的可计算形式;</li>
 <li>定义模式之间的距离测量公式;</li>
 <li>聚类算法实现;</li>
 <li>评价输出结果;      </li>
 </ol>
+<p>具体过程如下图所示：<br><img src="/images/13/arch.png" alt="arch"></p>
 <p><br></p>
-<h4 id="中文分词"><a href="#中文分词" class="headerlink" title="中文分词"></a><strong>中文分词</strong></h4><p>文本由大量字符所构成的字符串组成,它属于一种非结构化的数据,为了将其变为计算机机可以处理的形式,必须进行预处理。预处理的第一个关键步骤就 是分词。将连续的字序列按一定规则分隔为分散的有独立意义的词序列,然后过滤其中的停用词(Stop word),得到文本的关键词集合,这些关键词构成了初始特征项(词)集合。</p>
+<h4 id="二、中文分词"><a href="#二、中文分词" class="headerlink" title="二、中文分词"></a><strong>二、中文分词</strong></h4><p>文本由大量字符所构成的字符串组成,它属于一种非结构化的数据,为了将其变为计算机机可以处理的形式,必须进行预处理。预处理的第一个关键步骤就 是分词。将连续的字序列按一定规则分隔为分散的有独立意义的词序列,然后过滤其中的停用词(Stop word),得到文本的关键词集合,这些关键词构成了初始特征项(词)集合。</p>
 <p>本实验使用的 IKAnalyzer2012 进行分词,IKAnalyzer 是一个开源的,基于java语言开发的轻量级的中文分词工具包。对分好的词语进行去停词处理,一共使用了 1208 个常见的停用词。    </p>
 <p><br></p>
-<h4 id="TF-IDF-模型"><a href="#TF-IDF-模型" class="headerlink" title="TF-IDF 模型"></a><strong>TF-IDF 模型</strong></h4><p>TF-IDF(term frequency–inverse document frequency)是一种用于资讯 检索与文本挖掘的常用加权技术。TF-IDF 是一种统计方法,用以评估一个字词(term)对于一个文件集(docs)或一个语料库中的其中一份文件(doc)的重要程度。</p>
+<h4 id="三、TF-IDF-模型"><a href="#三、TF-IDF-模型" class="headerlink" title="三、TF-IDF 模型"></a><strong>三、TF-IDF 模型</strong></h4><p>TF-IDF(term frequency–inverse document frequency)是一种用于资讯 检索与文本挖掘的常用加权技术。TF-IDF 是一种统计方法,用以评估一个字词(term)对于一个文件集(docs)或一个语料库中的其中一份文件(doc)的重要程度。</p>
 <p>TF-IDF 的主要思想是:如果某个词或短语在一篇文章中出现的频率(TF)高, 并且在其他文章中很少出现,则认为此词或者短语具有很好的类别区分能力,适合用来分类。</p>
 <p>TF-IDF 实际上是:$TF\ast IDF$,TF 是词频(Term Frequency),IDF 是逆向文件 频率(Inverse Document Frequency)。TF-IDF 的计算也由这两部分组成:</p>
 <ol>
@@ -151,7 +168,34 @@
 <p>则两个文档的相似度计算方法为:</p>
 <p>$$sim(d_{x},d_{y})= \frac{\sum_{1}^{n}x_{i}y_{i}}{\sqrt{\sum_{1}^{n}x_{i}^{2}}\ast \sqrt{\sum_{1}^{n}y_{i}^{2}}}$$   </p>
 <p><br></p>
-<h4 id="KMeans算法"><a href="#KMeans算法" class="headerlink" title="KMeans算法"></a><strong>KMeans算法</strong></h4><p>未完待续   </p>
+<h4 id="四、KMeans算法"><a href="#四、KMeans算法" class="headerlink" title="四、KMeans算法"></a><strong>四、KMeans算法</strong></h4><p><code>k-means</code>基本算法的过程比较简单,首先,选择 k 个初始中心(k 是由用户 指定的聚类个数),每个点指派到最近的中心,而指派到一个中心的点集为一个聚类。然后根据指派到聚类的点,更新每个聚类的中心。重复指派个更新步骤, 直到聚类中心不发生变化,或每个聚类的内容不发生变化,即达到收敛状态。</p>
+<h4 id="五、MapReduce实现-K-means-算法"><a href="#五、MapReduce实现-K-means-算法" class="headerlink" title="五、MapReduce实现 K-means 算法"></a><strong>五、MapReduce实现 K-means 算法</strong></h4><p>k-means 聚类算法进行 MapReduce 的基本思路:对串行算法中每 1 次迭代启 动对应的 1 次 MapReduce 计算过程,完成数据记录到聚类中心的距离计算以及新 的聚类中心的计算。</p>
+<p>基于 MapReduce 的 k-means 并行算法主要有两部分,第一部分用于数据处理, 第二部分是 k-means 并行算法的实现部分。基于 MapReduce 的 k-means 算法的流程图如下图所示：</p>
+<p><img src="/images/13/process.png" alt="process"></p>
+<h5 id="I、详细设计方案"><a href="#I、详细设计方案" class="headerlink" title="I、详细设计方案"></a>I、详细设计方案</h5><p>项目类说明：</p>
+<p><img src="/images/13/class.png" alt="class"></p>
+<p>详细设计方案如下图：</p>
+<p><img src="/images/13/detail.png" alt="detail"></p>
+<h5 id="II、MR过程设计"><a href="#II、MR过程设计" class="headerlink" title="II、MR过程设计"></a>II、MR过程设计</h5><p>MapReduce 程序是由如下 5 个 Job 构成,前面的 Job 的输出是后面 Job 的输入,刚开始的输入是没有经过分词的原始数据。</p>
+<p>(1)、第 1 个 Job:提取内容、分词、去停词、统计单词在其文档中出现的次数, 输出为:key = 单词@文档号 , value = 单词在该文档中出现次数;输出结果如下图所示:</p>
+<p><img src="/images/13/p1.png" alt="detail"><br>(2)、第 2 个 Job:统计每个文档总词数,输出为:key = 单词@文档号 , value = 单词在该文档中出现次数/该文档总词数;输出结果如下图所示:</p>
+<p><img src="/images/13/p2.png" alt="detail"></p>
+<p>(3)、第 3 个 Job:写词表到 hdfs 上,计算 tfidf,输出为:key = 单词@文档号 , value = TFIDF;输出结果如下图所示:</p>
+<p><img src="/images/13/p3.png" alt="detail"></p>
+<p>(4)、第4个Job:写文档编号到hdfs上,写中心点信息,输出为:key = 文 档号 , value = 单词 1:tfidf1/单词 2:tfidf2/… …/单词 N:tfidfN;输出结果如下图所示：</p>
+<p><img src="/images/13/p4.png" alt="detail"></p>
+<p>(5)、第 5 个 Job:K-means 迭代,输出为 key = 文档号 , value = 聚类号; 输出结果见下图所示，输出文档向量 Vector 由文章号 ID 和该文章下的词和词 的 TFIDF 值组成：</p>
+<p><img src="/images/13/p5.png" alt="detail"></p>
+<p>数据源共有 12142 个文件,使用的 k-means 算法的参数设置如下:设置了 50个聚类中心,最多迭代 10 次(即如果前 10 次中某两次的迭代中心没有发生变 化,则认为已经收敛,跳出迭代循环)。</p>
+<h4 id="III、结果分析"><a href="#III、结果分析" class="headerlink" title="III、结果分析"></a>III、结果分析</h4><p>Mapreduce 下程序运行后产生文件如图：</p>
+<p><img src="/images/13/file_struc.png" alt="detail"></p>
+<p>MapReduce 下程序运行后输出结果如下图所示,是相应的 0 到 49一共 50 个聚类下面的文件统计,比如第一行表明在第 0 个聚类中共有 850 个文 件,第二行列出了相应的 850 个文件的文件编号,依此类推:</p>
+<p><img src="/images/13/output.png" alt="detail"></p>
+<p>MapReduce 下迭代次数如下图所示,可以看到,程序一共迭代了 10 次(depth_0 是准备聚类前的输出,depth_1 到 depth_10 是每次迭代的输出结果):</p>
+<p><img src="/images/13/iteration.png" alt="detail"></p>
+<p>通过不同次的实验结果发现,初始的聚类中心对最后的聚类结果存在影响,<br>迭代次数对最后的聚类结果存在影响,并且孤立点即聚类中不相似的文档对最后 的聚类结果也存在着影响。</p>
+<p>第二个需要改进的地方是目前比较相似度的文档向量矩阵维数可能很大,所 以效率不是很高,可以取每个文档 TFIDF 值最高的前 20 个词构建文档向量矩阵, 这样或许可以提高效率。</p>
+<p>从运行时间、磁盘利用率也看出了MR不适合做迭代类型的任务，中间结果都要落地到HDFS上，再读出进行下一次job的计算。</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -208,7 +252,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#中文文本聚类的一般过程"><span class="toc-number">1.</span> <span class="toc-text">中文文本聚类的一般过程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#中文分词"><span class="toc-number">2.</span> <span class="toc-text">中文分词</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#TF-IDF-模型"><span class="toc-number">3.</span> <span class="toc-text">TF-IDF 模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#KMeans算法"><span class="toc-number">4.</span> <span class="toc-text">KMeans算法</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、中文文本聚类的一般过程"><span class="toc-number">1.</span> <span class="toc-text">一、中文文本聚类的一般过程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、中文分词"><span class="toc-number">2.</span> <span class="toc-text">二、中文分词</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、TF-IDF-模型"><span class="toc-number">3.</span> <span class="toc-text">三、TF-IDF 模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#四、KMeans算法"><span class="toc-number">4.</span> <span class="toc-text">四、KMeans算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#五、MapReduce实现-K-means-算法"><span class="toc-number">5.</span> <span class="toc-text">五、MapReduce实现 K-means 算法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#I、详细设计方案"><span class="toc-number">5.1.</span> <span class="toc-text">I、详细设计方案</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#II、MR过程设计"><span class="toc-number">5.2.</span> <span class="toc-text">II、MR过程设计</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#III、结果分析"><span class="toc-number">6.</span> <span class="toc-text">III、结果分析</span></a></li></ol>
  
   </div>
 

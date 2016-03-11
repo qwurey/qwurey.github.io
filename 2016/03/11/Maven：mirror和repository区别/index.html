@@ -4,38 +4,38 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>regex的贪婪与懒惰 | Urey on the way</title>
+    <title>Maven：mirror和repository区别 | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="正则表达式有两种模式：贪婪模式与懒惰模式。
-　　贪婪模式：匹配尽可能多的字符。
-　　我们一般刚开始学习正则表达式使用到的都是贪婪模式下的表达。
-　　比如：将 a.*b  应用于串 “aabab” ，它会匹配 “aabab”整个串。注意，其实整个串“aabab”中的子串“aab”和“ab”也是匹配的。这就是正则表达式的贪婪模式。
-　　懒惰模式：匹配尽可能少的字符。
-　　正则表达式用?来表示懒惰限">
+    <meta name="description" content="repository使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。
+maven中的repo有两种类型：
+
+remote repository：相当于公共的仓库，大家都能访问到，一般可以用URL的形式访问
+
+local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:\Us">
 <meta property="og:type" content="article">
-<meta property="og:title" content="regex的贪婪与懒惰">
-<meta property="og:url" content="http://qiaowei.xyz/2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/index.html">
+<meta property="og:title" content="Maven：mirror和repository区别">
+<meta property="og:url" content="http://qiaowei.xyz/2016/03/11/Maven：mirror和repository区别/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="正则表达式有两种模式：贪婪模式与懒惰模式。
-　　贪婪模式：匹配尽可能多的字符。
-　　我们一般刚开始学习正则表达式使用到的都是贪婪模式下的表达。
-　　比如：将 a.*b  应用于串 “aabab” ，它会匹配 “aabab”整个串。注意，其实整个串“aabab”中的子串“aab”和“ab”也是匹配的。这就是正则表达式的贪婪模式。
-　　懒惰模式：匹配尽可能少的字符。
-　　正则表达式用?来表示懒惰限">
-<meta property="og:updated_time" content="2016-03-05T03:46:46.000Z">
+<meta property="og:description" content="repository使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。
+maven中的repo有两种类型：
+
+remote repository：相当于公共的仓库，大家都能访问到，一般可以用URL的形式访问
+
+local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:\Us">
+<meta property="og:updated_time" content="2016-03-11T14:16:51.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="regex的贪婪与懒惰">
-<meta name="twitter:description" content="正则表达式有两种模式：贪婪模式与懒惰模式。
-　　贪婪模式：匹配尽可能多的字符。
-　　我们一般刚开始学习正则表达式使用到的都是贪婪模式下的表达。
-　　比如：将 a.*b  应用于串 “aabab” ，它会匹配 “aabab”整个串。注意，其实整个串“aabab”中的子串“aab”和“ab”也是匹配的。这就是正则表达式的贪婪模式。
-　　懒惰模式：匹配尽可能少的字符。
-　　正则表达式用?来表示懒惰限">
+<meta name="twitter:title" content="Maven：mirror和repository区别">
+<meta name="twitter:description" content="repository使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。
+maven中的repo有两种类型：
+
+remote repository：相当于公共的仓库，大家都能访问到，一般可以用URL的形式访问
+
+local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:\Us">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -94,14 +94,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/" title="regex的贪婪与懒惰" itemprop="url">regex的贪婪与懒惰</a>
+      <a href="/2016/03/11/Maven：mirror和repository区别/" title="Maven：mirror和repository区别" itemprop="url">Maven：mirror和repository区别</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2015-09-04T13:07:39.000Z" itemprop="datePublished"> 发表于 2015-09-04</time>
+    <time datetime="2016-03-11T14:13:38.000Z" itemprop="datePublished"> 发表于 2016-03-11</time>
     
   </p>
 </header>
@@ -110,92 +110,37 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#repository"><span class="toc-number">1.</span> <span class="toc-text">repository</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mirror"><span class="toc-number">2.</span> <span class="toc-text">mirror</span></a></li></ol>
 		
 		</div>
 		
-		<p>　　正则表达式有两种模式：<strong>贪婪模式</strong>与<strong>懒惰模式</strong>。</p>
-<p>　　贪婪模式：匹配尽可能多的字符。</p>
-<p>　　我们一般刚开始学习正则表达式使用到的都是贪婪模式下的表达。</p>
-<p>　　比如：将<strong> a.*b </strong> 应用于串 <strong>“aabab”</strong> ，它会匹配 “aabab”整个串。注意，其实整个串“aabab”中的子串“aab”和“ab”也是匹配的。这就是正则表达式的贪婪模式。</p>
-<p>　　懒惰模式：匹配尽可能少的字符。</p>
-<p>　　正则表达式用<strong>?</strong>来表示懒惰限定符。它要用在重复匹配限定符的后面。</p>
-<p>　　重复匹配限定符：</p>
-<table>
-<thead>
-<tr>
-<th>代码</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>*</td>
-<td>重复零次或更多次</td>
-</tr>
-<tr>
-<td>+</td>
-<td>重复一次或更多次</td>
-</tr>
-<tr>
-<td>?</td>
-<td>重复零次或一次</td>
-</tr>
-<tr>
-<td>{n}</td>
-<td>重复n次</td>
-</tr>
-<tr>
-<td>{n,}</td>
-<td>重复n次或更多次</td>
-</tr>
-<tr>
-<td>{n,m}</td>
-<td>重复n到m次</td>
-</tr>
-</tbody>
-</table>
-<p>　　加入懒惰限定符的重复匹配限定符：　　</p>
-<table>
-<thead>
-<tr>
-<th>代码</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>*?</td>
-<td>重复零次或更多次，但尽可能少重复</td>
-</tr>
-<tr>
-<td>+?</td>
-<td>重复一次或更多次，但尽可能少重复</td>
-</tr>
-<tr>
-<td>??</td>
-<td>重复零次或一次，但尽可能少重复</td>
-</tr>
-<tr>
-<td>{n,}?</td>
-<td>重复n次或更多次，但尽可能少重复</td>
-</tr>
-<tr>
-<td>{n,m}?</td>
-<td>重复n到m次，但尽可能少重复</td>
-</tr>
-</tbody>
-</table>
-<p>　　还是上面那个例子：将<strong> a.*?b </strong> 应用于串 <strong>“aabab”</strong> ，它会匹配 “aab”这个子串（对应于原串的前三个字符）和 “ab”这个子串（对应于原串的最后两个字符）。注意：懒惰模式在匹配好了以后会记录该匹配串，如果还有剩余的字符，会继续往下匹配，直到结束，返回所有匹配成功的串。</p>
-<p>　　实战例子: 在python的爬虫应用中，我们常常遇见需要在整个html页面中找到我们需要的内容，这时就要用到regex。比如我们想要找到所有的img标签中的src属性的内容：</p>
-<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;img pic_type=<span class="string">"0"</span> <span class="keyword">class</span>=<span class="string">"BDE_Image"</span> src=<span class="string">"http://imgsrc.baidu.com/forum/w%3D580/sign=294db374d462853592e0d229a0ee76f2/e732c895d143ad4b630e8f4683025aafa40f0611.jpg"</span> pic_ext=<span class="string">"bmp"</span> <span class="built_in">height</span>=<span class="string">"328"</span> <span class="built_in">width</span>=<span class="string">"560"</span>&gt;</span><br></pre></td></tr></table></figure>
-<p>　　用到的正则表达式：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg = <span class="string">r'src="(.+?\.jpg)" pic_ext'</span></span><br></pre></td></tr></table></figure>
-<p>　　注意，这里就运用了懒惰规则，如果写成这样：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg = <span class="string">r'src="(.+\.jpg)" pic_ext'</span></span><br></pre></td></tr></table></figure>
-<p>　　如果有不止一个img标签的话，就会匹配第一个img标签的开始部分和最后一个img标签的结束部分的全部字符，这样就没有了意义。
-　</p>
-<p>　　上式中，“( )”中的内容表示待提取的字符。</p>
+		<h3 id="repository"><a href="#repository" class="headerlink" title="repository"></a><strong>repository</strong></h3><p>使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。</p>
+<p>maven中的repo有两种类型：</p>
+<ol>
+<li><p>remote repository：相当于公共的仓库，大家都能访问到，一般可以用URL的形式访问</p>
+</li>
+<li><p>local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:\Users\｛用户名｝.m2\repository目录</p>
+</li>
+</ol>
+<p>自动下载原则：repository里存放的都是各种jar包和maven插件。当向仓库请求插件或依赖的时候，会先检查local repository，如果local repository有则直接返回，否则会向remote repository请求，并缓存到local repository。也可以把做的东西放到本地仓库，仅供本地使用；或上传到远程仓库，供大家使用。</p>
+<p>其中，remote repository主要有3种类型：</p>
+<ol>
+<li><p>中央仓库：<a href="http://repo1.maven.org/maven2/" target="_blank" rel="external">http://repo1.maven.org/maven2/</a> </p>
+</li>
+<li><p>私服：内网自建的maven repository，其URL是一个内部网址 </p>
+</li>
+<li><p>其他公共仓库：其他可以互联网公共访问maven repository，例如 jboss repository等</p>
+</li>
+</ol>
+<p>一个repo的定义如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">repository</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">id</span>&gt;</span>central<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">url</span>&gt;</span>http://maven.oa.com/nexus/content/groups/public<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">releases</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">enabled</span>&gt;</span>true<span class="tag">&lt;/<span class="name">enabled</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">releases</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">snapshots</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">enabled</span>&gt;</span>false<span class="tag">&lt;/<span class="name">enabled</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">snapshots</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">repository</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="mirror"><a href="#mirror" class="headerlink" title="mirror"></a><strong>mirror</strong></h3><p>mirror相当于一个拦截器，可以拦截去往指定remote repository id的请求，把请求里的remote repository url，重定向到mirror里配置的地址。</p>
+<p>那么为什么要这么用呢？</p>
+<p>配置两个Repository之间的镜像关系，一般是出于访问速度和下载速度考虑。<br>例如， 有一个项目，需要在公司和住所都编码，并在项目pom.xml配置了A Maven库。在公司，是电信网络，访问A库很快，所以maven管理依赖和插件都从A库下载；在住所，是网通网络，访问A库很慢，但是访问B库很快。这时，在住所的setting.xml里，只要配置一下<mirrors><mirror>….</mirror></mirrors>，让B库成为A库的mirror，即可不用更改项目pom.xml里对于A库的相关配置。</p>
+<p>但是需要注意的是，如果配置了A库的镜像B库，那么当B库不稳定、不可访问或者停止服务的时候，maven此时也不会去访问A库，因而无法下载所需的构件。</p>
+<p>配置方法：</p>
+<p>在<code>&lt;mirrorOf&gt;&lt;/mirrorOf&gt;</code> 放置repo id，当然，这是mirror最基本的用法。</p>
+<p>为了满足一些复杂的需求，Maven还支持更高级的镜像配置：</p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 匹配所有远程仓库，此时所有的请求都会发往镜像库</span></span><br><span class="line"><span class="variable">&lt;mirrorOf&gt;</span><span class="keyword">*</span><span class="variable">&lt;/mirrorOf&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 匹配仓库repo1和repo2，使用逗号分隔多个远程仓库</span></span><br><span class="line"><span class="variable">&lt;mirrorOf&gt;</span>repo1,repo2<span class="variable">&lt;/mirrorOf&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 匹配所有远程仓库，repo1除外，使用感叹号将仓库从匹配中排除</span></span><br><span class="line"><span class="variable">&lt;mirrorOf&gt;</span><span class="keyword">*</span>,!repo1<span class="variable">&lt;/miiroOf&gt;</span></span><br></pre></td></tr></table></figure>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -203,13 +148,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/regex/">regex</a>
+  <a class="article-category-link" href="/categories/tool/">tool</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/regex/">regex</a><a href="/tags/python/">python</a>
+  <span></span> <a href="/tags/maven/">maven</a>
   </div>
 
 </div>
@@ -218,7 +163,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/" data-title="regex的贪婪与懒惰 | Urey on the way" data-tsina="null" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2016/03/11/Maven：mirror和repository区别/" data-title="Maven：mirror和repository区别 | Urey on the way" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -231,19 +176,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/09/07/2015-09-07-osx-plist-ding-shi-ren-wu/" title="osx plist 定时任务">
-  <strong>上一篇：</strong><br/>
-  <span>
-  osx plist 定时任务</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/08/31/2015-08-31-ban-jia-la/"  title="搬家啦">
+<a href="/2016/03/06/Hadoop实现KMeans聚类/"  title="Hadoop实现KMeans聚类">
  <strong>下一篇：</strong><br/> 
- <span>搬家啦
+ <span>Hadoop实现KMeans聚类
 </span>
 </a>
 </div>
@@ -252,7 +189,7 @@
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/" data-title="regex的贪婪与懒惰" data-url="http://qiaowei.xyz/2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/"></div>
+	<div class="ds-thread" data-thread-key="2016/03/11/Maven：mirror和repository区别/" data-title="Maven：mirror和repository区别" data-url="http://qiaowei.xyz/2016/03/11/Maven：mirror和repository区别/"></div>
 </section>
 
 
@@ -262,7 +199,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#repository"><span class="toc-number">1.</span> <span class="toc-text">repository</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mirror"><span class="toc-number">2.</span> <span class="toc-text">mirror</span></a></li></ol>
  
   </div>
 

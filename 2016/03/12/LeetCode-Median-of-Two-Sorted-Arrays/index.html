@@ -4,38 +4,41 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>regex的贪婪与懒惰 | Urey on the way</title>
+    <title>LeetCode Median of Two Sorted Arrays | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="正则表达式有两种模式：贪婪模式与懒惰模式。
-　　贪婪模式：匹配尽可能多的字符。
-　　我们一般刚开始学习正则表达式使用到的都是贪婪模式下的表达。
-　　比如：将 a.*b  应用于串 “aabab” ，它会匹配 “aabab”整个串。注意，其实整个串“aabab”中的子串“aab”和“ab”也是匹配的。这就是正则表达式的贪婪模式。
-　　懒惰模式：匹配尽可能少的字符。
-　　正则表达式用?来表示懒惰限">
+    <meta name="description" content="tips
+median, 找中位数
+奇数数组中位数，a[n/2 + 1]
+偶数数组中位数，(a[n/2]+a[n/2+1])/2.0
+化简为两个有序数组找第k大元素问题，普通解法O(m+n)，用递归可以达到O(log(m+n))
+
+1234567891011121314151617181920212223242526272829class Solution &amp;#123;public:    dou">
 <meta property="og:type" content="article">
-<meta property="og:title" content="regex的贪婪与懒惰">
-<meta property="og:url" content="http://qiaowei.xyz/2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/index.html">
+<meta property="og:title" content="LeetCode Median of Two Sorted Arrays">
+<meta property="og:url" content="http://qiaowei.xyz/2016/03/12/LeetCode-Median-of-Two-Sorted-Arrays/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="正则表达式有两种模式：贪婪模式与懒惰模式。
-　　贪婪模式：匹配尽可能多的字符。
-　　我们一般刚开始学习正则表达式使用到的都是贪婪模式下的表达。
-　　比如：将 a.*b  应用于串 “aabab” ，它会匹配 “aabab”整个串。注意，其实整个串“aabab”中的子串“aab”和“ab”也是匹配的。这就是正则表达式的贪婪模式。
-　　懒惰模式：匹配尽可能少的字符。
-　　正则表达式用?来表示懒惰限">
-<meta property="og:updated_time" content="2016-03-05T03:46:46.000Z">
+<meta property="og:description" content="tips
+median, 找中位数
+奇数数组中位数，a[n/2 + 1]
+偶数数组中位数，(a[n/2]+a[n/2+1])/2.0
+化简为两个有序数组找第k大元素问题，普通解法O(m+n)，用递归可以达到O(log(m+n))
+
+1234567891011121314151617181920212223242526272829class Solution &amp;#123;public:    dou">
+<meta property="og:updated_time" content="2016-03-12T09:45:58.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="regex的贪婪与懒惰">
-<meta name="twitter:description" content="正则表达式有两种模式：贪婪模式与懒惰模式。
-　　贪婪模式：匹配尽可能多的字符。
-　　我们一般刚开始学习正则表达式使用到的都是贪婪模式下的表达。
-　　比如：将 a.*b  应用于串 “aabab” ，它会匹配 “aabab”整个串。注意，其实整个串“aabab”中的子串“aab”和“ab”也是匹配的。这就是正则表达式的贪婪模式。
-　　懒惰模式：匹配尽可能少的字符。
-　　正则表达式用?来表示懒惰限">
+<meta name="twitter:title" content="LeetCode Median of Two Sorted Arrays">
+<meta name="twitter:description" content="tips
+median, 找中位数
+奇数数组中位数，a[n/2 + 1]
+偶数数组中位数，(a[n/2]+a[n/2+1])/2.0
+化简为两个有序数组找第k大元素问题，普通解法O(m+n)，用递归可以达到O(log(m+n))
+
+1234567891011121314151617181920212223242526272829class Solution &amp;#123;public:    dou">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -94,14 +97,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/" title="regex的贪婪与懒惰" itemprop="url">regex的贪婪与懒惰</a>
+      <a href="/2016/03/12/LeetCode-Median-of-Two-Sorted-Arrays/" title="LeetCode Median of Two Sorted Arrays" itemprop="url">LeetCode Median of Two Sorted Arrays</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2015-09-04T13:07:39.000Z" itemprop="datePublished"> 发表于 2015-09-04</time>
+    <time datetime="2016-03-12T09:40:44.000Z" itemprop="datePublished"> 发表于 2016-03-12</time>
     
   </p>
 </header>
@@ -110,92 +113,17 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips</span></a></li></ol>
 		
 		</div>
 		
-		<p>　　正则表达式有两种模式：<strong>贪婪模式</strong>与<strong>懒惰模式</strong>。</p>
-<p>　　贪婪模式：匹配尽可能多的字符。</p>
-<p>　　我们一般刚开始学习正则表达式使用到的都是贪婪模式下的表达。</p>
-<p>　　比如：将<strong> a.*b </strong> 应用于串 <strong>“aabab”</strong> ，它会匹配 “aabab”整个串。注意，其实整个串“aabab”中的子串“aab”和“ab”也是匹配的。这就是正则表达式的贪婪模式。</p>
-<p>　　懒惰模式：匹配尽可能少的字符。</p>
-<p>　　正则表达式用<strong>?</strong>来表示懒惰限定符。它要用在重复匹配限定符的后面。</p>
-<p>　　重复匹配限定符：</p>
-<table>
-<thead>
-<tr>
-<th>代码</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>*</td>
-<td>重复零次或更多次</td>
-</tr>
-<tr>
-<td>+</td>
-<td>重复一次或更多次</td>
-</tr>
-<tr>
-<td>?</td>
-<td>重复零次或一次</td>
-</tr>
-<tr>
-<td>{n}</td>
-<td>重复n次</td>
-</tr>
-<tr>
-<td>{n,}</td>
-<td>重复n次或更多次</td>
-</tr>
-<tr>
-<td>{n,m}</td>
-<td>重复n到m次</td>
-</tr>
-</tbody>
-</table>
-<p>　　加入懒惰限定符的重复匹配限定符：　　</p>
-<table>
-<thead>
-<tr>
-<th>代码</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>*?</td>
-<td>重复零次或更多次，但尽可能少重复</td>
-</tr>
-<tr>
-<td>+?</td>
-<td>重复一次或更多次，但尽可能少重复</td>
-</tr>
-<tr>
-<td>??</td>
-<td>重复零次或一次，但尽可能少重复</td>
-</tr>
-<tr>
-<td>{n,}?</td>
-<td>重复n次或更多次，但尽可能少重复</td>
-</tr>
-<tr>
-<td>{n,m}?</td>
-<td>重复n到m次，但尽可能少重复</td>
-</tr>
-</tbody>
-</table>
-<p>　　还是上面那个例子：将<strong> a.*?b </strong> 应用于串 <strong>“aabab”</strong> ，它会匹配 “aab”这个子串（对应于原串的前三个字符）和 “ab”这个子串（对应于原串的最后两个字符）。注意：懒惰模式在匹配好了以后会记录该匹配串，如果还有剩余的字符，会继续往下匹配，直到结束，返回所有匹配成功的串。</p>
-<p>　　实战例子: 在python的爬虫应用中，我们常常遇见需要在整个html页面中找到我们需要的内容，这时就要用到regex。比如我们想要找到所有的img标签中的src属性的内容：</p>
-<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;img pic_type=<span class="string">"0"</span> <span class="keyword">class</span>=<span class="string">"BDE_Image"</span> src=<span class="string">"http://imgsrc.baidu.com/forum/w%3D580/sign=294db374d462853592e0d229a0ee76f2/e732c895d143ad4b630e8f4683025aafa40f0611.jpg"</span> pic_ext=<span class="string">"bmp"</span> <span class="built_in">height</span>=<span class="string">"328"</span> <span class="built_in">width</span>=<span class="string">"560"</span>&gt;</span><br></pre></td></tr></table></figure>
-<p>　　用到的正则表达式：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg = <span class="string">r'src="(.+?\.jpg)" pic_ext'</span></span><br></pre></td></tr></table></figure>
-<p>　　注意，这里就运用了懒惰规则，如果写成这样：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg = <span class="string">r'src="(.+\.jpg)" pic_ext'</span></span><br></pre></td></tr></table></figure>
-<p>　　如果有不止一个img标签的话，就会匹配第一个img标签的开始部分和最后一个img标签的结束部分的全部字符，这样就没有了意义。
-　</p>
-<p>　　上式中，“( )”中的内容表示待提取的字符。</p>
+		<h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a><strong>tips</strong></h4><ol>
+<li>median, 找中位数</li>
+<li>奇数数组中位数，a[n/2 + 1]</li>
+<li>偶数数组中位数，(a[n/2]+a[n/2+1])/2.0</li>
+<li>化简为两个有序数组找第k大元素问题，普通解法O(m+n)，用递归可以达到O(log(m+n))</li>
+</ol>
+<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    <span class="keyword">double</span> findMedianSortedArrays(vector&lt;<span class="keyword">int</span>&gt;&amp; nums1, vector&lt;<span class="keyword">int</span>&gt;&amp; nums2) &#123;</span><br><span class="line">        <span class="keyword">int</span> total = nums1.size() + nums2.size()<span class="comment">;</span></span><br><span class="line">        <span class="keyword">if</span>(total &amp; <span class="number">1</span>) &#123;<span class="comment">//odd</span></span><br><span class="line">            <span class="keyword">return</span> findKth(nums1, nums2, <span class="number">0</span>, <span class="number">0</span>, total / <span class="number">2</span> + <span class="number">1</span>)<span class="comment">;</span></span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;<span class="comment">//not odd</span></span><br><span class="line">            <span class="keyword">return</span> (findKth(nums1, nums2, <span class="number">0</span>, <span class="number">0</span>, total / <span class="number">2</span>) + findKth(nums1, nums2, <span class="number">0</span>, <span class="number">0</span>, total / <span class="number">2</span> + <span class="number">1</span>)) / <span class="number">2.0</span><span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">double</span> findKth(vector&lt;<span class="keyword">int</span>&gt;&amp; nums1, vector&lt;<span class="keyword">int</span>&gt;&amp; nums2, <span class="keyword">int</span> nums1_start, <span class="keyword">int</span> nums2_start, <span class="keyword">int</span> k) &#123;</span><br><span class="line">        <span class="keyword">if</span>(nums1_start &gt;= nums1.size()) &#123;</span><br><span class="line">            <span class="keyword">return</span> nums2[nums2_start + k - <span class="number">1</span>]<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(nums2_start &gt;= nums2.size()) &#123;</span><br><span class="line">            <span class="keyword">return</span> nums1[nums1_start + k - <span class="number">1</span>]<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(k == <span class="number">1</span>) <span class="keyword">return</span> min(nums1[nums1_start], nums2[nums2_start])<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> nums1_key = nums1_start + k / <span class="number">2</span>  - <span class="number">1</span>&gt;= nums1.size() ? INT_MAX : nums1[nums1_start + k / <span class="number">2</span> - <span class="number">1</span>]<span class="comment">;</span></span><br><span class="line">        <span class="keyword">int</span> nums2_key = nums2_start + k / <span class="number">2</span>  - <span class="number">1</span>&gt;= nums2.size() ? INT_MAX : nums2[nums2_start + k / <span class="number">2</span> - <span class="number">1</span>]<span class="comment">;</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span>(nums1_key &lt; nums2_key) &#123;</span><br><span class="line">            <span class="keyword">return</span> findKth(nums1, nums2, nums1_start + k / <span class="number">2</span>, nums2_start, k - k / <span class="number">2</span>)<span class="comment">;</span></span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> findKth(nums1, nums2, nums1_start, nums2_start + k / <span class="number">2</span>, k - k / <span class="number">2</span>)<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -203,13 +131,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/regex/">regex</a>
+  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/regex/">regex</a><a href="/tags/python/">python</a>
+  <span></span> <a href="/tags/leetcode/">leetcode</a>
   </div>
 
 </div>
@@ -218,7 +146,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/" data-title="regex的贪婪与懒惰 | Urey on the way" data-tsina="null" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2016/03/12/LeetCode-Median-of-Two-Sorted-Arrays/" data-title="LeetCode Median of Two Sorted Arrays | Urey on the way" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -231,19 +159,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/09/07/2015-09-07-osx-plist-ding-shi-ren-wu/" title="osx plist 定时任务">
-  <strong>上一篇：</strong><br/>
-  <span>
-  osx plist 定时任务</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/08/31/2015-08-31-ban-jia-la/"  title="搬家啦">
+<a href="/2016/03/12/LeetCode-Longest-Substring-Without-Repeating-Characters/"  title="LeetCode Longest Substring Without Repeating Characters">
  <strong>下一篇：</strong><br/> 
- <span>搬家啦
+ <span>LeetCode Longest Substring Without Repeating Characters
 </span>
 </a>
 </div>
@@ -252,7 +172,7 @@
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/" data-title="regex的贪婪与懒惰" data-url="http://qiaowei.xyz/2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/"></div>
+	<div class="ds-thread" data-thread-key="2016/03/12/LeetCode-Median-of-Two-Sorted-Arrays/" data-title="LeetCode Median of Two Sorted Arrays" data-url="http://qiaowei.xyz/2016/03/12/LeetCode-Median-of-Two-Sorted-Arrays/"></div>
 </section>
 
 
@@ -262,7 +182,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips</span></a></li></ol>
  
   </div>
 

@@ -4,31 +4,38 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>搬家啦 | Urey on the way</title>
+    <title>LeetCode Longest Palindromic Substring | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="以前一直把博客的家安在CSDN上(http://blog.csdn.net/yeruby)，它记录了我从大一开始，一直到研一生活结束的点点滴滴，这也是我一直不断前进的动力，但就像一直住在别人家里一样，有点别扭。
-　　因此赶在2015年的8月末，我决定将博客迁移到github上，并且从以前的技术为主转变为：写写技术、还要再聊聊生活。
-　　脚踏实地，仰望星空。">
+    <meta name="description" content="tips
+最长回文子串问题
+暴力解法O(N^3)
+DP, time complexcity O(N^2)
+DP, space complexcity O(N^2)
+DP重在递推方程12345678910111213p[i][j] = 1 从i开始以j结尾的子串是回文串p[i][j] != 1从i开始以j结尾的子串不是回文串1&amp;gt;p[i][i] = 12&amp;gt;p[i][i+1] = 1 onl">
 <meta property="og:type" content="article">
-<meta property="og:title" content="搬家啦">
-<meta property="og:url" content="http://qiaowei.xyz/2015/08/31/2015-08-31-ban-jia-la/index.html">
+<meta property="og:title" content="LeetCode Longest Palindromic Substring">
+<meta property="og:url" content="http://qiaowei.xyz/2016/03/12/LeetCode-Longest-Palindromic-Substring/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="以前一直把博客的家安在CSDN上(http://blog.csdn.net/yeruby)，它记录了我从大一开始，一直到研一生活结束的点点滴滴，这也是我一直不断前进的动力，但就像一直住在别人家里一样，有点别扭。
-　　因此赶在2015年的8月末，我决定将博客迁移到github上，并且从以前的技术为主转变为：写写技术、还要再聊聊生活。
-　　脚踏实地，仰望星空。">
-<meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/1.png">
-<meta property="og:updated_time" content="2015-09-01T03:36:47.000Z">
+<meta property="og:description" content="tips
+最长回文子串问题
+暴力解法O(N^3)
+DP, time complexcity O(N^2)
+DP, space complexcity O(N^2)
+DP重在递推方程12345678910111213p[i][j] = 1 从i开始以j结尾的子串是回文串p[i][j] != 1从i开始以j结尾的子串不是回文串1&amp;gt;p[i][i] = 12&amp;gt;p[i][i+1] = 1 onl">
+<meta property="og:updated_time" content="2016-03-12T13:09:29.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="搬家啦">
-<meta name="twitter:description" content="以前一直把博客的家安在CSDN上(http://blog.csdn.net/yeruby)，它记录了我从大一开始，一直到研一生活结束的点点滴滴，这也是我一直不断前进的动力，但就像一直住在别人家里一样，有点别扭。
-　　因此赶在2015年的8月末，我决定将博客迁移到github上，并且从以前的技术为主转变为：写写技术、还要再聊聊生活。
-　　脚踏实地，仰望星空。">
-<meta name="twitter:image" content="http://7xlhna.com1.z0.glb.clouddn.com/1.png">
+<meta name="twitter:title" content="LeetCode Longest Palindromic Substring">
+<meta name="twitter:description" content="tips
+最长回文子串问题
+暴力解法O(N^3)
+DP, time complexcity O(N^2)
+DP, space complexcity O(N^2)
+DP重在递推方程12345678910111213p[i][j] = 1 从i开始以j结尾的子串是回文串p[i][j] != 1从i开始以j结尾的子串不是回文串1&amp;gt;p[i][i] = 12&amp;gt;p[i][i+1] = 1 onl">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -87,14 +94,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/08/31/2015-08-31-ban-jia-la/" title="搬家啦" itemprop="url">搬家啦</a>
+      <a href="/2016/03/12/LeetCode-Longest-Palindromic-Substring/" title="LeetCode Longest Palindromic Substring" itemprop="url">LeetCode Longest Palindromic Substring</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2015-08-31T09:15:31.000Z" itemprop="datePublished"> 发表于 2015-08-31</time>
+    <time datetime="2016-03-12T13:04:14.000Z" itemprop="datePublished"> 发表于 2016-03-12</time>
     
   </p>
 </header>
@@ -103,14 +110,19 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips</span></a></li></ol>
 		
 		</div>
 		
-		<p>　　以前一直把博客的家安在CSDN上(<a href="http://blog.csdn.net/yeruby" target="_blank" rel="external">http://blog.csdn.net/yeruby</a>)，它记录了我从大一开始，一直到研一生活结束的点点滴滴，这也是我一直不断前进的动力，但就像一直住在别人家里一样，有点别扭。</p>
-<p>　　因此赶在2015年的8月末，我决定将博客迁移到github上，并且从以前的技术为主转变为：写写技术、还要再聊聊生活。</p>
-<p>　　脚踏实地，仰望星空。</p>
-<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/1.png" alt="BlueSky"></p>
+		<h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a><strong>tips</strong></h4><ol>
+<li>最长回文子串问题</li>
+<li>暴力解法O(N^3)</li>
+<li>DP, time complexcity O(N^2)</li>
+<li>DP, space complexcity O(N^2)</li>
+<li>DP重在递推方程<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">p[<span class="string">i</span>][<span class="symbol">j</span>] = 1 </span><br><span class="line">从i开始以j结尾的子串是回文串</span><br><span class="line">p[<span class="string">i</span>][<span class="symbol">j</span>] != 1</span><br><span class="line">从i开始以j结尾的子串不是回文串</span><br><span class="line"></span><br><span class="line">1&gt;</span><br><span class="line">p[<span class="string">i</span>][<span class="symbol">i</span>] = 1</span><br><span class="line"></span><br><span class="line">2&gt;</span><br><span class="line">p[<span class="string">i</span>][<span class="symbol">i+1</span>] = 1 only if s[i] == s[i+1]</span><br><span class="line"></span><br><span class="line">3&gt;</span><br><span class="line">p[<span class="string">i</span>][<span class="symbol">j</span>] = 1 only if s[<span class="string">i</span>] == s[<span class="string">j</span>] &amp;&amp; p[<span class="string">i+1</span>][<span class="symbol">j-1</span>] == 1</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    string longestPalindrome(string s) &#123;</span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">1</span>, begin = <span class="number">0</span><span class="comment">;</span></span><br><span class="line">        <span class="keyword">int</span> n = s.<span class="keyword">length</span>()<span class="comment">;</span></span><br><span class="line">        <span class="comment">// vector&lt;vector&lt;bool&gt;&gt; p(n, vector&lt;bool&gt;(n, 0)); -&gt; timeout</span></span><br><span class="line">        bool p[<span class="number">1000</span>][<span class="number">1000</span>] = &#123;<span class="number">0</span>&#125;<span class="comment">;</span></span><br><span class="line">        <span class="comment">//init: len = 1</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span><span class="comment">; i &lt; n; ++i) &#123;</span></span><br><span class="line">            p[i][i] = <span class="number">1</span><span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//init: len = 2</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span><span class="comment">; i &lt; n - 1; ++i) &#123;</span></span><br><span class="line">            <span class="keyword">if</span>(s[i] == s[i + <span class="number">1</span>]) &#123;</span><br><span class="line">                p[i][i + <span class="number">1</span>] = <span class="number">1</span><span class="comment">;</span></span><br><span class="line">                res = <span class="number">2</span><span class="comment">;</span></span><br><span class="line">                begin = i<span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//dp: len = 3, ..., n</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> len = <span class="number">3</span><span class="comment">; len &lt;= n; ++len) &#123;</span></span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span><span class="comment">; i &lt; n - len + 1; ++i) &#123;</span></span><br><span class="line">                <span class="keyword">int</span> j = i + len - <span class="number">1</span><span class="comment">;</span></span><br><span class="line">                <span class="keyword">if</span>(s[i] == s[j] &amp;&amp; p[i + <span class="number">1</span>][j - <span class="number">1</span>] == <span class="number">1</span>) &#123;</span><br><span class="line">                    p[i][j] = <span class="number">1</span><span class="comment">;</span></span><br><span class="line">                    res = len<span class="comment">;</span></span><br><span class="line">                    begin = i<span class="comment">;</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> s.substr(begin, res)<span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -118,13 +130,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/life/">life</a>
+  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/tips/">tips</a>
+  <span></span> <a href="/tags/leetcode/">leetcode</a>
   </div>
 
 </div>
@@ -133,7 +145,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2015/08/31/2015-08-31-ban-jia-la/" data-title="搬家啦 | Urey on the way" data-tsina="null" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2016/03/12/LeetCode-Longest-Palindromic-Substring/" data-title="LeetCode Longest Palindromic Substring | Urey on the way" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -146,20 +158,20 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/" title="regex的贪婪与懒惰">
-  <strong>上一篇：</strong><br/>
-  <span>
-  regex的贪婪与懒惰</span>
+
+<div class="next">
+<a href="/2016/03/12/LeetCode-Median-of-Two-Sorted-Arrays/"  title="LeetCode Median of Two Sorted Arrays">
+ <strong>下一篇：</strong><br/> 
+ <span>LeetCode Median of Two Sorted Arrays
+</span>
 </a>
 </div>
-
 
 </nav>
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2015/08/31/2015-08-31-ban-jia-la/" data-title="搬家啦" data-url="http://qiaowei.xyz/2015/08/31/2015-08-31-ban-jia-la/"></div>
+	<div class="ds-thread" data-thread-key="2016/03/12/LeetCode-Longest-Palindromic-Substring/" data-title="LeetCode Longest Palindromic Substring" data-url="http://qiaowei.xyz/2016/03/12/LeetCode-Longest-Palindromic-Substring/"></div>
 </section>
 
 
@@ -169,7 +181,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips</span></a></li></ol>
  
   </div>
 

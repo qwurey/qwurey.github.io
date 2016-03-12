@@ -4,35 +4,41 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Maven：mirror和repository区别 | Urey on the way</title>
+    <title>LeetCode Add Two Numbers | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="一、repository用法使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。
-maven中的repo有两种类型：
+    <meta name="description" content="tips
+使用链表实现高精度整形加法
+链表元素和链表指针
+time complexity: O(max(len(l1),len(l2)))
+space complexity: O(max(len(l1),len(l2)))
 
-remote repository：相当于公共的仓库，大家都能访问到，一般可以用URL的形式访问
-local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:">
+1234567891011121314151617181920212223242526272829303132333435/** * Definition for singl">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Maven：mirror和repository区别">
-<meta property="og:url" content="http://qiaowei.xyz/2016/03/11/Maven：mirror和repository区别/index.html">
+<meta property="og:title" content="LeetCode Add Two Numbers">
+<meta property="og:url" content="http://qiaowei.xyz/2016/03/12/LeetCode-Add-Two-Numbers/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="一、repository用法使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。
-maven中的repo有两种类型：
+<meta property="og:description" content="tips
+使用链表实现高精度整形加法
+链表元素和链表指针
+time complexity: O(max(len(l1),len(l2)))
+space complexity: O(max(len(l1),len(l2)))
 
-remote repository：相当于公共的仓库，大家都能访问到，一般可以用URL的形式访问
-local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:">
-<meta property="og:updated_time" content="2016-03-11T14:19:10.000Z">
+1234567891011121314151617181920212223242526272829303132333435/** * Definition for singl">
+<meta property="og:updated_time" content="2016-03-12T03:06:52.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Maven：mirror和repository区别">
-<meta name="twitter:description" content="一、repository用法使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。
-maven中的repo有两种类型：
+<meta name="twitter:title" content="LeetCode Add Two Numbers">
+<meta name="twitter:description" content="tips
+使用链表实现高精度整形加法
+链表元素和链表指针
+time complexity: O(max(len(l1),len(l2)))
+space complexity: O(max(len(l1),len(l2)))
 
-remote repository：相当于公共的仓库，大家都能访问到，一般可以用URL的形式访问
-local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:">
+1234567891011121314151617181920212223242526272829303132333435/** * Definition for singl">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -91,14 +97,14 @@ local repository：存放在本地磁盘的一个文件夹，例如，windows上
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/03/11/Maven：mirror和repository区别/" title="Maven：mirror和repository区别" itemprop="url">Maven：mirror和repository区别</a>
+      <a href="/2016/03/12/LeetCode-Add-Two-Numbers/" title="LeetCode Add Two Numbers" itemprop="url">LeetCode Add Two Numbers</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2016-03-11T14:13:38.000Z" itemprop="datePublished"> 发表于 2016-03-11</time>
+    <time datetime="2016-03-12T03:02:25.000Z" itemprop="datePublished"> 发表于 2016-03-12</time>
     
   </p>
 </header>
@@ -107,46 +113,30 @@ local repository：存放在本地磁盘的一个文件夹，例如，windows上
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、repository用法"><span class="toc-number">1.</span> <span class="toc-text">一、repository用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、mirror用法"><span class="toc-number">2.</span> <span class="toc-text">二、mirror用法</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips</span></a></li></ol>
 		
 		</div>
 		
-		<h3 id="一、repository用法"><a href="#一、repository用法" class="headerlink" title="一、repository用法"></a><strong>一、repository用法</strong></h3><p>使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。</p>
-<p>maven中的repo有两种类型：</p>
-<ol>
-<li>remote repository：相当于公共的仓库，大家都能访问到，一般可以用URL的形式访问</li>
-<li>local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:\Users\｛用户名｝.m2\repository目录</li>
+		<h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a>tips</h4><ol>
+<li>使用链表实现高精度整形加法</li>
+<li>链表元素和链表指针</li>
+<li>time complexity: O(max(len(l1),len(l2)))</li>
+<li>space complexity: O(max(len(l1),len(l2)))</li>
 </ol>
-<p>自动下载原则：repository里存放的都是各种jar包和maven插件。当向仓库请求插件或依赖的时候，会先检查local repository，如果local repository有则直接返回，否则会向remote repository请求，并缓存到local repository。也可以把做的东西放到本地仓库，仅供本地使用；或上传到远程仓库，供大家使用。</p>
-<p>其中，remote repository主要有3种类型：</p>
-<ol>
-<li>中央仓库：<a href="http://repo1.maven.org/maven2/" target="_blank" rel="external">http://repo1.maven.org/maven2/</a> </li>
-<li>私服：内网自建的maven repository，其URL是一个内部网址 </li>
-<li>其他公共仓库：其他可以互联网公共访问maven repository，例如 jboss repository等</li>
-</ol>
-<p>一个repo的定义如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">repository</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">id</span>&gt;</span>central<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">url</span>&gt;</span>http://maven.oa.com/nexus/content/groups/public<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">releases</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">enabled</span>&gt;</span>true<span class="tag">&lt;/<span class="name">enabled</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">releases</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">snapshots</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">enabled</span>&gt;</span>false<span class="tag">&lt;/<span class="name">enabled</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">snapshots</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">repository</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<h3 id="二、mirror用法"><a href="#二、mirror用法" class="headerlink" title="二、mirror用法"></a><strong>二、mirror用法</strong></h3><p>mirror相当于一个拦截器，可以拦截去往指定remote repository id的请求，把请求里的remote repository url，重定向到mirror里配置的地址。</p>
-<p>那么为什么要这么用呢？</p>
-<p>配置两个Repository之间的镜像关系，一般是出于访问速度和下载速度考虑。<br>例如， 有一个项目，需要在公司和住所都编码，并在项目pom.xml配置了A Maven库。在公司，是电信网络，访问A库很快，所以maven管理依赖和插件都从A库下载；在住所，是网通网络，访问A库很慢，但是访问B库很快。这时，在住所的setting.xml里，只要配置一下<mirrors><mirror>….</mirror></mirrors>，让B库成为A库的mirror，即可不用更改项目pom.xml里对于A库的相关配置。</p>
-<p>但是需要注意的是，如果配置了A库的镜像B库，那么当B库不稳定、不可访问或者停止服务的时候，maven此时也不会去访问A库，因而无法下载所需的构件。</p>
-<p>配置方法：</p>
-<p>在<code>&lt;mirrorOf&gt;&lt;/mirrorOf&gt;</code> 放置repo id，当然，这是mirror最基本的用法。</p>
-<p>为了满足一些复杂的需求，Maven还支持更高级的镜像配置：</p>
-<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 匹配所有远程仓库，此时所有的请求都会发往镜像库</span></span><br><span class="line"><span class="variable">&lt;mirrorOf&gt;</span><span class="keyword">*</span><span class="variable">&lt;/mirrorOf&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 匹配仓库repo1和repo2，使用逗号分隔多个远程仓库</span></span><br><span class="line"><span class="variable">&lt;mirrorOf&gt;</span>repo1,repo2<span class="variable">&lt;/mirrorOf&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 匹配所有远程仓库，repo1除外，使用感叹号将仓库从匹配中排除</span></span><br><span class="line"><span class="variable">&lt;mirrorOf&gt;</span><span class="keyword">*</span>,!repo1<span class="variable">&lt;/miiroOf&gt;</span></span><br></pre></td></tr></table></figure>
-  
+<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Definition for singly-linked list.</span><br><span class="line"> * struct ListNode &#123;</span><br><span class="line"> *     int val;</span><br><span class="line"> *     ListNode *next;</span><br><span class="line"> *     ListNode(int x) : val(x), next(NULL) &#123;&#125;</span><br><span class="line"> * &#125;;</span><br><span class="line"> */</span></span><br><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) &#123;</span><br><span class="line">        ListNode* head = new ListNode(<span class="number">0</span>)<span class="comment">;</span></span><br><span class="line">        ListNode* p = head<span class="comment">;</span></span><br><span class="line">        <span class="keyword">int</span> carry = <span class="number">0</span><span class="comment">;</span></span><br><span class="line">        <span class="keyword">while</span>(true) &#123;</span><br><span class="line">            <span class="keyword">if</span>(l1 != NULL) &#123;</span><br><span class="line">                carry += l1-&gt;val<span class="comment">;</span></span><br><span class="line">                l1 = l1-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span>(l2 != NULL) &#123;</span><br><span class="line">                carry += l2-&gt;val<span class="comment">;</span></span><br><span class="line">                l2 = l2-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">            p-&gt;val = carry % <span class="number">10</span><span class="comment">;</span></span><br><span class="line">            carry /= <span class="number">10</span><span class="comment">;</span></span><br><span class="line">            <span class="keyword">if</span>(l1 != NULL || l2 != NULL || carry != <span class="number">0</span>) &#123;</span><br><span class="line">                p-&gt;<span class="keyword">next</span> = new ListNode(<span class="number">0</span>)<span class="comment">;</span></span><br><span class="line">                p = p-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">            &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">break</span><span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> head<span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>  
 	</div>
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/tool/">tool</a>
+  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/maven/">maven</a>
+  <span></span> <a href="/tags/leetcode/">leetcode</a>
   </div>
 
 </div>
@@ -155,7 +145,7 @@ local repository：存放在本地磁盘的一个文件夹，例如，windows上
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2016/03/11/Maven：mirror和repository区别/" data-title="Maven：mirror和repository区别 | Urey on the way" data-tsina="null" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2016/03/12/LeetCode-Add-Two-Numbers/" data-title="LeetCode Add Two Numbers | Urey on the way" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -168,19 +158,11 @@ local repository：存放在本地磁盘的一个文件夹，例如，windows上
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2016/03/12/LeetCode-Two-Sum/" title="LeetCode Two Sum">
-  <strong>上一篇：</strong><br/>
-  <span>
-  LeetCode Two Sum</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2016/03/06/Hadoop实现KMeans聚类/"  title="Hadoop实现KMeans聚类">
+<a href="/2016/03/12/LeetCode-Two-Sum/"  title="LeetCode Two Sum">
  <strong>下一篇：</strong><br/> 
- <span>Hadoop实现KMeans聚类
+ <span>LeetCode Two Sum
 </span>
 </a>
 </div>
@@ -189,7 +171,7 @@ local repository：存放在本地磁盘的一个文件夹，例如，windows上
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2016/03/11/Maven：mirror和repository区别/" data-title="Maven：mirror和repository区别" data-url="http://qiaowei.xyz/2016/03/11/Maven：mirror和repository区别/"></div>
+	<div class="ds-thread" data-thread-key="2016/03/12/LeetCode-Add-Two-Numbers/" data-title="LeetCode Add Two Numbers" data-url="http://qiaowei.xyz/2016/03/12/LeetCode-Add-Two-Numbers/"></div>
 </section>
 
 
@@ -199,7 +181,7 @@ local repository：存放在本地磁盘的一个文件夹，例如，windows上
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、repository用法"><span class="toc-number">1.</span> <span class="toc-text">一、repository用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、mirror用法"><span class="toc-number">2.</span> <span class="toc-text">二、mirror用法</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips</span></a></li></ol>
  
   </div>
 

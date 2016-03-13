@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>LeetCode Two Sum | Urey on the way</title>
+    <title>LeetCode Regular Expression Matching | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
@@ -12,30 +12,27 @@
 
     
     <meta name="description" content="tips
-hash_table: unordered_map
-没有找到：mapping.find(gap) != mapping.end()
-vector向量
+字符串正则匹配
+递归解法，一层一层往下递归
 
-12345678910111213141516171819class Solution &amp;#123;public:    vector&amp;lt;int&amp;gt; twoSum(vector&amp;lt;int&amp;gt;&amp;amp; nums, int">
+123456789101112131415161718192021222324252627282930class Solution &amp;#123;public:    bool isMatch(string s, string p) &amp;#123;        //s match over        if(s.length() == 0)">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LeetCode Two Sum">
-<meta property="og:url" content="http://qiaowei.xyz/2016/03/12/LeetCode-Two-Sum/index.html">
+<meta property="og:title" content="LeetCode Regular Expression Matching">
+<meta property="og:url" content="http://qiaowei.xyz/2016/03/13/LeetCode-Regular-Expression-Matching/index.html">
 <meta property="og:site_name" content="Urey on the way">
 <meta property="og:description" content="tips
-hash_table: unordered_map
-没有找到：mapping.find(gap) != mapping.end()
-vector向量
+字符串正则匹配
+递归解法，一层一层往下递归
 
-12345678910111213141516171819class Solution &amp;#123;public:    vector&amp;lt;int&amp;gt; twoSum(vector&amp;lt;int&amp;gt;&amp;amp; nums, int">
-<meta property="og:updated_time" content="2016-03-12T03:01:32.000Z">
+123456789101112131415161718192021222324252627282930class Solution &amp;#123;public:    bool isMatch(string s, string p) &amp;#123;        //s match over        if(s.length() == 0)">
+<meta property="og:updated_time" content="2016-03-13T15:06:33.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LeetCode Two Sum">
+<meta name="twitter:title" content="LeetCode Regular Expression Matching">
 <meta name="twitter:description" content="tips
-hash_table: unordered_map
-没有找到：mapping.find(gap) != mapping.end()
-vector向量
+字符串正则匹配
+递归解法，一层一层往下递归
 
-12345678910111213141516171819class Solution &amp;#123;public:    vector&amp;lt;int&amp;gt; twoSum(vector&amp;lt;int&amp;gt;&amp;amp; nums, int">
+123456789101112131415161718192021222324252627282930class Solution &amp;#123;public:    bool isMatch(string s, string p) &amp;#123;        //s match over        if(s.length() == 0)">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -94,14 +91,14 @@ vector向量
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/03/12/LeetCode-Two-Sum/" title="LeetCode Two Sum" itemprop="url">LeetCode Two Sum</a>
+      <a href="/2016/03/13/LeetCode-Regular-Expression-Matching/" title="LeetCode Regular Expression Matching" itemprop="url">LeetCode Regular Expression Matching</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2016-03-12T02:58:21.000Z" itemprop="datePublished"> 发表于 2016-03-12</time>
+    <time datetime="2016-03-13T14:53:59.000Z" itemprop="datePublished"> 发表于 2016-03-13</time>
     
   </p>
 </header>
@@ -114,12 +111,12 @@ vector向量
 		
 		</div>
 		
-		<h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a>tips</h4><ol>
-<li>hash_table: unordered_map</li>
-<li>没有找到：mapping.find(gap) != mapping.end()</li>
-<li>vector向量</li>
+		<h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a><strong>tips</strong></h4><ol>
+<li>字符串正则匹配</li>
+<li>递归解法，一层一层往下递归</li>
 </ol>
-<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    vector&lt;<span class="keyword">int</span>&gt; twoSum(vector&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> target) &#123;</span><br><span class="line">        unordered_map&lt;<span class="keyword">int</span>, <span class="keyword">int</span>&gt; mapping<span class="comment">;</span></span><br><span class="line">        vector&lt;<span class="keyword">int</span>&gt; res<span class="comment">;</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span><span class="comment">; i &lt; nums.size(); ++i) &#123;</span></span><br><span class="line">            mapping[nums[i]] = i<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span><span class="comment">; i &lt; nums.size(); ++i) &#123;</span></span><br><span class="line">            const <span class="keyword">int</span> gap = target - nums[i]<span class="comment">;</span></span><br><span class="line">            <span class="keyword">if</span>(mapping.find(gap) != mapping.<span class="keyword">end</span>() &amp;&amp; mapping[gap] &gt; i) &#123;</span><br><span class="line">                res.push_back(i)<span class="comment">;</span></span><br><span class="line">                res.push_back(mapping[gap])<span class="comment">;</span></span><br><span class="line">                <span class="keyword">return</span> res<span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res<span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    bool isMatch(string s, string p) &#123;</span><br><span class="line">        <span class="comment">//s match over</span></span><br><span class="line">        <span class="keyword">if</span>(s.<span class="keyword">length</span>() == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">//p needs to be null or X*X* format</span></span><br><span class="line">            <span class="comment">// if(p.length() == 0) return true;</span></span><br><span class="line">            <span class="keyword">if</span>(p.<span class="keyword">length</span>() &amp; <span class="number">1</span>) <span class="keyword">return</span> false<span class="comment">;</span></span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">1</span><span class="comment">; i &lt; p.length(); i += 2) &#123;</span></span><br><span class="line">                    <span class="keyword">if</span>(p[i] != <span class="string">'*'</span>) <span class="keyword">return</span> false<span class="comment">;</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> true<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//s still has characters</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment">//p is null</span></span><br><span class="line">        <span class="keyword">if</span>(p.<span class="keyword">length</span>() == <span class="number">0</span>) <span class="keyword">return</span> false<span class="comment">;</span></span><br><span class="line">        <span class="comment">//p has more</span></span><br><span class="line">        <span class="keyword">if</span>(p.<span class="keyword">length</span>() &gt; <span class="number">1</span> &amp;&amp; p[<span class="number">1</span>] == <span class="string">'*'</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span>(p[<span class="number">0</span>] == <span class="string">'.'</span> || s[<span class="number">0</span>] == p[<span class="number">0</span>]) &#123;</span><br><span class="line">                <span class="keyword">return</span> isMatch(s.substr(<span class="number">1</span>), p) || isMatch(s, p.substr(<span class="number">2</span>))<span class="comment">;</span></span><br><span class="line">            &#125;<span class="keyword">else</span> <span class="keyword">return</span> isMatch(s, p.substr(<span class="number">2</span>))<span class="comment">;</span></span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span>(s[<span class="number">0</span>] == p[<span class="number">0</span>] || p[<span class="number">0</span>] == <span class="string">'.'</span>) <span class="keyword">return</span> isMatch(s.substr(<span class="number">1</span>), p.substr(<span class="number">1</span>))<span class="comment">;</span></span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">return</span> false<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<p>若想给递归加参数，使用一个helper方法，比如matchHelper(string s, string p, int xx, int yy…)<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">matchHelper</span>(<span class="params"><span class="keyword">string</span> s, <span class="keyword">string</span> p, <span class="keyword">int</span> i, <span class="keyword">int</span> j</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(p[j] == <span class="string">'\0'</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> s[i] == <span class="string">'\0'</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(p[j+<span class="number">1</span>] != <span class="string">'*'</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span>((s[i] == p[j]) || (p[j] == <span class="string">'.'</span> &amp;&amp; s[i] != <span class="string">'\0'</span>)) &#123;</span><br><span class="line">                <span class="keyword">return</span> matchHelper(s, p, i+<span class="number">1</span>, j+<span class="number">1</span>);</span><br><span class="line">            &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span>((s[i] == p[j]) || (p[j] == <span class="string">'.'</span> &amp;&amp; s[i] != <span class="string">'\0'</span>)) &#123;</span><br><span class="line">            <span class="keyword">if</span>(matchHelper(s, p, i, j+<span class="number">2</span>)) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            ++i;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> matchHelper(s, p, i, j+<span class="number">2</span>);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isMatch</span>(<span class="params"><span class="keyword">string</span> s, <span class="keyword">string</span> p</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> matchHelper(s, p, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -142,7 +139,7 @@ vector向量
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2016/03/12/LeetCode-Two-Sum/" data-title="LeetCode Two Sum | Urey on the way" data-tsina="null" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2016/03/13/LeetCode-Regular-Expression-Matching/" data-title="LeetCode Regular Expression Matching | Urey on the way" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -155,19 +152,11 @@ vector向量
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2016/03/12/LeetCode-Add-Two-Numbers/" title="LeetCode Add Two Numbers">
-  <strong>上一篇：</strong><br/>
-  <span>
-  LeetCode Add Two Numbers</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2016/03/11/Maven：mirror和repository区别/"  title="Maven：mirror和repository区别">
+<a href="/2016/03/13/LeetCode-Palindrome-Number/"  title="LeetCode Palindrome Number">
  <strong>下一篇：</strong><br/> 
- <span>Maven：mirror和repository区别
+ <span>LeetCode Palindrome Number
 </span>
 </a>
 </div>
@@ -176,7 +165,7 @@ vector向量
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2016/03/12/LeetCode-Two-Sum/" data-title="LeetCode Two Sum" data-url="http://qiaowei.xyz/2016/03/12/LeetCode-Two-Sum/"></div>
+	<div class="ds-thread" data-thread-key="2016/03/13/LeetCode-Regular-Expression-Matching/" data-title="LeetCode Regular Expression Matching" data-url="http://qiaowei.xyz/2016/03/13/LeetCode-Regular-Expression-Matching/"></div>
 </section>
 
 

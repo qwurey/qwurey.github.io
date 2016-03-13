@@ -4,31 +4,41 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>搬家啦 | Urey on the way</title>
+    <title>LeetCode String to Integer | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="以前一直把博客的家安在CSDN上(http://blog.csdn.net/yeruby)，它记录了我从大一开始，一直到研一生活结束的点点滴滴，这也是我一直不断前进的动力，但就像一直住在别人家里一样，有点别扭。
-　　因此赶在2015年的8月末，我决定将博客迁移到github上，并且从以前的技术为主转变为：写写技术、还要再聊聊生活。
-　　脚踏实地，仰望星空。">
+    <meta name="description" content="tips
+考虑whitespace
+考虑正负符号
+考虑正溢出和负溢出
+考虑不能转化情况，返回0
+
+123456789101112131415161718192021222324252627class Solution &amp;#123;public:    int myAtoi(string str) &amp;#123;        int n = str.length();        int p =">
 <meta property="og:type" content="article">
-<meta property="og:title" content="搬家啦">
-<meta property="og:url" content="http://qiaowei.xyz/2015/08/31/2015-08-31-ban-jia-la/index.html">
+<meta property="og:title" content="LeetCode String to Integer">
+<meta property="og:url" content="http://qiaowei.xyz/2016/03/13/LeetCode-String-to-Integer/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="以前一直把博客的家安在CSDN上(http://blog.csdn.net/yeruby)，它记录了我从大一开始，一直到研一生活结束的点点滴滴，这也是我一直不断前进的动力，但就像一直住在别人家里一样，有点别扭。
-　　因此赶在2015年的8月末，我决定将博客迁移到github上，并且从以前的技术为主转变为：写写技术、还要再聊聊生活。
-　　脚踏实地，仰望星空。">
-<meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/1.png">
-<meta property="og:updated_time" content="2015-09-01T03:36:47.000Z">
+<meta property="og:description" content="tips
+考虑whitespace
+考虑正负符号
+考虑正溢出和负溢出
+考虑不能转化情况，返回0
+
+123456789101112131415161718192021222324252627class Solution &amp;#123;public:    int myAtoi(string str) &amp;#123;        int n = str.length();        int p =">
+<meta property="og:updated_time" content="2016-03-13T09:45:53.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="搬家啦">
-<meta name="twitter:description" content="以前一直把博客的家安在CSDN上(http://blog.csdn.net/yeruby)，它记录了我从大一开始，一直到研一生活结束的点点滴滴，这也是我一直不断前进的动力，但就像一直住在别人家里一样，有点别扭。
-　　因此赶在2015年的8月末，我决定将博客迁移到github上，并且从以前的技术为主转变为：写写技术、还要再聊聊生活。
-　　脚踏实地，仰望星空。">
-<meta name="twitter:image" content="http://7xlhna.com1.z0.glb.clouddn.com/1.png">
+<meta name="twitter:title" content="LeetCode String to Integer">
+<meta name="twitter:description" content="tips
+考虑whitespace
+考虑正负符号
+考虑正溢出和负溢出
+考虑不能转化情况，返回0
+
+123456789101112131415161718192021222324252627class Solution &amp;#123;public:    int myAtoi(string str) &amp;#123;        int n = str.length();        int p =">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -87,14 +97,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/08/31/2015-08-31-ban-jia-la/" title="搬家啦" itemprop="url">搬家啦</a>
+      <a href="/2016/03/13/LeetCode-String-to-Integer/" title="LeetCode String to Integer" itemprop="url">LeetCode String to Integer</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2015-08-31T09:15:31.000Z" itemprop="datePublished"> 发表于 2015-08-31</time>
+    <time datetime="2016-03-13T09:43:37.000Z" itemprop="datePublished"> 发表于 2016-03-13</time>
     
   </p>
 </header>
@@ -103,14 +113,17 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips</span></a></li></ol>
 		
 		</div>
 		
-		<p>　　以前一直把博客的家安在CSDN上(<a href="http://blog.csdn.net/yeruby" target="_blank" rel="external">http://blog.csdn.net/yeruby</a>)，它记录了我从大一开始，一直到研一生活结束的点点滴滴，这也是我一直不断前进的动力，但就像一直住在别人家里一样，有点别扭。</p>
-<p>　　因此赶在2015年的8月末，我决定将博客迁移到github上，并且从以前的技术为主转变为：写写技术、还要再聊聊生活。</p>
-<p>　　脚踏实地，仰望星空。</p>
-<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/1.png" alt="BlueSky"></p>
+		<h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a><strong>tips</strong></h4><ol>
+<li>考虑whitespace</li>
+<li>考虑正负符号</li>
+<li>考虑正溢出和负溢出</li>
+<li>考虑不能转化情况，返回0</li>
+</ol>
+<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    <span class="keyword">int</span> myAtoi(string <span class="keyword">str</span>) &#123;</span><br><span class="line">        <span class="keyword">int</span> n = <span class="keyword">str</span>.<span class="keyword">length</span>()<span class="comment">;</span></span><br><span class="line">        <span class="keyword">int</span> p = <span class="number">0</span><span class="comment">;</span></span><br><span class="line">        bool sign = <span class="number">0</span><span class="comment">;// 0 -&gt; '+' , 1 -&gt; '-'</span></span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">0</span><span class="comment">;</span></span><br><span class="line">        <span class="comment">//whitespace</span></span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">str</span>[p] == <span class="string">' '</span> &amp;&amp; p &lt; n) p++<span class="comment">;</span></span><br><span class="line">        <span class="comment">//'+' and '-'</span></span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">str</span>[p] == <span class="string">'+'</span>) &#123;</span><br><span class="line">            p++<span class="comment">;</span></span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span>(<span class="keyword">str</span>[p] == <span class="string">'-'</span>)&#123;</span><br><span class="line">            p++<span class="comment">;</span></span><br><span class="line">            sign = <span class="number">1</span><span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//digits</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="comment">; p &lt; n; p++) &#123;</span></span><br><span class="line">            <span class="keyword">if</span>(<span class="keyword">str</span>[p] &lt; <span class="string">'0'</span> || <span class="keyword">str</span>[p] &gt; <span class="string">'9'</span>) <span class="keyword">break</span><span class="comment">;</span></span><br><span class="line">            <span class="keyword">if</span>(res &gt; INT_MAX / <span class="number">10</span> || (res == INT_MAX / <span class="number">10</span> &amp;&amp; (<span class="keyword">str</span>[p] - <span class="string">'0'</span>) &gt; INT_MAX % <span class="number">10</span>)) &#123;</span><br><span class="line">                <span class="keyword">return</span> sign == <span class="number">1</span> ? INT_MIN : INT_MAX<span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">            res = res * <span class="number">10</span> + (<span class="keyword">str</span>[p] - <span class="string">'0'</span>)<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sign == <span class="number">1</span> ? (<span class="number">-1</span>) * res : res<span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -118,13 +131,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/life/">life</a>
+  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/tips/">tips</a>
+  <span></span> <a href="/tags/leetcode/">leetcode</a>
   </div>
 
 </div>
@@ -133,7 +146,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2015/08/31/2015-08-31-ban-jia-la/" data-title="搬家啦 | Urey on the way" data-tsina="null" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2016/03/13/LeetCode-String-to-Integer/" data-title="LeetCode String to Integer | Urey on the way" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -146,20 +159,20 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/" title="regex的贪婪与懒惰">
-  <strong>上一篇：</strong><br/>
-  <span>
-  regex的贪婪与懒惰</span>
+
+<div class="next">
+<a href="/2016/03/12/LeetCode-Reverse-Integer/"  title="LeetCode Reverse Integer">
+ <strong>下一篇：</strong><br/> 
+ <span>LeetCode Reverse Integer
+</span>
 </a>
 </div>
-
 
 </nav>
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2015/08/31/2015-08-31-ban-jia-la/" data-title="搬家啦" data-url="http://qiaowei.xyz/2015/08/31/2015-08-31-ban-jia-la/"></div>
+	<div class="ds-thread" data-thread-key="2016/03/13/LeetCode-String-to-Integer/" data-title="LeetCode String to Integer" data-url="http://qiaowei.xyz/2016/03/13/LeetCode-String-to-Integer/"></div>
 </section>
 
 
@@ -169,7 +182,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips</span></a></li></ol>
  
   </div>
 

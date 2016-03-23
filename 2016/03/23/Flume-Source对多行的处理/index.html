@@ -1,0 +1,599 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Flume Source对多行的处理 | Urey on the way</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="urey">
+    
+
+    
+    <meta name="description" content="ExecSource会readLine()读取日志中的每一行，把其作为每一个flume event的body放进去，这对于大部分这种每行就可以结束的日志记录，是完全可以的：122016-03-18 17:53:48,374 INFO namenode.FSNamesystem (FSNamesystem.java:listCorruptFileBlocks(7217)) - there are n">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flume Source对多行的处理">
+<meta property="og:url" content="http://qiaowei.xyz/2016/03/23/Flume-Source对多行的处理/index.html">
+<meta property="og:site_name" content="Urey on the way">
+<meta property="og:description" content="ExecSource会readLine()读取日志中的每一行，把其作为每一个flume event的body放进去，这对于大部分这种每行就可以结束的日志记录，是完全可以的：122016-03-18 17:53:48,374 INFO namenode.FSNamesystem (FSNamesystem.java:listCorruptFileBlocks(7217)) - there are n">
+<meta property="og:updated_time" content="2016-03-22T14:42:35.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Flume Source对多行的处理">
+<meta name="twitter:description" content="ExecSource会readLine()读取日志中的每一行，把其作为每一个flume event的body放进去，这对于大部分这种每行就可以结束的日志记录，是完全可以的：122016-03-18 17:53:48,374 INFO namenode.FSNamesystem (FSNamesystem.java:listCorruptFileBlocks(7217)) - there are n">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Urey on the way" title="Urey on the way"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Urey on the way">Urey on the way</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" autocomplete="off" name="q" maxlength="20" placeholder="搜索" />
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/03/23/Flume-Source对多行的处理/" title="Flume Source对多行的处理" itemprop="url">Flume Source对多行的处理</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
+		
+  <p class="article-time">
+    <time datetime="2016-03-23T14:41:36.000Z" itemprop="datePublished"> 发表于 2016-03-23</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			
+		
+		</div>
+		
+		<p>ExecSource会<code>readLine()</code>读取日志中的每一行，把其作为每一个flume event的body放进去，这对于大部分这种每行就可以结束的日志记录，是完全可以的：<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">2016<span class="selector-tag">-03-18</span> 17<span class="selector-pseudo">:53</span><span class="selector-pseudo">:48</span>,374 <span class="selector-tag">INFO</span> <span class="selector-tag">namenode</span><span class="selector-class">.FSNamesystem</span> (<span class="selector-tag">FSNamesystem</span><span class="selector-class">.java</span><span class="selector-pseudo">:listCorruptFileBlocks(7217))</span> <span class="selector-tag">-</span> <span class="selector-tag">there</span> <span class="selector-tag">are</span> <span class="selector-tag">no</span> <span class="selector-tag">corrupt</span> <span class="selector-tag">file</span> <span class="selector-tag">blocks</span>.</span><br><span class="line">2016<span class="selector-tag">-03-18</span> 17<span class="selector-pseudo">:53</span><span class="selector-pseudo">:48</span>,278 <span class="selector-tag">INFO</span> <span class="selector-tag">namenode</span><span class="selector-class">.FSNamesystem</span> (<span class="selector-tag">FSNamesystem</span><span class="selector-class">.java</span><span class="selector-pseudo">:listCorruptFileBlocks(7217))</span> <span class="selector-tag">-</span> <span class="selector-tag">there</span> <span class="selector-tag">are</span> <span class="selector-tag">no</span> <span class="selector-tag">corrupt</span> <span class="selector-tag">file</span> <span class="selector-tag">blocks</span>.</span><br></pre></td></tr></table></figure></p>
+<p>但是，对于有<code>stacktrace</code>的<code>ERROR</code>日志记录，如果把一行的内容当作一个flume event会有很大的问题，直观上来看，肯定需要把若干行看作是一个flume event，比如下面这样的日志记录，要作为一个flume event，而不是27个（一共27行）：<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2016</span>-<span class="number">03</span>-<span class="number">18</span> <span class="number">17</span>:<span class="number">53</span>:<span class="number">40</span>,<span class="number">278</span> ERROR [HiveServer2-Handler-Pool: Thread-<span class="number">26</span>]: Error occurred during processing of message.</span><br><span class="line">java<span class="selector-class">.lang</span><span class="selector-class">.RuntimeException</span>: org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TTransportException</span>: java<span class="selector-class">.net</span><span class="selector-class">.SocketException</span>: Connection reset</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TSaslServerTransport</span><span class="variable">$Factory</span>.getTransport(TSaslServerTransport<span class="selector-class">.java</span>:<span class="number">219</span>)</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.server</span><span class="selector-class">.TThreadPoolServer</span><span class="variable">$WorkerProcess</span>.run(TThreadPoolServer<span class="selector-class">.java</span>:<span class="number">268</span>)</span><br><span class="line">	at java<span class="selector-class">.util</span><span class="selector-class">.concurrent</span><span class="selector-class">.ThreadPoolExecutor</span><span class="selector-class">.runWorker</span>(ThreadPoolExecutor<span class="selector-class">.java</span>:<span class="number">1145</span>)</span><br><span class="line">	at java<span class="selector-class">.util</span><span class="selector-class">.concurrent</span><span class="selector-class">.ThreadPoolExecutor</span><span class="variable">$Worker</span>.run(ThreadPoolExecutor<span class="selector-class">.java</span>:<span class="number">615</span>)</span><br><span class="line">	at java<span class="selector-class">.lang</span><span class="selector-class">.Thread</span><span class="selector-class">.run</span>(Thread<span class="selector-class">.java</span>:<span class="number">745</span>)</span><br><span class="line">Caused by: org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TTransportException</span>: java<span class="selector-class">.net</span><span class="selector-class">.SocketException</span>: Connection reset</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TIOStreamTransport</span><span class="selector-class">.read</span>(TIOStreamTransport<span class="selector-class">.java</span>:<span class="number">129</span>)</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TTransport</span><span class="selector-class">.readAll</span>(TTransport<span class="selector-class">.java</span>:<span class="number">86</span>)</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TSaslTransport</span><span class="selector-class">.receiveSaslMessage</span>(TSaslTransport<span class="selector-class">.java</span>:<span class="number">178</span>)</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TSaslServerTransport</span><span class="selector-class">.handleSaslStartMessage</span>(TSaslServerTransport<span class="selector-class">.java</span>:<span class="number">125</span>)</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TSaslTransport</span><span class="selector-class">.open</span>(TSaslTransport<span class="selector-class">.java</span>:<span class="number">271</span>)</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TSaslServerTransport</span><span class="selector-class">.open</span>(TSaslServerTransport<span class="selector-class">.java</span>:<span class="number">41</span>)</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TSaslServerTransport</span><span class="variable">$Factory</span>.getTransport(TSaslServerTransport<span class="selector-class">.java</span>:<span class="number">216</span>)</span><br><span class="line">	... <span class="number">4</span> more</span><br><span class="line">Caused by: java<span class="selector-class">.net</span><span class="selector-class">.SocketException</span>: Connection reset</span><br><span class="line">	at java<span class="selector-class">.net</span><span class="selector-class">.SocketInputStream</span><span class="selector-class">.read</span>(SocketInputStream<span class="selector-class">.java</span>:<span class="number">196</span>)</span><br><span class="line">	at java<span class="selector-class">.net</span><span class="selector-class">.SocketInputStream</span><span class="selector-class">.read</span>(SocketInputStream<span class="selector-class">.java</span>:<span class="number">122</span>)</span><br><span class="line">	at java<span class="selector-class">.io</span><span class="selector-class">.BufferedInputStream</span><span class="selector-class">.fill</span>(BufferedInputStream<span class="selector-class">.java</span>:<span class="number">235</span>)</span><br><span class="line">	at java<span class="selector-class">.io</span><span class="selector-class">.BufferedInputStream</span><span class="selector-class">.read1</span>(BufferedInputStream<span class="selector-class">.java</span>:<span class="number">275</span>)</span><br><span class="line">	at java<span class="selector-class">.io</span><span class="selector-class">.BufferedInputStream</span><span class="selector-class">.read</span>(BufferedInputStream<span class="selector-class">.java</span>:<span class="number">334</span>)</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TIOStreamTransport</span><span class="selector-class">.read</span>(TIOStreamTransport<span class="selector-class">.java</span>:<span class="number">127</span>)</span><br><span class="line">	... <span class="number">10</span> more</span><br></pre></td></tr></table></figure></p>
+<p>我这里的实现方式是：识别每行的开头部分，如果满足某种条件，就当作一条日志，否则，视作是上一条的日志的一部分。</p>
+<p>比如：</p>
+<p>对于上面举的例子来说（即符合标准log4j的日志），如果每一行开头满足下面这条正则表达式：<br><figure class="highlight cos"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\<span class="keyword">s</span>?\<span class="keyword">d</span>\<span class="keyword">d</span>\<span class="keyword">d</span>\<span class="keyword">d</span>-\<span class="keyword">d</span>\<span class="keyword">d</span>-\<span class="keyword">d</span>\<span class="keyword">d</span>\<span class="keyword">s</span>\<span class="keyword">d</span>\<span class="keyword">d</span>:\<span class="keyword">d</span>\<span class="keyword">d</span>:\<span class="keyword">d</span>\<span class="keyword">d</span>,\<span class="keyword">d</span>\<span class="keyword">d</span>\<span class="keyword">d</span></span><br></pre></td></tr></table></figure></p>
+<p>就当作一条新的日志，如果不满足，就说明该行内容是上一条日志（已规定格式开头的那条）的一部分。</p>
+<p>当然，我增加了可以自定义配置以哪种方式开头视为一条日志的regex配置，可以对不通的source进行不通的配置，已满足要求。</p>
+<p>有了这样的约束，就可以写出将某些多行看作一个flume event的ExecSource，我把它开源到了github上，如有兴趣，欢迎前去试用，如有任何建议，欢迎提出与指正：MultiLineExecSource<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">github.com<span class="regexp">/qwurey/</span>flume-<span class="keyword">source</span>-multiline</span><br></pre></td></tr></table></figure></p>
+<p>该版本基于<code>flume-ng-core 1.6.0</code></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/flume/">flume</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/flume/">flume</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://qiaowei.xyz/2016/03/23/Flume-Source对多行的处理/" data-title="Flume Source对多行的处理 | Urey on the way" data-tsina="null" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2016/03/14/LeetCode-Longest-Common-Prefix/"  title="LeetCode Longest Common Prefix">
+ <strong>下一篇：</strong><br/> 
+ <span>LeetCode Longest Common Prefix
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2016/03/23/Flume-Source对多行的处理/" data-title="Flume Source对多行的处理" data-url="http://qiaowei.xyz/2016/03/23/Flume-Source对多行的处理/"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ 
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/ambari/" title="ambari">ambari<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/flume/" title="flume">flume<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/leetcode/" title="leetcode">leetcode<sup>10</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/life/" title="life">life<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/osx/" title="osx">osx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pg/" title="pg">pg<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pgxl/" title="pgxl">pgxl<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/python/" title="python">python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/regex/" title="regex">regex<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tool/" title="tool">tool<sup>3</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/leetcode/" title="leetcode">leetcode<sup>10</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/tips/" title="tips">tips<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pgxl/" title="pgxl">pgxl<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/postgres-xl/" title="postgres-xl">postgres-xl<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/flume/" title="flume">flume<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pg/" title="pg">pg<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/regex/" title="regex">regex<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/REST-API/" title="REST API">REST API<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/puppet/" title="puppet">puppet<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ambari/" title="ambari">ambari<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/maven/" title="maven">maven<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/elasticsearch/" title="elasticsearch">elasticsearch<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/linux/" title="linux">linux<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://blog.csdn.net/yeruby" target="_blank" title="在路上的学习者">在路上的学习者</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://macshuo.com/" target="_blank" title="MacTalk-池建强的随想录">MacTalk-池建强的随想录</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://www.liaoxuefeng.com/" target="_blank" title="廖雪峰的官方网站">廖雪峰的官方网站</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=null&verifier=ec858d3c&dpc=1"></iframe>
+</div>
+
+
+  
+    <div class="widget-wrap">
+          <h3 class="widget-title">最近评论</h3>
+          <div class="widget">
+          <ul class="ds-recent-comments" data-num-items="5" data-show-avatars="1" data-show-time="1" data-show-title="1" data-show-admin="1" data-excerpt-length="70"></ul>
+          </div>
+            </div>
+            
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Urey. <br/>
+			Welcome to contact me ^_^</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/qiaoweiblog" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		<a href="https://www.linkedin.com/in/qwurey" target="_blank" class="icon-linkedin" title="linkedin"></a>
+		
+		
+		
+		<a href="http://www.zhihu.com/people/urey" target="_blank" class="icon-zhihu" title="知乎"></a>
+		
+		
+		
+		<a href="mailto:qiaowei@pku.edu.cn" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="/about" target="_blank" title="urey">urey</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"urey"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

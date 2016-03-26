@@ -74,155 +74,743 @@
     <div id="container">
       <div id="main">
 
-  
-<section class="post" itemscope itemprop="blogitem">
-  
-    <a href="/2015/10/09/2015-10-09-postgresqlde-jdbcfang-wen/" title="PostgreSQL的JDBC访问" itemprop="url">
-  
-    <h1 itemprop="name">PostgreSQL的JDBC访问</h1>
+   
     
-     
-           <p itemprop="description" >“过去的代码都是未经测试的代码” —— 无名
-
-JDBC的版本选择官网有给出具体的jdk与postgresql driver的版本对应关系：https://jdbc.postgresql.org/download.html
-这里使用jdk1.7，对应：JDBC41 Postgre</p>
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/10/09/2015-10-09-postgresqlde-jdbcfang-wen/" title="PostgreSQL的JDBC访问" itemprop="url">PostgreSQL的JDBC访问</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
+		
+  <p class="article-time">
+    <time datetime="2015-10-09T12:45:33.000Z" itemprop="datePublished"> 发表于 2015-10-09</time>
+    
+  </p>
+</header>
+    <div class="article-content">
         
-    
-    <time datetime="2015-10-09T12:45:33.000Z" itemprop="datePublished">2015-10-09</time>
-  </a>
-</section>
+        <blockquote>
+<p>“过去的代码都是未经测试的代码” —— 无名</p>
+</blockquote>
+<h4 id="JDBC的版本选择"><a href="#JDBC的版本选择" class="headerlink" title="JDBC的版本选择"></a><strong>JDBC的版本选择</strong></h4><p>官网有给出具体的jdk与postgresql driver的版本对应关系：<a href="https://jdbc.postgresql.org/download.html" target="_blank" rel="external">https://jdbc.postgresql.org/download.html</a></p>
+<p>这里使用jdk1.7，对应：JDBC41 Postgresql Driver, Version 9.4-1203</p>
+<h4 id="连接数据库"><a href="#连接数据库" class="headerlink" title="连接数据库"></a><strong>连接数据库</strong></h4><p>导入jar包</p>
+<p>在shell终端进入psql：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">psql</span> -U urey</span><br></pre></td></tr></table></figure>
+<p>新建数据库testdb并切换到该数据库下：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">DATABASE</span> testdb;</span><br><span class="line">\c testdb</span><br></pre></td></tr></table></figure></p>
+<p>新建表test并插入一条数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">test</span>(<span class="keyword">id</span> <span class="built_in">int</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">test</span> <span class="keyword">VALUES</span>(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<p>查看刚插入的数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">test</span>;</span><br></pre></td></tr></table></figure>
+<p>编辑java代码连接：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">package</span> indi.qw.pgjdbc.demo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.sql.Connection;</span><br><span class="line"><span class="keyword">import</span> java.sql.DriverManager;</span><br><span class="line"><span class="keyword">import</span> java.sql.ResultSet;</span><br><span class="line"><span class="keyword">import</span> java.sql.Statement;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PGJDBCDemo</span> </span>&#123;</span><br><span class="line">	<span class="keyword">static</span> String url = <span class="string">"jdbc:postgresql://127.0.0.1:5432/testdb"</span>;</span><br><span class="line">    <span class="keyword">static</span> String usr = <span class="string">"urey"</span>;</span><br><span class="line">    <span class="keyword">static</span> String psd = <span class="string">"urey"</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span> </span>&#123;</span><br><span class="line">        Connection conn = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Class.forName(<span class="string">"org.postgresql.Driver"</span>);</span><br><span class="line">            conn = DriverManager.getConnection(url, usr, psd);</span><br><span class="line">            Statement st = conn.createStatement();</span><br><span class="line">            ResultSet rs = st.executeQuery(<span class="string">"SELECT * FROM TEST"</span>);</span><br><span class="line">            <span class="keyword">while</span> (rs.next()) &#123;</span><br><span class="line">               System.out.print(rs.getString(<span class="number">1</span>));</span><br><span class="line">            &#125;</span><br><span class="line">            rs.close();</span><br><span class="line">            st.close();</span><br><span class="line">            conn.close();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>OK,测试成功。</p>
 
-
-
-
-
-
-  
-<section class="post" itemscope itemprop="blogitem">
-  
-    <a href="/2015/10/08/2015-10-08-postgres-xl-de-jie-shao/" title="Postgres-XL介绍" itemprop="url">
-  
-    <h1 itemprop="name">Postgres-XL介绍</h1>
-    
-     
-           <p itemprop="description" >“沉默即赞同” —— 无名
-
-什么是Postgres-XLXL的意思是：eXtensible Lattice，可以扩展的格子，即将PostgreSQL应用在多机器上的分布式数据库的形象化表达。
-Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩展的、多租户</p>
         
-    
-    <time datetime="2015-10-08T11:32:26.000Z" itemprop="datePublished">2015-10-08</time>
-  </a>
-</section>
-
-
-
-
-
-
-  
-<section class="post" itemscope itemprop="blogitem">
-  
-    <a href="/2015/10/08/2015-10-08-postgres-xlji-qun-de-da-jian/" title="Postgres-XL集群的搭建" itemprop="url">
-  
-    <h1 itemprop="name">Postgres-XL集群的搭建</h1>
-    
-     
-           <p itemprop="description" >“如果你惟一的工具是一把锤子，你往往会把一切问题看成钉子” —— 无名
-
-集群规划建立5个虚拟机构成的集群，虚拟机的os均为centos6.5，依次命名为cnode1，cnode2，cnode3，cnode4，cnode5，其中cnode1为gtm，其余4个节点均为coordin</p>
         
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/pg/">pg</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/pg/">pg</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2015/10/09/2015-10-09-postgresqlde-jdbcfang-wen/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/10/09/2015-10-09-postgresqlde-jdbcfang-wen/" data-count-type="comments">&nbsp;</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
     
-    <time datetime="2015-10-08T11:32:26.000Z" itemprop="datePublished">2015-10-08</time>
-  </a>
-</section>
-
-
-
-
-
-
-  
-<section class="post" itemscope itemprop="blogitem">
-  
-    <a href="/2015/09/30/2015-09-30-python-flask-rest-apide-shi-yong/" title="python Flask REST API的使用" itemprop="url">
-  
-    <h1 itemprop="name">python Flask REST API的使用</h1>
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
     
-     
-           <p itemprop="description" >“简单不先于复杂，而是在复杂之后” —— Alan Perlis
-
-本文参考：Designing a RESTful API using Flask-RESTfulPosted by Miguel Grinberg under Python, Programming, REST,</p>
+      <a href="/2015/10/08/2015-10-08-postgres-xl-de-jie-shao/" title="Postgres-XL介绍" itemprop="url">Postgres-XL介绍</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
+		
+  <p class="article-time">
+    <time datetime="2015-10-08T11:32:26.000Z" itemprop="datePublished"> 发表于 2015-10-08</time>
+    
+  </p>
+</header>
+    <div class="article-content">
         
-    
-    <time datetime="2015-09-30T07:43:21.000Z" itemprop="datePublished">2015-09-30</time>
-  </a>
-</section>
+        <blockquote>
+<p>“沉默即赞同” —— 无名</p>
+</blockquote>
+<h4 id="什么是Postgres-XL"><a href="#什么是Postgres-XL" class="headerlink" title="什么是Postgres-XL"></a><strong>什么是Postgres-XL</strong></h4><p>XL的意思是：eXtensible Lattice，可以扩展的格子，即将PostgreSQL应用在多机器上的分布式数据库的形象化表达。</p>
+<p>Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩展的、多租户安全的、基于PostgreSQL的数据库解决方案。</p>
+<p>Postgres-XL 可非常灵活的应付各种负载，比如：</p>
+<ul>
+<li>OLAP（通过MPP并行化）</li>
+<li>OLTP</li>
+<li>OLAP &amp; OLTP</li>
+<li>操作数据存储</li>
+<li>Key-value存储，包括JSON格式</li>
+</ul>
+<p>不同的应用场景：</p>
+<ul>
+<li>支持商业智能应用（数据仓库&amp;数据集市），因为PGXL支持MPP(Massively Parallel Processing)</li>
+<li>Web2.0，数据库扩容的解决方案</li>
+<li>遗留系统的数据库扩容的解决方案</li>
+<li>新应用，可以先使用PostgreSQL，之后随着数据库变大使用PGXL扩容</li>
+</ul>
+<p>PGXL底层为PostgreSQL，这意味着它支持所有支持PostgresSQL类型的驱动，包括： JDBC, ODBC, OLE DB, Python, Ruby, perl DBI, Tcl, and Erlang.</p>
+<h4 id="PostgreSQL与Postgres-XL"><a href="#PostgreSQL与Postgres-XL" class="headerlink" title="PostgreSQL与Postgres-XL"></a><strong>PostgreSQL与Postgres-XL</strong></h4><p>1994年，Postgre95发布，开源。<br>1996年，PostgreSQL继承了Postgre95，发布。<br>2010年，Postgres-XC发布。<br>2012年，前PGXC核心开发者创建StormDB公司，进行了一些改进，包括对MPP并行化的性能改进和多租户安全。<br>2013年，TransLattice收购了StormDB。<br>2014年，将项目开源，命名为Postgres-XL。</p>
+<h4 id="Postgres-XC与Postgres-XL"><a href="#Postgres-XC与Postgres-XL" class="headerlink" title="Postgres-XC与Postgres-XL"></a><strong>Postgres-XC与Postgres-XL</strong></h4><p>PGXL的架构师和开发者    很多都是以前做PGXC的，PGXL的部分代码是从PGXC移植过来的。</p>
+<p>比起功能性，PGXL更强调稳定性, 正确性和性能. </p>
+<p>PGXL增加了一些重要的性能提升，比如MPP和replan avoidance on the data nodes，这些都是PGXC没有的。</p>
+<p>PGXC目前集中在OLTP的业务上面，PGXL则更加灵活，可以应用于很多不同种类的业务上，比如可以用在大数据处理领域，除此，在多租户的环境中，PGXL也更加安全。</p>
+<p>PGXL的社区非常开放。</p>
+<h4 id="PGXL架构基本知识"><a href="#PGXL架构基本知识" class="headerlink" title="PGXL架构基本知识"></a><strong>PGXL架构基本知识</strong></h4><p>PGXL是一系列PostgreSQL数据库的集群，在上层看来就像使用一个数据库一样。根据设计方案的不同，每张表可以是replicated或是distributed的形式。</p>
+<p>PGXL有三个主要组件，分别是GTM，Coordinator和Datanode。</p>
+<ul>
+<li>GTM(Gloable Transaction Manager)负责提供事务的ACID属性；</li>
+<li>Datanode负责存储表的数据和本地执行由Coordinator派发的SQL任务；</li>
+<li>Coordinator负责处理每个来自Application的SQL任务，并且决定由哪个Datanode执行，然后将任务计划派发给相应的Datanode，根据需要收集结果返还给Application；</li>
+</ul>
+<p>GTM通常由一台独立的服务器承担，因为GTM需要处理来自所有Coordinator和Datanode的事务请求。为了将Coordinator和Datanode上进程的请求和响应聚集到一台机器上，可以配置GTM-Proxy。GTM-Proxy会减少GTM的负载，同时会帮助处理GTM失效的情况。即便如此，GTM还是可能会发生单点失效问题，这时可以配置一个GTM-Standby节点作为GTM的备用节点。</p>
+<p>每台机器最好同时配置一个Coordinator和一个Datanode，这样既不用担心二者的负载均衡，而且可以降低网络流量。</p>
+<h4 id="如何实现High-Availability"><a href="#如何实现High-Availability" class="headerlink" title="如何实现High Availability"></a><strong>如何实现High Availability</strong></h4><p>可以对每个节点增加slave，就类似PostgreSQL的streaming replication一样。</p>
+<p>GTM可以有一个GTM Standby。</p>
+<p>针对自动的failover，目前可以使用Corosync/Pacemaker，虽然它们现在还不是核心项目。</p>
+<h4 id="PGXL的license"><a href="#PGXL的license" class="headerlink" title="PGXL的license"></a><strong>PGXL的license</strong></h4><p>PGXL和PostgreSQL使用相同的LICENSE，截止到2015年，使用的还是Mozilla Public License.</p>
 
-
-
-
-
-
-  
-<section class="post" itemscope itemprop="blogitem">
-  
-    <a href="/2015/09/07/2015-09-07-osx-plist-ding-shi-ren-wu/" title="osx plist 定时任务" itemprop="url">
-  
-    <h1 itemprop="name">osx plist 定时任务</h1>
-    
-     
-           <p itemprop="description" >osx下定时任务是通过写plist脚本实现的，plist要比linux/osx下使用crontab更为简单、方便、细粒度。
-可以通过两种方式来设置脚本的执行时间。一个是使用StartInterval，它指定脚本每间隔多长时间（单位：秒）执行一次；另外一个使用StartCalend</p>
         
-    
-    <time datetime="2015-09-07T01:56:18.000Z" itemprop="datePublished">2015-09-07</time>
-  </a>
-</section>
-
-
-
-
-
-
-  
-<section class="post" itemscope itemprop="blogitem">
-  
-    <a href="/2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/" title="regex的贪婪与懒惰" itemprop="url">
-  
-    <h1 itemprop="name">regex的贪婪与懒惰</h1>
-    
-     
-           <p itemprop="description" >正则表达式有两种模式：贪婪模式与懒惰模式。
-　　贪婪模式：匹配尽可能多的字符。
-　　我们一般刚开始学习正则表达式使用到的都是贪婪模式下的表达。
-　　比如：将 a.*b  应用于串 “aabab” ，它会匹配 “aabab”整个串。注意，其实整个串“aabab”中的子串“aab”和</p>
         
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/pgxl/">pgxl</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/pgxl/">pgxl</a><a href="/tags/postgres-xl/">postgres-xl</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2015/10/08/2015-10-08-postgres-xl-de-jie-shao/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/10/08/2015-10-08-postgres-xl-de-jie-shao/" data-count-type="comments">&nbsp;</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
     
-    <time datetime="2015-09-04T13:07:39.000Z" itemprop="datePublished">2015-09-04</time>
-  </a>
-</section>
-
-
-
-
-
-
-  
-<section class="post" itemscope itemprop="blogitem">
-  
-    <a href="/2015/08/31/2015-08-31-ban-jia-la/" title="搬家啦" itemprop="url">
-  
-    <h1 itemprop="name">搬家啦</h1>
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
     
-     
-           <p itemprop="description" >以前一直把博客的家安在CSDN上(http://blog.csdn.net/yeruby)，它记录了我从大一开始，一直到研一生活结束的点点滴滴，这也是我一直不断前进的动力，但就像一直住在别人家里一样，有点别扭。
-　　因此赶在2015年的8月末，我决定将博客迁移到github上，并</p>
+      <a href="/2015/10/08/2015-10-08-postgres-xlji-qun-de-da-jian/" title="Postgres-XL集群的搭建" itemprop="url">Postgres-XL集群的搭建</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
+		
+  <p class="article-time">
+    <time datetime="2015-10-08T11:32:26.000Z" itemprop="datePublished"> 发表于 2015-10-08</time>
+    
+  </p>
+</header>
+    <div class="article-content">
         
+        <blockquote>
+<p>“如果你惟一的工具是一把锤子，你往往会把一切问题看成钉子” —— 无名</p>
+</blockquote>
+<h4 id="集群规划"><a href="#集群规划" class="headerlink" title="集群规划"></a><strong>集群规划</strong></h4><p>建立5个虚拟机构成的集群，虚拟机的os均为centos6.5，依次命名为cnode1，cnode2，cnode3，cnode4，cnode5，其中cnode1为gtm，其余4个节点均为coordinator和datanode。</p>
+<table>
+<thead>
+<tr>
+<th>hostname</th>
+<th>ip</th>
+<th>function</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cnode1</td>
+<td>172.16.15.131</td>
+<td>gtm</td>
+</tr>
+<tr>
+<td>cnode2</td>
+<td>172.16.15.132</td>
+<td>coordinator &amp; datanode</td>
+</tr>
+<tr>
+<td>cnode3</td>
+<td>172.16.15.133</td>
+<td>coordinator &amp; datanode</td>
+</tr>
+<tr>
+<td>cnode4</td>
+<td>172.16.15.134</td>
+<td>coordinator &amp; datanode</td>
+</tr>
+<tr>
+<td>cnode5</td>
+<td>172.16.15.135</td>
+<td>coordinator &amp; datanode</td>
+</tr>
+</tbody>
+</table>
+<h4 id="建立用户"><a href="#建立用户" class="headerlink" title="建立用户"></a><strong>建立用户</strong></h4><p>每个节点(<code>cnode1~cnode5</code>)都建立用户<code>postgres</code>，并且建立<code>.ssh</code>目录，并配置相应的权限：</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">useradd postgres</span><br><span class="line">passwd postgres</span><br><span class="line"><span class="keyword">su</span> - postgres</span><br><span class="line"><span class="keyword">mkdir</span> ~/.ssh</span><br><span class="line">chmod 700 ~/.ssh</span><br></pre></td></tr></table></figure>
+<h4 id="ssh免密码登录"><a href="#ssh免密码登录" class="headerlink" title="ssh免密码登录"></a><strong>ssh免密码登录</strong></h4><p>在cnode1节点配置：</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">su - postgres</span><br><span class="line">ssh-keygen -t rsa</span><br><span class="line">cat ~<span class="regexp">/.ssh/id</span>_rsa.pub <span class="meta">&gt;&gt; </span>~<span class="regexp">/.ssh/authorized</span>_keys</span><br><span class="line">chmod <span class="number">600</span> ~<span class="regexp">/.ssh/authorized</span>_keys</span><br></pre></td></tr></table></figure>
+<p>将刚生成的认证文件拷贝到cnode2到cnode5中，使得cnode1可以免密码登录cnode2~cnode5的任意一个节点：</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp ~<span class="regexp">/.ssh/authorized</span>_keys postgres<span class="variable">@cnode2</span><span class="symbol">:~/</span>.ssh/</span><br></pre></td></tr></table></figure>
+<h4 id="安装postgres-xl"><a href="#安装postgres-xl" class="headerlink" title="安装postgres-xl"></a><strong>安装postgres-xl</strong></h4><p>每个节点安装编译pgxl所需的依赖包：</p>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y flex bison <span class="built_in">readline</span>-devel zlib-devel openjade docbook-<span class="built_in">style</span>-dsssl</span><br></pre></td></tr></table></figure>
+<p>每个节点安装postgres-xl和pgxc_ctl，我这里使用的版本是：<code>postgres-xl-v9.2-src.tar.gz</code>：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf postgres-xl-v9.<span class="number">2</span>-src.tar.gz</span><br><span class="line"><span class="keyword">cd</span> postgres-xl</span><br><span class="line">./configure --prefix=/home/postgres/pgxl/</span><br><span class="line"><span class="keyword">make</span></span><br><span class="line"><span class="keyword">make</span> install</span><br><span class="line"><span class="keyword">cd</span> contrib/</span><br><span class="line"><span class="keyword">make</span></span><br><span class="line"><span class="keyword">make</span> install</span><br></pre></td></tr></table></figure>
+<p>每个节点编辑环境变量：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">vim</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
+<p>添加如下内容：</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">export PGHOME=/home/postgres/pgxl</span><br><span class="line">export PGUSER=postgres</span><br><span class="line">export LD_LIBRARY_PATH=$PGHOME/lib:$LD_LIBRARY_PATH</span><br><span class="line">export PATH=$PGHOME/bin:$PATH</span><br></pre></td></tr></table></figure>
+<p>使之生效：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
+<h4 id="配置集群"><a href="#配置集群" class="headerlink" title="配置集群"></a><strong>配置集群</strong></h4><p>关闭防火墙或者放开相应的端口，这里我直接关闭了每个虚拟机的防火墙，并且重启它们：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">chkconfig</span> iptables <span class="literal">off</span>   --重启后生效</span><br></pre></td></tr></table></figure>
+<p>选择cnode1(gtm)，进入/home/pgxc/postgres-xl/contrib/pgxc_ctl目录中，执行pgxc_ctl命令来生成配置集群的模板文件：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./pgxc_ctl				<span class="comment">---会提示Error说没有配置文件，忽略即可</span></span><br><span class="line">PGXC <span class="built_in">prepare</span>			<span class="comment">---执行该命令将会生成一份配置文件模板</span></span><br><span class="line">PGXC ^C</span><br></pre></td></tr></table></figure>
+<p>根据自己的集群配置该文件：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">vim</span> ~/pgxc_ctl/pgxc_ctl.<span class="keyword">conf</span></span><br></pre></td></tr></table></figure>
+<p>我这里简单的进行了如下的配置：</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#user and path</span></span><br><span class="line"><span class="attr">pgxcInstallDir=$HOME/pgxl</span></span><br><span class="line"><span class="attr">pgxcOwner=postgres</span></span><br><span class="line"><span class="attr">pgxcUser=$pgxcOwner</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#gtm</span></span><br><span class="line"><span class="attr">gtmName=gtm</span></span><br><span class="line"><span class="attr">gtmMasterServer=cnode1</span></span><br><span class="line"><span class="attr">gtmMasterPort=20001</span></span><br><span class="line"><span class="attr">gtmMasterDir=$HOME/pgxl/nodes/gtm</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#---- Configuration ---</span></span><br><span class="line"><span class="attr">gtmExtraConfig=none</span>                     <span class="comment"># Will be added gtm.conf for both Master and Slave (done at initilization only)</span></span><br><span class="line"><span class="attr">gtmMasterSpecificExtraConfig=none</span>       <span class="comment"># Will be added to Master's gtm.conf (done at initialization only)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="attr">gtmSlave=n</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#gtm proxy</span></span><br><span class="line"><span class="attr">gtmProxy=n</span></span><br><span class="line"><span class="comment">#gtmProxyDir=$HOME/pgxl/nodes/gtm_pxy</span></span><br><span class="line"><span class="comment">#gtmProxyNames=(gtm_pxy1 gtm_pxy2 gtm_pxy3 gtm_pxy4)</span></span><br><span class="line"><span class="comment">#gtmProxyServers=(cnode2 cnode3 cnode4 cnode5)</span></span><br><span class="line"><span class="comment">#gtmProxyPorts=(20001 20001 20001 20001)</span></span><br><span class="line"><span class="comment">#gtmProxyDirs=($gtmProxyDir $gtmProxyDir $gtmProxyDir $gtmProxyDir)</span></span><br><span class="line"><span class="comment">#gtmPxyExtraConfig=none</span></span><br><span class="line"><span class="comment">#gtmPxySpecificExtraConfig=(none none none none)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#coordinator</span></span><br><span class="line"><span class="attr">coordMasterDir=$HOME/pgxl/nodes/coord</span></span><br><span class="line"><span class="attr">coordNames=(coord1</span> coord2 coord3 coord4)</span><br><span class="line"><span class="attr">coordPorts=(20004</span> <span class="number">20004</span> <span class="number">20004</span> <span class="number">20004</span>)</span><br><span class="line"><span class="attr">poolerPorts=(20010</span> <span class="number">20010</span> <span class="number">20010</span> <span class="number">20010</span>)</span><br><span class="line"><span class="attr">coordPgHbaEntries=(0.0.0.0/0)</span></span><br><span class="line"><span class="attr">coordMasterServers=(cnode2</span> cnode3 cnode4 cnode5)</span><br><span class="line"><span class="attr">coordMasterDirs=($coordMasterDir</span> $coordMasterDir $coordMasterDir $coordMasterDir)</span><br><span class="line"><span class="attr">coordMaxWALsernder=0</span></span><br><span class="line"><span class="attr">coordMaxWALSenders=($coordMaxWALsernder</span> $coordMaxWALsernder $coordMaxWALsernder $coordMaxWALsernder)</span><br><span class="line"><span class="attr">coordSlave=n</span></span><br><span class="line"><span class="attr">coordSpecificExtraConfig=(none</span> none none none)</span><br><span class="line"><span class="attr">coordSpecificExtraPgHba=(none</span> none none none)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#datanode</span></span><br><span class="line"><span class="attr">datanodeNames=(datanode1</span> datanode2 datanode3 datanode4)</span><br><span class="line"><span class="attr">datanodePorts=(20008</span> <span class="number">20008</span> <span class="number">20008</span> <span class="number">20008</span>)</span><br><span class="line"><span class="attr">datanodePoolerPorts=(20012</span> <span class="number">20012</span> <span class="number">20012</span> <span class="number">20012</span>)</span><br><span class="line"><span class="attr">datanodePgHbaEntries=(0.0.0.0/0)</span></span><br><span class="line"><span class="attr">datanodeMasterServers=(cnode2</span> cnode3 cnode4 cnode5)</span><br><span class="line"><span class="attr">datanodeMasterDir=$HOME/pgxl/nodes/dn_master</span></span><br><span class="line"><span class="attr">datanodeMasterDirs=($datanodeMasterDir</span> $datanodeMasterDir $datanodeMasterDir $datanodeMasterDir)</span><br><span class="line"><span class="attr">datanodeMaxWalSender=0</span></span><br><span class="line"><span class="attr">datanodeMaxWALSenders=($datanodeMaxWalSender</span> $datanodeMaxWalSender $datanodeMaxWalSender $datanodeMaxWalSender)</span><br><span class="line"><span class="attr">datanodeSlave=n</span></span><br><span class="line"><span class="attr">primaryDatanode=datanode1</span></span><br></pre></td></tr></table></figure>
+<p>以上各配置项的具体含义可以参考：<a href="http://files.postgres-xl.org/documentation/pgxc_ctl.html" target="_blank" rel="external">http://files.postgres-xl.org/documentation/pgxc_ctl.html</a></p>
+<h4 id="初始化-启动集群"><a href="#初始化-启动集群" class="headerlink" title="初始化+启动集群"></a><strong>初始化+启动集群</strong></h4><p>在cnode1（gtm）执行命令，这个命令会初始化（配置）各个节点，并且启动相应的进程：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pgxc_ctl -c pgxc_ctl<span class="selector-class">.conf</span> init all    --初始化完成后会自动启动</span><br></pre></td></tr></table></figure>
+<p>可以在每个节点上查看对应的进程：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ps</span> -ef | <span class="keyword">grep</span> gtm</span><br><span class="line"><span class="keyword">ps</span> -ef | <span class="keyword">grep</span> postgres</span><br></pre></td></tr></table></figure>
+<h4 id="测试集群"><a href="#测试集群" class="headerlink" title="测试集群"></a><strong>测试集群</strong></h4><p>可以在任意节点上输入以下命令，查看除gtm以外的所有节点的配置情况：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> pgxc_node;</span><br></pre></td></tr></table></figure>
+<p>简单的测试，在cnode2节点上创建一个数据库test，并创建一个表test，插入数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">psql -p 20004 -U postgres </span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">DATABASE</span> <span class="keyword">test</span>;</span><br><span class="line">\c test</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">test</span>(<span class="keyword">id</span> <span class="built_in">int</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">test</span> <span class="keyword">VALUES</span>(<span class="number">1</span>);</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">test</span>;</span><br><span class="line">\q</span><br></pre></td></tr></table></figure>
+<p>在cnode3节点上查看刚刚在cnode2节点的更改：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">psql -p 20004 -U postgres  </span><br><span class="line">\c test</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">test</span>;</span><br><span class="line">\q</span><br></pre></td></tr></table></figure>
+<p>发现有刚刚插入的数据，验证成功！</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/pgxl/">pgxl</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/pgxl/">pgxl</a><a href="/tags/postgres-xl/">postgres-xl</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2015/10/08/2015-10-08-postgres-xlji-qun-de-da-jian/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/10/08/2015-10-08-postgres-xlji-qun-de-da-jian/" data-count-type="comments">&nbsp;</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
     
-    <time datetime="2015-08-31T09:15:31.000Z" itemprop="datePublished">2015-08-31</time>
-  </a>
-</section>
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/09/30/2015-09-30-python-flask-rest-apide-shi-yong/" title="python Flask REST API的使用" itemprop="url">python Flask REST API的使用</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
+		
+  <p class="article-time">
+    <time datetime="2015-09-30T07:43:21.000Z" itemprop="datePublished"> 发表于 2015-09-30</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <blockquote>
+<p>“简单不先于复杂，而是在复杂之后” —— Alan Perlis</p>
+</blockquote>
+<p>本文参考：Designing a RESTful API using Flask-RESTful<br>Posted by Miguel Grinberg under Python, Programming, REST, Flask.</p>
+<h4 id="使用Flask的扩展构建REST-API"><a href="#使用Flask的扩展构建REST-API" class="headerlink" title="使用Flask的扩展构建REST API"></a><strong>使用Flask的扩展构建REST API</strong></h4><p>Flask-RESTful扩展简化了构建REST API服务器的过程，在开始之前，我们先来看一下本文中会使用到的几个api：</p>
+<table>
+<thead>
+<tr>
+<th>HTTP Method</th>
+<th>URI</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><a href="http://[hostname]/todo/api/v1.0/tasks" target="_blank" rel="external">http://[hostname]/todo/api/v1.0/tasks</a></td>
+<td>Retrieve list of tasks</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><a href="http://[hostname]/todo/api/v1.0/tasks/[task_id" target="_blank" rel="external">http://[hostname]/todo/api/v1.0/tasks/[task_id</a>]</td>
+<td>Retrieve a task</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><a href="http://[hostname]/todo/api/v1.0/tasks" target="_blank" rel="external">http://[hostname]/todo/api/v1.0/tasks</a></td>
+<td>Create a new task</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><a href="http://[hostname]/todo/api/v1.0/tasks/[task_id" target="_blank" rel="external">http://[hostname]/todo/api/v1.0/tasks/[task_id</a>]</td>
+<td>Update an existing task</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><a href="http://[hostname]/todo/api/v1.0/tasks/[task_id" target="_blank" rel="external">http://[hostname]/todo/api/v1.0/tasks/[task_id</a>]</td>
+<td>Delete a task</td>
+</tr>
+</tbody>
+</table>
+<p>本文的web service提供的服务使用的资源是task，它包含如下字段：</p>
+<ul>
+<li>uri: unique URI for the task. String type.</li>
+<li>title: short task description. String type.</li>
+<li>description: long task description. Text type.</li>
+<li>done: task completion state. Boolean type.</li>
+</ul>
+<h4 id="路由"><a href="#路由" class="headerlink" title="路由"></a><strong>路由</strong></h4><p>Flask-RESTful提供<code>Resource</code>基类用来定义一个给定的URL的不同的HTTP请求的响应方法，比如，在我们的例子中，可以继承<code>Resource</code>基类定义一个<code>TaskListAPI</code>类来实现<code>Tasks</code>资源的<code>GET</code>，<code>POST</code>等方法，另外可以继承<code>Resource</code>基类定义一个<code>TaskAPI</code>类来实现<code>Task</code>资源的<code>GET</code>，<code>PUT</code>，<code>DELETE</code>等方法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</span><br><span class="line"><span class="keyword">from</span> flask.ext.restful <span class="keyword">import</span> Api, Resource</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskListAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self)</span>:</span></span><br><span class="line">		<span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self, id)</span>:</span></span><br><span class="line">		<span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">put</span><span class="params">(self, id)</span>:</span></span><br><span class="line">		<span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">delete</span><span class="params">(self, id)</span>:</span></span><br><span class="line">		<span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">api.add_resource(TaskListAPI, <span class="string">'/todo/api/v1.0/tasks'</span>, endpoint = <span class="string">'tasks'</span>)</span><br><span class="line">api.add_resource(TaskAPI, <span class="string">'/todo/api/v1.0/tasks/&lt;int:id&gt;'</span>, endpoint = <span class="string">'task'</span>)</span><br></pre></td></tr></table></figure>
+<p><code>api.add_resource</code>方法使用指定的<code>endpoint</code>注册路由到相应的<code>资源API类</code>上，对应HTTP请求的动作会指定使用相应<code>资源API类</code>下面的相应方法。</p>
+<h4 id="验证请求及约束"><a href="#验证请求及约束" class="headerlink" title="验证请求及约束"></a><strong>验证请求及约束</strong></h4><p>当请求的数据不符合要求时，需要拒绝。Flask-RESTful 提供了一个方式来处理数据验证，它叫做<code>RequestParser</code>类。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask.ext.restful <span class="keyword">import</span> reqparse</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskListAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.reqparse = reqparse.RequestParser()</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'title'</span>, type = str, required = <span class="keyword">True</span>,</span><br><span class="line">            help = <span class="string">'No task title provided'</span>, location = <span class="string">'json'</span>)</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'description'</span>, type = str, default = <span class="string">""</span>, location = <span class="string">'json'</span>)</span><br><span class="line">        super(TaskListAPI, self).__init__()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.reqparse = reqparse.RequestParser()</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'title'</span>, type = str, location = <span class="string">'json'</span>)</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'description'</span>, type = str, location = <span class="string">'json'</span>)</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'done'</span>, type = bool, location = <span class="string">'json'</span>)</span><br><span class="line">        super(TaskAPI, self).__init__()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># ...</span></span><br></pre></td></tr></table></figure>
+<p>先获得<code>reqparse.RequestParser</code>对象，对每一个参数进行约束验证。比如，对于创建一个<code>Task</code>来说，<code>title</code>字段是必须的，且必须是json格式的。</p>
+<h4 id="生成响应"><a href="#生成响应" class="headerlink" title="生成响应"></a><strong>生成响应</strong></h4><p>Flask-RESTFul会自动将return的内容作为响应response发出:</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> &#123; <span class="string">'task'</span>: make_public_task(task) &#125;</span><br></pre></td></tr></table></figure>
+<p>另外，还可以加入自定义状态码：</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> &#123; <span class="string">'task'</span>: make_public_task(task) &#125;, 201</span><br></pre></td></tr></table></figure>
+<h4 id="生成外部可定位格式"><a href="#生成外部可定位格式" class="headerlink" title="生成外部可定位格式"></a><strong>生成外部可定位格式</strong></h4><p>每一个请求的资源都有一个固定的URI，通常会将这个URI绑定在相应的资源中：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"tasks"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"description"</span>: <span class="string">"Need to find a good Python tutorial on the web"</span>,</span><br><span class="line">            <span class="attr">"done"</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="attr">"title"</span>: <span class="string">"Learn Python"</span>,</span><br><span class="line">            <span class="attr">"uri"</span>: <span class="string">"/todo/api/v1.0/tasks/2"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"description"</span>: <span class="string">"Hello,world"</span>,</span><br><span class="line">            <span class="attr">"done"</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="attr">"title"</span>: <span class="string">"Hello,Urey"</span>,</span><br><span class="line">            <span class="attr">"uri"</span>: <span class="string">"/todo/api/v1.0/tasks/3"</span></span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但是，我们创建资源的时候是使用的<code>id</code>标明，所以需要将内部的<code>id</code>转换成外部可定位的<code>URI</code>，Flask-RESTful提供了一个辅助函数能够很优雅地做到这样的转换，不仅仅能够把<code>id</code>转成<code>URI</code>并且能够转换其他的参数:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask.ext.restful <span class="keyword">import</span> fields, marshal</span><br><span class="line"></span><br><span class="line">task_fields = &#123;</span><br><span class="line">    <span class="string">'title'</span>: fields.String,</span><br><span class="line">    <span class="string">'description'</span>: fields.String,</span><br><span class="line">    <span class="string">'done'</span>: fields.Boolean,</span><br><span class="line">    <span class="string">'uri'</span>: fields.Url(<span class="string">'task'</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">put</span><span class="params">(self, id)</span>:</span></span><br><span class="line">        <span class="comment"># ...</span></span><br><span class="line">        <span class="keyword">return</span> &#123; <span class="string">'task'</span>: marshal(task, task_fields) &#125;</span><br><span class="line">        </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskListAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span><span class="params">(self, id)</span>:</span></span><br><span class="line">        <span class="comment"># ...</span></span><br><span class="line">        <span class="keyword">return</span> &#123;<span class="string">'task'</span>: marshal(task, task_fields)&#125;, <span class="number">201</span></span><br></pre></td></tr></table></figure>
+<p>其中，<code>task_fields</code>结构用于作为<code>marshal</code>函数的模板。fields.Uri 是一个用于生成一个<code>URL</code>的特定的参数。它需要的参数是<code>endpoint</code>。这样，当<code>PUT</code>更新一个资源或者<code>POST</code>上传一个资源时，会自动进行相应的转换（在本例中，将内部资源转换为外部资源）。</p>
+<h4 id="安全认证"><a href="#安全认证" class="headerlink" title="安全认证"></a><strong>安全认证</strong></h4><p>Flask-RESTful提供了一个扩展<code>Flask-HTTPAuth</code>进行认证。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask.ext.httpauth <span class="keyword">import</span> HTTPBasicAuth</span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line">auth = HTTPBasicAuth()</span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line">    decorators = [auth.login_required]</span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line">    decorators = [auth.login_required]</span><br><span class="line">    <span class="comment"># ...</span></span><br></pre></td></tr></table></figure>
+<p>使用<code>auth</code>获得一个<code>HTTPBasicAuth</code>类型的对象，之后，在需要认证的<code>资源API</code>中加入一个装饰器，这样，每一个方法都必须在认证的前提下进行访问。</p>
+<p>最简单的认证方式如下，提供相应的账户和密码。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@auth.get_password</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_password</span><span class="params">(username)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> username == <span class="string">'miguel'</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'python'</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">None</span></span><br></pre></td></tr></table></figure>
+<p>如果认证失败的处理方法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@auth.error_handler</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">unauthorized</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># return 403 instead of 401 to prevent browsers from displaying the default</span></span><br><span class="line">    <span class="comment"># auth dialog</span></span><br><span class="line">    <span class="keyword">return</span> make_response(jsonify(&#123;<span class="string">'message'</span>: <span class="string">'Unauthorized access'</span>&#125;), <span class="number">401</span>)</span><br></pre></td></tr></table></figure>
+<p><strong>全部代码：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!flask/bin/python</span></span><br><span class="line"></span><br><span class="line"><span class="string">"""Alternative version of the ToDo RESTful server implemented using the</span><br><span class="line">Flask-RESTful extension."""</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, jsonify, abort, make_response</span><br><span class="line"><span class="keyword">from</span> flask.ext.restful <span class="keyword">import</span> Api, Resource, reqparse, fields, marshal</span><br><span class="line"><span class="keyword">from</span> flask.ext.httpauth <span class="keyword">import</span> HTTPBasicAuth</span><br><span class="line"></span><br><span class="line">app = Flask(__name__, static_url_path=<span class="string">""</span>)</span><br><span class="line">api = Api(app)</span><br><span class="line">auth = HTTPBasicAuth()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@auth.get_password</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_password</span><span class="params">(username)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> username == <span class="string">'miguel'</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'python'</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">None</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@auth.error_handler</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">unauthorized</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># return 403 instead of 401 to prevent browsers from displaying the default</span></span><br><span class="line">    <span class="comment"># auth dialog</span></span><br><span class="line">    <span class="keyword">return</span> make_response(jsonify(&#123;<span class="string">'message'</span>: <span class="string">'Unauthorized access'</span>&#125;), <span class="number">401</span>)</span><br><span class="line"></span><br><span class="line">tasks = [</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">'id'</span>: <span class="number">1</span>,</span><br><span class="line">        <span class="string">'title'</span>: <span class="string">u'Buy groceries'</span>,</span><br><span class="line">        <span class="string">'description'</span>: <span class="string">u'Milk, Cheese, Pizza, Fruit, Tylenol'</span>,</span><br><span class="line">        <span class="string">'done'</span>: <span class="keyword">False</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">'id'</span>: <span class="number">2</span>,</span><br><span class="line">        <span class="string">'title'</span>: <span class="string">u'Learn Python'</span>,</span><br><span class="line">        <span class="string">'description'</span>: <span class="string">u'Need to find a good Python tutorial on the web'</span>,</span><br><span class="line">        <span class="string">'done'</span>: <span class="keyword">False</span></span><br><span class="line">    &#125;</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">task_fields = &#123;</span><br><span class="line">    <span class="string">'title'</span>: fields.String,</span><br><span class="line">    <span class="string">'description'</span>: fields.String,</span><br><span class="line">    <span class="string">'done'</span>: fields.Boolean,</span><br><span class="line">    <span class="string">'uri'</span>: fields.Url(<span class="string">'task'</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskListAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line">    decorators = [auth.login_required]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.reqparse = reqparse.RequestParser()</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'title'</span>, type=str, required=<span class="keyword">True</span>,</span><br><span class="line">                                   help=<span class="string">'No task title provided'</span>,</span><br><span class="line">                                   location=<span class="string">'json'</span>)</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'description'</span>, type=str, default=<span class="string">""</span>,</span><br><span class="line">                                   location=<span class="string">'json'</span>)</span><br><span class="line">        super(TaskListAPI, self).__init__()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> &#123;<span class="string">'tasks'</span>: [marshal(task, task_fields) <span class="keyword">for</span> task <span class="keyword">in</span> tasks]&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span><span class="params">(self)</span>:</span></span><br><span class="line">        args = self.reqparse.parse_args()</span><br><span class="line">        task = &#123;</span><br><span class="line">            <span class="string">'id'</span>: tasks[<span class="number">-1</span>][<span class="string">'id'</span>] + <span class="number">1</span>,</span><br><span class="line">            <span class="string">'title'</span>: args[<span class="string">'title'</span>],</span><br><span class="line">            <span class="string">'description'</span>: args[<span class="string">'description'</span>],</span><br><span class="line">            <span class="string">'done'</span>: <span class="keyword">False</span></span><br><span class="line">        &#125;</span><br><span class="line">        tasks.append(task)</span><br><span class="line">        <span class="keyword">return</span> &#123;<span class="string">'task'</span>: marshal(task, task_fields)&#125;, <span class="number">201</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskAPI</span><span class="params">(Resource)</span>:</span></span><br><span class="line">    decorators = [auth.login_required]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.reqparse = reqparse.RequestParser()</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'title'</span>, type=str, location=<span class="string">'json'</span>)</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'description'</span>, type=str, location=<span class="string">'json'</span>)</span><br><span class="line">        self.reqparse.add_argument(<span class="string">'done'</span>, type=bool, location=<span class="string">'json'</span>)</span><br><span class="line">        super(TaskAPI, self).__init__()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self, id)</span>:</span></span><br><span class="line">        task = [task <span class="keyword">for</span> task <span class="keyword">in</span> tasks <span class="keyword">if</span> task[<span class="string">'id'</span>] == id]</span><br><span class="line">        <span class="keyword">if</span> len(task) == <span class="number">0</span>:</span><br><span class="line">            abort(<span class="number">404</span>)</span><br><span class="line">        <span class="keyword">return</span> &#123;<span class="string">'task'</span>: marshal(task[<span class="number">0</span>], task_fields)&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">put</span><span class="params">(self, id)</span>:</span></span><br><span class="line">        task = [task <span class="keyword">for</span> task <span class="keyword">in</span> tasks <span class="keyword">if</span> task[<span class="string">'id'</span>] == id]</span><br><span class="line">        <span class="keyword">if</span> len(task) == <span class="number">0</span>:</span><br><span class="line">            abort(<span class="number">404</span>)</span><br><span class="line">        task = task[<span class="number">0</span>]</span><br><span class="line">        args = self.reqparse.parse_args()</span><br><span class="line">        <span class="keyword">for</span> k, v <span class="keyword">in</span> args.items():</span><br><span class="line">            <span class="keyword">if</span> v <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">                task[k] = v</span><br><span class="line">        <span class="keyword">return</span> &#123;<span class="string">'task'</span>: marshal(task, task_fields)&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">delete</span><span class="params">(self, id)</span>:</span></span><br><span class="line">        task = [task <span class="keyword">for</span> task <span class="keyword">in</span> tasks <span class="keyword">if</span> task[<span class="string">'id'</span>] == id]</span><br><span class="line">        <span class="keyword">if</span> len(task) == <span class="number">0</span>:</span><br><span class="line">            abort(<span class="number">404</span>)</span><br><span class="line">        tasks.remove(task[<span class="number">0</span>])</span><br><span class="line">        <span class="keyword">return</span> &#123;<span class="string">'result'</span>: <span class="keyword">True</span>&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">api.add_resource(TaskListAPI, <span class="string">'/todo/api/v1.0/tasks'</span>, endpoint=<span class="string">'tasks'</span>)</span><br><span class="line">api.add_resource(TaskAPI, <span class="string">'/todo/api/v1.0/tasks/&lt;int:id&gt;'</span>, endpoint=<span class="string">'task'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run(debug=<span class="keyword">True</span>)</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/python/">python</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/python/">python</a><a href="/tags/REST-API/">REST API</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2015/09/30/2015-09-30-python-flask-rest-apide-shi-yong/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/09/30/2015-09-30-python-flask-rest-apide-shi-yong/" data-count-type="comments">&nbsp;</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/09/07/2015-09-07-osx-plist-ding-shi-ren-wu/" title="osx plist 定时任务" itemprop="url">osx plist 定时任务</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
+		
+  <p class="article-time">
+    <time datetime="2015-09-07T01:56:18.000Z" itemprop="datePublished"> 发表于 2015-09-07</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>osx下定时任务是通过写plist脚本实现的，plist要比linux/osx下使用crontab更为简单、方便、细粒度。</p>
+<p>可以通过两种方式来设置脚本的执行时间。一个是使用StartInterval，它指定脚本每间隔多长时间（单位：秒）执行一次；另外一个使用StartCalendarInterval，它可以指定脚本在多少分钟、小时、天、星期几、月时间上执行，类似如crontab的中的设置。</p>
+<p>比如：</p>
+<p>写一个名为“com.urey.test.plist”的脚本保存在目录“/Users/urey/data/”下面。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="php"><span class="meta">&lt;?</span>xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span><span class="meta">?&gt;</span></span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">plist</span> <span class="attr">version</span>=<span class="string">"1.0"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">key</span>&gt;</span>Label<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">string</span>&gt;</span>com.urey.test.plist<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">key</span>&gt;</span>ProgramArguments<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">array</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">string</span>&gt;</span>/Users/urey/data/test.sh<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">array</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">key</span>&gt;</span>KeepAlive<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">false</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">key</span>&gt;</span>RunAtLoad<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">true</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">key</span>&gt;</span>StartInterval<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">integer</span>&gt;</span>5<span class="tag">&lt;/<span class="name">integer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plist</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>其中，key是plist对应的属性名，相应的为该属性名对应的属性值（即key/value，plist为一种特殊的xml文件）。</p>
+<p>比如，上面我们定于了该定时任务叫“com.urey.test.plist”，定时执行的脚本是“/Users/urey/data/test.sh”，载入时开始执行，执行间隔是每5s一次。</p>
+<p>/Users/urey/data/test.sh是shell脚本，我写的测试脚本如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"><span class="built_in">cd</span> /Users/urey/data/</span><br><span class="line">LOG=`date +<span class="string">"%Y-%m-%d %H:%M:%S"</span>`</span><br><span class="line">LOGFILE=`date + <span class="string">"log-%Y%m%d-%H:%M:%S.log"</span>`</span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$LOG</span> &gt; <span class="variable">$LOGFILE</span></span><br></pre></td></tr></table></figure>
+<p>好，下面我们就可以通过命令：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo launchctl load com<span class="selector-class">.urey</span><span class="selector-class">.test</span><span class="selector-class">.plist</span></span><br><span class="line">sudo launchctl unload com<span class="selector-class">.urey</span><span class="selector-class">.test</span><span class="selector-class">.plist</span></span><br></pre></td></tr></table></figure>
+<p>来载入或者取消载入对应的定时任务。</p>
+<p>值得注意的是，我们还必须明确com.urey.test.plist的权限和所有者：</p>
+<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/plist.png" width="600" height="200" alt="图片名称" align="center"></p>
+<p>即需要操作：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo chmod <span class="number">600</span> com<span class="selector-class">.urey</span><span class="selector-class">.test</span><span class="selector-class">.plist</span></span><br><span class="line">sudo chown root com<span class="selector-class">.urey</span><span class="selector-class">.test</span><span class="selector-class">.plist</span></span><br></pre></td></tr></table></figure>
+<p>至此，一个简单的定时任务就做好了。</p>
+<p>我们可以把plist脚本存放在路径为/Library/LaunchDaemons或/Library/LaunchAgents，其区别是后一个路径的脚本当用户登陆系统后才会被执行，前一个只要系统启动了，哪怕用户不登陆系统也会被执行。</p>
+<p>当然，我们也可以存放在任意的其它路径上，这时就不会有上面的限制且会根据具体的属性值进行限制。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/osx/">osx</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/tips/">tips</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2015/09/07/2015-09-07-osx-plist-ding-shi-ren-wu/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/09/07/2015-09-07-osx-plist-ding-shi-ren-wu/" data-count-type="comments">&nbsp;</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/" title="regex的贪婪与懒惰" itemprop="url">regex的贪婪与懒惰</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
+		
+  <p class="article-time">
+    <time datetime="2015-09-04T13:07:39.000Z" itemprop="datePublished"> 发表于 2015-09-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>　　正则表达式有两种模式：<strong>贪婪模式</strong>与<strong>懒惰模式</strong>。</p>
+<p>　　贪婪模式：匹配尽可能多的字符。</p>
+<p>　　我们一般刚开始学习正则表达式使用到的都是贪婪模式下的表达。</p>
+<p>　　比如：将<strong> a.*b </strong> 应用于串 <strong>“aabab”</strong> ，它会匹配 “aabab”整个串。注意，其实整个串“aabab”中的子串“aab”和“ab”也是匹配的。这就是正则表达式的贪婪模式。</p>
+<p>　　懒惰模式：匹配尽可能少的字符。</p>
+<p>　　正则表达式用<strong>?</strong>来表示懒惰限定符。它要用在重复匹配限定符的后面。</p>
+<p>　　重复匹配限定符：</p>
+<table>
+<thead>
+<tr>
+<th>代码</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>*</td>
+<td>重复零次或更多次</td>
+</tr>
+<tr>
+<td>+</td>
+<td>重复一次或更多次</td>
+</tr>
+<tr>
+<td>?</td>
+<td>重复零次或一次</td>
+</tr>
+<tr>
+<td>{n}</td>
+<td>重复n次</td>
+</tr>
+<tr>
+<td>{n,}</td>
+<td>重复n次或更多次</td>
+</tr>
+<tr>
+<td>{n,m}</td>
+<td>重复n到m次</td>
+</tr>
+</tbody>
+</table>
+<p>　　加入懒惰限定符的重复匹配限定符：　　</p>
+<table>
+<thead>
+<tr>
+<th>代码</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>*?</td>
+<td>重复零次或更多次，但尽可能少重复</td>
+</tr>
+<tr>
+<td>+?</td>
+<td>重复一次或更多次，但尽可能少重复</td>
+</tr>
+<tr>
+<td>??</td>
+<td>重复零次或一次，但尽可能少重复</td>
+</tr>
+<tr>
+<td>{n,}?</td>
+<td>重复n次或更多次，但尽可能少重复</td>
+</tr>
+<tr>
+<td>{n,m}?</td>
+<td>重复n到m次，但尽可能少重复</td>
+</tr>
+</tbody>
+</table>
+<p>　　还是上面那个例子：将<strong> a.*?b </strong> 应用于串 <strong>“aabab”</strong> ，它会匹配 “aab”这个子串（对应于原串的前三个字符）和 “ab”这个子串（对应于原串的最后两个字符）。注意：懒惰模式在匹配好了以后会记录该匹配串，如果还有剩余的字符，会继续往下匹配，直到结束，返回所有匹配成功的串。</p>
+<p>　　实战例子: 在python的爬虫应用中，我们常常遇见需要在整个html页面中找到我们需要的内容，这时就要用到regex。比如我们想要找到所有的img标签中的src属性的内容：</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;img pic_type=<span class="string">"0"</span> <span class="keyword">class</span>=<span class="string">"BDE_Image"</span> src=<span class="string">"http://imgsrc.baidu.com/forum/w%3D580/sign=294db374d462853592e0d229a0ee76f2/e732c895d143ad4b630e8f4683025aafa40f0611.jpg"</span> pic_ext=<span class="string">"bmp"</span> <span class="built_in">height</span>=<span class="string">"328"</span> <span class="built_in">width</span>=<span class="string">"560"</span>&gt;</span><br></pre></td></tr></table></figure>
+<p>　　用到的正则表达式：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg = <span class="string">r'src="(.+?\.jpg)" pic_ext'</span></span><br></pre></td></tr></table></figure>
+<p>　　注意，这里就运用了懒惰规则，如果写成这样：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg = <span class="string">r'src="(.+\.jpg)" pic_ext'</span></span><br></pre></td></tr></table></figure>
+<p>　　如果有不止一个img标签的话，就会匹配第一个img标签的开始部分和最后一个img标签的结束部分的全部字符，这样就没有了意义。
+　</p>
+<p>　　上式中，“( )”中的内容表示待提取的字符。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/regex/">regex</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/regex/">regex</a><a href="/tags/python/">python</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/" data-count-type="comments">&nbsp;</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/08/31/2015-08-31-ban-jia-la/" title="搬家啦" itemprop="url">搬家啦</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
+		
+  <p class="article-time">
+    <time datetime="2015-08-31T09:15:31.000Z" itemprop="datePublished"> 发表于 2015-08-31</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>　　以前一直把博客的家安在CSDN上(<a href="http://blog.csdn.net/yeruby" target="_blank" rel="external">http://blog.csdn.net/yeruby</a>)，它记录了我从大一开始，一直到研一生活结束的点点滴滴，这也是我一直不断前进的动力，但就像一直住在别人家里一样，有点别扭。</p>
+<p>　　因此赶在2015年的8月末，我决定将博客迁移到github上，并且从以前的技术为主转变为：写写技术、还要再聊聊生活。</p>
+<p>　　脚踏实地，仰望星空。</p>
+<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/1.png" alt="BlueSky"></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/life/">life</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/tips/">tips</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2015/08/31/2015-08-31-ban-jia-la/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/08/31/2015-08-31-ban-jia-la/" data-count-type="comments">&nbsp;</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
 
 
 
@@ -230,7 +818,7 @@ Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩�
 
 
 
-  <nav id="page-nav" class="clearfix unexpand">
+  <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/page/2/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
   </nav>
 

@@ -515,6 +515,11 @@ $(document).ready(function(){
     o.css("top",Math.max(80,260-$(this).scrollTop()));
   });
   
+        getSize();
+        if (myWidth >= 1024) {
+          c.click();
+        }
+  
   $(window).resize(function(){
     getSize(); 
     if (myWidth >= 1024) {

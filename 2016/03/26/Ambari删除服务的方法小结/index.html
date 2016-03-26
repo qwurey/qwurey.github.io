@@ -4,41 +4,23 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>LeetCode Add Two Numbers | Urey on the way</title>
+    <title>Ambari删除服务的方法小结 | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="tips
-使用链表实现高精度整形加法
-链表元素和链表指针
-time complexity: O(max(len(l1),len(l2)))
-space complexity: O(max(len(l1),len(l2)))
-
-1234567891011121314151617181920212223242526272829303132333435/** * Definition for singl">
+    <meta name="description" content="使用REST API(1). 停止服务：123# stop MYSQL service# 注意: 修改 ambari_server_ip &amp;amp; cluster_namecurl -u admin:admin -H &quot;X-Requested-By: ambari&quot; -X PUT -d &apos;&amp;#123;&quot;RequestInfo&quot;:&amp;#123;&quot;context&quot;:&quot;Stop Service&quot;&amp;#12">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LeetCode Add Two Numbers">
-<meta property="og:url" content="http://qiaowei.xyz/2016/03/12/LeetCode-Add-Two-Numbers/index.html">
+<meta property="og:title" content="Ambari删除服务的方法小结">
+<meta property="og:url" content="http://qiaowei.xyz/2016/03/26/Ambari删除服务的方法小结/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="tips
-使用链表实现高精度整形加法
-链表元素和链表指针
-time complexity: O(max(len(l1),len(l2)))
-space complexity: O(max(len(l1),len(l2)))
-
-1234567891011121314151617181920212223242526272829303132333435/** * Definition for singl">
-<meta property="og:updated_time" content="2016-03-12T03:06:52.000Z">
+<meta property="og:description" content="使用REST API(1). 停止服务：123# stop MYSQL service# 注意: 修改 ambari_server_ip &amp;amp; cluster_namecurl -u admin:admin -H &quot;X-Requested-By: ambari&quot; -X PUT -d &apos;&amp;#123;&quot;RequestInfo&quot;:&amp;#123;&quot;context&quot;:&quot;Stop Service&quot;&amp;#12">
+<meta property="og:updated_time" content="2016-03-26T09:10:14.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LeetCode Add Two Numbers">
-<meta name="twitter:description" content="tips
-使用链表实现高精度整形加法
-链表元素和链表指针
-time complexity: O(max(len(l1),len(l2)))
-space complexity: O(max(len(l1),len(l2)))
-
-1234567891011121314151617181920212223242526272829303132333435/** * Definition for singl">
+<meta name="twitter:title" content="Ambari删除服务的方法小结">
+<meta name="twitter:description" content="使用REST API(1). 停止服务：123# stop MYSQL service# 注意: 修改 ambari_server_ip &amp;amp; cluster_namecurl -u admin:admin -H &quot;X-Requested-By: ambari&quot; -X PUT -d &apos;&amp;#123;&quot;RequestInfo&quot;:&amp;#123;&quot;context&quot;:&quot;Stop Service&quot;&amp;#12">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -97,14 +79,14 @@ space complexity: O(max(len(l1),len(l2)))
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/03/12/LeetCode-Add-Two-Numbers/" title="LeetCode Add Two Numbers" itemprop="url">LeetCode Add Two Numbers</a>
+      <a href="/2016/03/26/Ambari删除服务的方法小结/" title="Ambari删除服务的方法小结" itemprop="url">Ambari删除服务的方法小结</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2016-03-12T03:02:25.000Z" itemprop="datePublished"> 发表于 2016-03-12</time>
+    <time datetime="2016-03-26T09:00:57.000Z" itemprop="datePublished"> 发表于 2016-03-26</time>
     
   </p>
 </header>
@@ -113,30 +95,33 @@ space complexity: O(max(len(l1),len(l2)))
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#使用REST-API"><span class="toc-number">1.</span> <span class="toc-text">使用REST API</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-停止服务："><span class="toc-number">1.0.1.</span> <span class="toc-text">(1). 停止服务：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-删除服务："><span class="toc-number">1.0.2.</span> <span class="toc-text">(2). 删除服务：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#从Ambari元数据库中直接删除"><span class="toc-number">2.</span> <span class="toc-text">从Ambari元数据库中直接删除</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-先停掉ambari-server"><span class="toc-number">2.0.1.</span> <span class="toc-text">(1). 先停掉ambari-server:</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-执行sql命令："><span class="toc-number">2.0.2.</span> <span class="toc-text">(2). 执行sql命令：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-重新开启ambari-server："><span class="toc-number">2.0.3.</span> <span class="toc-text">(3). 重新开启ambari-server：</span></a></li></ol></li></ol></li></ol>
 		
 		</div>
 		
-		<h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a>tips</h4><ol>
-<li>使用链表实现高精度整形加法</li>
-<li>链表元素和链表指针</li>
-<li>time complexity: O(max(len(l1),len(l2)))</li>
-<li>space complexity: O(max(len(l1),len(l2)))</li>
-</ol>
-<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Definition for singly-linked list.</span><br><span class="line"> * struct ListNode &#123;</span><br><span class="line"> *     int val;</span><br><span class="line"> *     ListNode *next;</span><br><span class="line"> *     ListNode(int x) : val(x), next(NULL) &#123;&#125;</span><br><span class="line"> * &#125;;</span><br><span class="line"> */</span></span><br><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) &#123;</span><br><span class="line">        ListNode* head = new ListNode(<span class="number">0</span>)<span class="comment">;</span></span><br><span class="line">        ListNode* p = head<span class="comment">;</span></span><br><span class="line">        <span class="keyword">int</span> carry = <span class="number">0</span><span class="comment">;</span></span><br><span class="line">        <span class="keyword">while</span>(true) &#123;</span><br><span class="line">            <span class="keyword">if</span>(l1 != NULL) &#123;</span><br><span class="line">                carry += l1-&gt;val<span class="comment">;</span></span><br><span class="line">                l1 = l1-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span>(l2 != NULL) &#123;</span><br><span class="line">                carry += l2-&gt;val<span class="comment">;</span></span><br><span class="line">                l2 = l2-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">            p-&gt;val = carry % <span class="number">10</span><span class="comment">;</span></span><br><span class="line">            carry /= <span class="number">10</span><span class="comment">;</span></span><br><span class="line">            <span class="keyword">if</span>(l1 != NULL || l2 != NULL || carry != <span class="number">0</span>) &#123;</span><br><span class="line">                p-&gt;<span class="keyword">next</span> = new ListNode(<span class="number">0</span>)<span class="comment">;</span></span><br><span class="line">                p = p-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">            &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">break</span><span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> head<span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>  
+		<h4 id="使用REST-API"><a href="#使用REST-API" class="headerlink" title="使用REST API"></a>使用REST API</h4><h6 id="1-停止服务："><a href="#1-停止服务：" class="headerlink" title="(1). 停止服务："></a>(1). 停止服务：</h6><figure class="highlight cos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># stop MYSQL service</span><br><span class="line"># 注意: 修改 ambari_server_ip &amp; cluster_name</span><br><span class="line">curl -u admin:admin -<span class="keyword">H</span> <span class="string">"X-Requested-By: ambari"</span> -<span class="keyword">X</span> PUT -<span class="keyword">d</span> '&#123;<span class="string">"RequestInfo"</span>:&#123;<span class="string">"context"</span>:<span class="string">"Stop Service"</span>&#125;,<span class="string">"Body"</span>:&#123;<span class="string">"ServiceInfo"</span>:&#123;<span class="string">"state"</span>:<span class="string">"INSTALLED"</span>&#125;&#125;&#125;' http:<span class="comment">//ambari_server_ip:8080/api/v1/clusters/cluster_name/services/MYSQL</span></span><br></pre></td></tr></table></figure>
+<h6 id="2-删除服务："><a href="#2-删除服务：" class="headerlink" title="(2). 删除服务："></a>(2). 删除服务：</h6><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># delete MYSQL service</span></span><br><span class="line"><span class="comment"># 注意: 修改 ambari_server_ip &amp; cluster_name</span></span><br><span class="line">curl -u <span class="symbol">admin:</span>admin -H <span class="string">"X-Requested-By: ambari"</span> -X DELETE  <span class="symbol">http:</span>/<span class="regexp">/ambari_server_ip:8080/api</span><span class="regexp">/v1/clusters</span><span class="regexp">/cluster_name/services</span><span class="regexp">/MYSQL</span></span><br></pre></td></tr></table></figure>
+<h4 id="从Ambari元数据库中直接删除"><a href="#从Ambari元数据库中直接删除" class="headerlink" title="从Ambari元数据库中直接删除"></a>从Ambari元数据库中直接删除</h4><p>为什么这么删除，多麻烦？其实这是笔者在用rest api删除发现bug后才想到的方法。ambari2.1.1 rest api 删除服务偶尔会出现bug，情形是重启ambari－server又出现了该服务，此时在安装该服务会出现 server error的错误！</p>
+<p>处理方法：<br>通过数据库删除，ambari默认使用pg，使用其他数据库原理一样。</p>
+<h6 id="1-先停掉ambari-server"><a href="#1-先停掉ambari-server" class="headerlink" title="(1). 先停掉ambari-server:"></a>(1). 先停掉ambari-server:</h6><figure class="highlight vbscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ambari-<span class="built_in">server</span> <span class="keyword">stop</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># 登录数据库：默认密码是：bigdata</span></span><br><span class="line">psql -U ambari</span><br><span class="line"></span><br><span class="line"><span class="meta"># 查看数据库</span></span><br><span class="line">\l </span><br><span class="line"></span><br><span class="line"><span class="meta"># 切换到ambari数据库</span></span><br><span class="line">\c ambari   </span><br><span class="line"></span><br><span class="line"><span class="meta"># 查看表</span></span><br><span class="line">\d</span><br></pre></td></tr></table></figure>
+<h6 id="2-执行sql命令："><a href="#2-执行sql命令：" class="headerlink" title="(2). 执行sql命令："></a>(2). 执行sql命令：</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> hostcomponentstate <span class="keyword">WHERE</span> service_name <span class="keyword">IN</span> (<span class="string">'SERVICE_NAME'</span>);</span><br><span class="line"> </span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> hostcomponentdesiredstate <span class="keyword">WHERE</span> service_name <span class="keyword">IN</span> (<span class="string">'SERVICE_NAME'</span>);</span><br><span class="line"> </span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> servicecomponentdesiredstate <span class="keyword">WHERE</span> service_name <span class="keyword">IN</span> (<span class="string">'SERVICE_NAME'</span>);</span><br><span class="line"> </span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> servicedesiredstate <span class="keyword">WHERE</span> service_name <span class="keyword">IN</span> (<span class="string">'SERVICE_NAME'</span>);</span><br><span class="line"> </span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> clusterservices <span class="keyword">WHERE</span> service_name <span class="keyword">IN</span> (<span class="string">'SERVICE_NAME'</span>);</span><br></pre></td></tr></table></figure>
+<h6 id="3-重新开启ambari-server："><a href="#3-重新开启ambari-server：" class="headerlink" title="(3). 重新开启ambari-server："></a>(3). 重新开启ambari-server：</h6><figure class="highlight axapta"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ambari-<span class="keyword">server</span> start</span><br></pre></td></tr></table></figure>
+<p>注意：<br>sql语句顺序有很大的关系，实际上是从component到service到cluster这个层次顺序删除的，这也是ambari设计的层次结构。</p>
+  
 	</div>
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
+  <a class="article-category-link" href="/categories/ambari/">ambari</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
+  <span></span> <a href="/tags/ambari/">ambari</a>
   </div>
 
 </div>
@@ -145,7 +130,7 @@ space complexity: O(max(len(l1),len(l2)))
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2016/03/12/LeetCode-Add-Two-Numbers/" data-title="LeetCode Add Two Numbers | Urey on the way" data-tsina="null" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2016/03/26/Ambari删除服务的方法小结/" data-title="Ambari删除服务的方法小结 | Urey on the way" data-tsina="null" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -158,19 +143,11 @@ space complexity: O(max(len(l1),len(l2)))
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2016/03/12/LeetCode-Longest-Substring-Without-Repeating-Characters/" title="LeetCode Longest Substring Without Repeating Characters">
-  <strong>上一篇：</strong><br/>
-  <span>
-  LeetCode Longest Substring Without Repeating Characters</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2016/03/12/LeetCode-Two-Sum/"  title="LeetCode Two Sum">
+<a href="/2016/03/23/Flume-Source对多行的处理/"  title="Flume Source对多行的处理">
  <strong>下一篇：</strong><br/> 
- <span>LeetCode Two Sum
+ <span>Flume Source对多行的处理
 </span>
 </a>
 </div>
@@ -179,7 +156,7 @@ space complexity: O(max(len(l1),len(l2)))
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2016/03/12/LeetCode-Add-Two-Numbers/" data-title="LeetCode Add Two Numbers" data-url="http://qiaowei.xyz/2016/03/12/LeetCode-Add-Two-Numbers/"></div>
+	<div class="ds-thread" data-thread-key="2016/03/26/Ambari删除服务的方法小结/" data-title="Ambari删除服务的方法小结" data-url="http://qiaowei.xyz/2016/03/26/Ambari删除服务的方法小结/"></div>
 </section>
 
 
@@ -189,7 +166,7 @@ space complexity: O(max(len(l1),len(l2)))
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#使用REST-API"><span class="toc-number">1.</span> <span class="toc-text">使用REST API</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-停止服务："><span class="toc-number">1.0.1.</span> <span class="toc-text">(1). 停止服务：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-删除服务："><span class="toc-number">1.0.2.</span> <span class="toc-text">(2). 删除服务：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#从Ambari元数据库中直接删除"><span class="toc-number">2.</span> <span class="toc-text">从Ambari元数据库中直接删除</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-先停掉ambari-server"><span class="toc-number">2.0.1.</span> <span class="toc-text">(1). 先停掉ambari-server:</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-执行sql命令："><span class="toc-number">2.0.2.</span> <span class="toc-text">(2). 执行sql命令：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-重新开启ambari-server："><span class="toc-number">2.0.3.</span> <span class="toc-text">(3). 重新开启ambari-server：</span></a></li></ol></li></ol></li></ol>
  
   </div>
 

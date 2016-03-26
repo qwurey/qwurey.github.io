@@ -77,17 +77,18 @@
   
 <section class="post" itemscope itemprop="blogitem">
   
-    <a href="/2015/10/08/2015-10-08-postgres-xlji-qun-de-da-jian/" title="Postgres-XL集群的搭建" itemprop="url">
+    <a href="/2015/10/09/2015-10-09-postgresqlde-jdbcfang-wen/" title="PostgreSQL的JDBC访问" itemprop="url">
   
-    <h1 itemprop="name">Postgres-XL集群的搭建</h1>
+    <h1 itemprop="name">PostgreSQL的JDBC访问</h1>
     
      
-           <p itemprop="description" >“如果你惟一的工具是一把锤子，你往往会把一切问题看成钉子” —— 无名
+           <p itemprop="description" >“过去的代码都是未经测试的代码” —— 无名
 
-集群规划建立5个虚拟机构成的集群，虚拟机的os均为centos6.5，依次命名为cnode1，cnode2，cnode3，cnode4，cnode5，其中cnode1为gtm，其余4个节点均为coordin</p>
+JDBC的版本选择官网有给出具体的jdk与postgresql driver的版本对应关系：https://jdbc.postgresql.org/download.html
+这里使用jdk1.7，对应：JDBC41 Postgre</p>
         
     
-    <time datetime="2015-10-08T11:32:26.000Z" itemprop="datePublished">2015-10-08</time>
+    <time datetime="2015-10-09T12:45:33.000Z" itemprop="datePublished">2015-10-09</time>
   </a>
 </section>
 
@@ -108,6 +109,28 @@
 
 什么是Postgres-XLXL的意思是：eXtensible Lattice，可以扩展的格子，即将PostgreSQL应用在多机器上的分布式数据库的形象化表达。
 Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩展的、多租户</p>
+        
+    
+    <time datetime="2015-10-08T11:32:26.000Z" itemprop="datePublished">2015-10-08</time>
+  </a>
+</section>
+
+
+
+
+
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2015/10/08/2015-10-08-postgres-xlji-qun-de-da-jian/" title="Postgres-XL集群的搭建" itemprop="url">
+  
+    <h1 itemprop="name">Postgres-XL集群的搭建</h1>
+    
+     
+           <p itemprop="description" >“如果你惟一的工具是一把锤子，你往往会把一切问题看成钉子” —— 无名
+
+集群规划建立5个虚拟机构成的集群，虚拟机的os均为centos6.5，依次命名为cnode1，cnode2，cnode3，cnode4，cnode5，其中cnode1为gtm，其余4个节点均为coordin</p>
         
     
     <time datetime="2015-10-08T11:32:26.000Z" itemprop="datePublished">2015-10-08</time>
@@ -227,7 +250,7 @@ Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩�
 		<ul>
 		
 		  
-			<li><a href="/categories/ambari/" title="ambari">ambari<sup>1</sup></a></li>
+			<li><a href="/categories/ambari/" title="ambari">ambari<sup>2</sup></a></li>
 		  
 		
 		  
@@ -292,6 +315,10 @@ Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩�
 			
 		
 			
+				<li><a href="/tags/ambari/" title="ambari">ambari<sup>2</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/python/" title="python">python<sup>2</sup></a></li>
 			
 		
@@ -300,15 +327,11 @@ Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩�
 			
 		
 			
-				<li><a href="/tags/pg/" title="pg">pg<sup>1</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/regex/" title="regex">regex<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/REST-API/" title="REST API">REST API<sup>1</sup></a></li>
+				<li><a href="/tags/pg/" title="pg">pg<sup>1</sup></a></li>
 			
 		
 			
@@ -316,15 +339,15 @@ Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩�
 			
 		
 			
-				<li><a href="/tags/ambari/" title="ambari">ambari<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/maven/" title="maven">maven<sup>1</sup></a></li>
+				<li><a href="/tags/REST-API/" title="REST API">REST API<sup>1</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/elasticsearch/" title="elasticsearch">elasticsearch<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/maven/" title="maven">maven<sup>1</sup></a></li>
 			
 		
 			

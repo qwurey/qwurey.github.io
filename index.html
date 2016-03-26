@@ -74,690 +74,245 @@
     <div id="container">
       <div id="main">
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/03/26/Ambari删除服务的方法小结/" title="Ambari删除服务的方法小结" itemprop="url">Ambari删除服务的方法小结</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2016-03-26T09:00:57.000Z" itemprop="datePublished"> 发表于 2016-03-26</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>通过rest api 或者 通过操作ambari元数据库实现<br>
-        
-        
-        <p class="article-more-link">
-          
-            <a href="/2016/03/26/Ambari删除服务的方法小结/#more">Read More</a>
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/ambari/">ambari</a>
-</div>
-
-
-  <div class="article-tags">
   
-  <span></span> <a href="/tags/ambari/">ambari</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2016/03/26/Ambari删除服务的方法小结/#comments" class="ds-thread-count comments-count-link" data-thread-key="2016/03/26/Ambari删除服务的方法小结/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/03/23/Flume-Source对多行的处理/" title="Flume Source对多行的处理" itemprop="url">Flume Source对多行的处理</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2016-03-23T14:41:36.000Z" itemprop="datePublished"> 发表于 2016-03-23</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>ExecSource会<code>readLine()</code>读取日志中的每一行，把其作为每一个flume event的body放进去，这对于大部分这种每行就可以结束的日志记录，是完全可以的：<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">2016<span class="selector-tag">-03-18</span> 17<span class="selector-pseudo">:53</span><span class="selector-pseudo">:48</span>,374 <span class="selector-tag">INFO</span> <span class="selector-tag">namenode</span><span class="selector-class">.FSNamesystem</span> (<span class="selector-tag">FSNamesystem</span><span class="selector-class">.java</span><span class="selector-pseudo">:listCorruptFileBlocks(7217))</span> <span class="selector-tag">-</span> <span class="selector-tag">there</span> <span class="selector-tag">are</span> <span class="selector-tag">no</span> <span class="selector-tag">corrupt</span> <span class="selector-tag">file</span> <span class="selector-tag">blocks</span>.</span><br><span class="line">2016<span class="selector-tag">-03-18</span> 17<span class="selector-pseudo">:53</span><span class="selector-pseudo">:48</span>,278 <span class="selector-tag">INFO</span> <span class="selector-tag">namenode</span><span class="selector-class">.FSNamesystem</span> (<span class="selector-tag">FSNamesystem</span><span class="selector-class">.java</span><span class="selector-pseudo">:listCorruptFileBlocks(7217))</span> <span class="selector-tag">-</span> <span class="selector-tag">there</span> <span class="selector-tag">are</span> <span class="selector-tag">no</span> <span class="selector-tag">corrupt</span> <span class="selector-tag">file</span> <span class="selector-tag">blocks</span>.</span><br></pre></td></tr></table></figure></p>
-<p>但是，对于有<code>stacktrace</code>的<code>ERROR</code>日志记录，如果把一行的内容当作一个flume event会有很大的问题，直观上来看，肯定需要把若干行看作是一个flume event，比如下面这样的日志记录，要作为一个flume event，而不是27个（一共27行）：<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2016</span>-<span class="number">03</span>-<span class="number">18</span> <span class="number">17</span>:<span class="number">53</span>:<span class="number">40</span>,<span class="number">278</span> ERROR [HiveServer2-Handler-Pool: Thread-<span class="number">26</span>]: Error occurred during processing of message.</span><br><span class="line">java<span class="selector-class">.lang</span><span class="selector-class">.RuntimeException</span>: org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TTransportException</span>: java<span class="selector-class">.net</span><span class="selector-class">.SocketException</span>: Connection reset</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TSaslServerTransport</span><span class="variable">$Factory</span>.getTransport(TSaslServerTransport<span class="selector-class">.java</span>:<span class="number">219</span>)</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.server</span><span class="selector-class">.TThreadPoolServer</span><span class="variable">$WorkerProcess</span>.run(TThreadPoolServer<span class="selector-class">.java</span>:<span class="number">268</span>)</span><br><span class="line">	at java<span class="selector-class">.util</span><span class="selector-class">.concurrent</span><span class="selector-class">.ThreadPoolExecutor</span><span class="selector-class">.runWorker</span>(ThreadPoolExecutor<span class="selector-class">.java</span>:<span class="number">1145</span>)</span><br><span class="line">	at java<span class="selector-class">.util</span><span class="selector-class">.concurrent</span><span class="selector-class">.ThreadPoolExecutor</span><span class="variable">$Worker</span>.run(ThreadPoolExecutor<span class="selector-class">.java</span>:<span class="number">615</span>)</span><br><span class="line">	at java<span class="selector-class">.lang</span><span class="selector-class">.Thread</span><span class="selector-class">.run</span>(Thread<span class="selector-class">.java</span>:<span class="number">745</span>)</span><br><span class="line">Caused by: org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TTransportException</span>: java<span class="selector-class">.net</span><span class="selector-class">.SocketException</span>: Connection reset</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TIOStreamTransport</span><span class="selector-class">.read</span>(TIOStreamTransport<span class="selector-class">.java</span>:<span class="number">129</span>)</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TTransport</span><span class="selector-class">.readAll</span>(TTransport<span class="selector-class">.java</span>:<span class="number">86</span>)</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TSaslTransport</span><span class="selector-class">.receiveSaslMessage</span>(TSaslTransport<span class="selector-class">.java</span>:<span class="number">178</span>)</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TSaslServerTransport</span><span class="selector-class">.handleSaslStartMessage</span>(TSaslServerTransport<span class="selector-class">.java</span>:<span class="number">125</span>)</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TSaslTransport</span><span class="selector-class">.open</span>(TSaslTransport<span class="selector-class">.java</span>:<span class="number">271</span>)</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TSaslServerTransport</span><span class="selector-class">.open</span>(TSaslServerTransport<span class="selector-class">.java</span>:<span class="number">41</span>)</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TSaslServerTransport</span><span class="variable">$Factory</span>.getTransport(TSaslServerTransport<span class="selector-class">.java</span>:<span class="number">216</span>)</span><br><span class="line">	... <span class="number">4</span> more</span><br><span class="line">Caused by: java<span class="selector-class">.net</span><span class="selector-class">.SocketException</span>: Connection reset</span><br><span class="line">	at java<span class="selector-class">.net</span><span class="selector-class">.SocketInputStream</span><span class="selector-class">.read</span>(SocketInputStream<span class="selector-class">.java</span>:<span class="number">196</span>)</span><br><span class="line">	at java<span class="selector-class">.net</span><span class="selector-class">.SocketInputStream</span><span class="selector-class">.read</span>(SocketInputStream<span class="selector-class">.java</span>:<span class="number">122</span>)</span><br><span class="line">	at java<span class="selector-class">.io</span><span class="selector-class">.BufferedInputStream</span><span class="selector-class">.fill</span>(BufferedInputStream<span class="selector-class">.java</span>:<span class="number">235</span>)</span><br><span class="line">	at java<span class="selector-class">.io</span><span class="selector-class">.BufferedInputStream</span><span class="selector-class">.read1</span>(BufferedInputStream<span class="selector-class">.java</span>:<span class="number">275</span>)</span><br><span class="line">	at java<span class="selector-class">.io</span><span class="selector-class">.BufferedInputStream</span><span class="selector-class">.read</span>(BufferedInputStream<span class="selector-class">.java</span>:<span class="number">334</span>)</span><br><span class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.thrift</span><span class="selector-class">.transport</span><span class="selector-class">.TIOStreamTransport</span><span class="selector-class">.read</span>(TIOStreamTransport<span class="selector-class">.java</span>:<span class="number">127</span>)</span><br><span class="line">	... <span class="number">10</span> more</span><br></pre></td></tr></table></figure></p>
-<p>我这里的实现方式是：识别每行的开头部分，如果满足某种条件，就当作一条日志，否则，视作是上一条的日志的一部分。</p>
-<p>比如：</p>
-<p>对于上面举的例子来说（即符合标准log4j的日志），如果每一行开头满足下面这条正则表达式：<br><figure class="highlight cos"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\<span class="keyword">s</span>?\<span class="keyword">d</span>\<span class="keyword">d</span>\<span class="keyword">d</span>\<span class="keyword">d</span>-\<span class="keyword">d</span>\<span class="keyword">d</span>-\<span class="keyword">d</span>\<span class="keyword">d</span>\<span class="keyword">s</span>\<span class="keyword">d</span>\<span class="keyword">d</span>:\<span class="keyword">d</span>\<span class="keyword">d</span>:\<span class="keyword">d</span>\<span class="keyword">d</span>,\<span class="keyword">d</span>\<span class="keyword">d</span>\<span class="keyword">d</span></span><br></pre></td></tr></table></figure></p>
-<p>就当作一条新的日志，如果不满足，就说明该行内容是上一条日志（已规定格式开头的那条）的一部分。</p>
-<p>当然，我增加了可以自定义配置以哪种方式开头视为一条日志的regex配置，可以对不通的source进行不通的配置，已满足要求。</p>
-<p>有了这样的约束，就可以写出将某些多行看作一个flume event的ExecSource，我把它开源到了github上，如有兴趣，欢迎前去试用，如有任何建议，欢迎提出与指正：MultiLineExecSource<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">github.com<span class="regexp">/qwurey/</span>flume-<span class="keyword">source</span>-multiline</span><br></pre></td></tr></table></figure></p>
-<p>该版本基于<code>flume-ng-core 1.6.0</code></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/flume/">flume</a>
-</div>
-
-
-  <div class="article-tags">
+<section class="post" itemscope itemprop="blogitem">
   
-  <span></span> <a href="/tags/flume/">flume</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2016/03/23/Flume-Source对多行的处理/#comments" class="ds-thread-count comments-count-link" data-thread-key="2016/03/23/Flume-Source对多行的处理/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/03/14/LeetCode-Longest-Common-Prefix/" title="LeetCode Longest Common Prefix" itemprop="url">LeetCode Longest Common Prefix</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2016-03-14T00:31:22.000Z" itemprop="datePublished"> 发表于 2016-03-14</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a><strong>tips</strong></h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
-</div>
-
-
-  <div class="article-tags">
+    <a href="/2016/03/26/Ambari删除服务的方法小结/" title="Ambari删除服务的方法小结" itemprop="url">
   
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2016/03/14/LeetCode-Longest-Common-Prefix/#comments" class="ds-thread-count comments-count-link" data-thread-key="2016/03/14/LeetCode-Longest-Common-Prefix/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
+    <h1 itemprop="name">Ambari删除服务的方法小结</h1>
     
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
+     
+       <p itemprop="description" >通过rest api 或者 通过操作ambari元数据库实现</p>
+      
     
-      <a href="/2016/03/13/LeetCode-Regular-Expression-Matching/" title="LeetCode Regular Expression Matching" itemprop="url">LeetCode Regular Expression Matching</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2016-03-13T14:53:59.000Z" itemprop="datePublished"> 发表于 2016-03-13</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a><strong>tips</strong></h4><ol>
-<li>字符串正则匹配</li>
-<li>递归解法，一层一层往下递归</li>
-</ol>
-<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    bool isMatch(string s, string p) &#123;</span><br><span class="line">        <span class="comment">//s match over</span></span><br><span class="line">        <span class="keyword">if</span>(s.<span class="keyword">length</span>() == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">//p needs to be null or X*X* format</span></span><br><span class="line">            <span class="comment">// if(p.length() == 0) return true;</span></span><br><span class="line">            <span class="keyword">if</span>(p.<span class="keyword">length</span>() &amp; <span class="number">1</span>) <span class="keyword">return</span> false<span class="comment">;</span></span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">1</span><span class="comment">; i &lt; p.length(); i += 2) &#123;</span></span><br><span class="line">                    <span class="keyword">if</span>(p[i] != <span class="string">'*'</span>) <span class="keyword">return</span> false<span class="comment">;</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> true<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//s still has characters</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment">//p is null</span></span><br><span class="line">        <span class="keyword">if</span>(p.<span class="keyword">length</span>() == <span class="number">0</span>) <span class="keyword">return</span> false<span class="comment">;</span></span><br><span class="line">        <span class="comment">//p has more</span></span><br><span class="line">        <span class="keyword">if</span>(p.<span class="keyword">length</span>() &gt; <span class="number">1</span> &amp;&amp; p[<span class="number">1</span>] == <span class="string">'*'</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span>(p[<span class="number">0</span>] == <span class="string">'.'</span> || s[<span class="number">0</span>] == p[<span class="number">0</span>]) &#123;</span><br><span class="line">                <span class="keyword">return</span> isMatch(s.substr(<span class="number">1</span>), p) || isMatch(s, p.substr(<span class="number">2</span>))<span class="comment">;</span></span><br><span class="line">            &#125;<span class="keyword">else</span> <span class="keyword">return</span> isMatch(s, p.substr(<span class="number">2</span>))<span class="comment">;</span></span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span>(s[<span class="number">0</span>] == p[<span class="number">0</span>] || p[<span class="number">0</span>] == <span class="string">'.'</span>) <span class="keyword">return</span> isMatch(s.substr(<span class="number">1</span>), p.substr(<span class="number">1</span>))<span class="comment">;</span></span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">return</span> false<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
-<p>若想给递归加参数，使用一个helper方法，比如matchHelper(string s, string p, int xx, int yy…)<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">matchHelper</span>(<span class="params"><span class="keyword">string</span> s, <span class="keyword">string</span> p, <span class="keyword">int</span> i, <span class="keyword">int</span> j</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(p[j] == <span class="string">'\0'</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> s[i] == <span class="string">'\0'</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(p[j+<span class="number">1</span>] != <span class="string">'*'</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span>((s[i] == p[j]) || (p[j] == <span class="string">'.'</span> &amp;&amp; s[i] != <span class="string">'\0'</span>)) &#123;</span><br><span class="line">                <span class="keyword">return</span> matchHelper(s, p, i+<span class="number">1</span>, j+<span class="number">1</span>);</span><br><span class="line">            &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span>((s[i] == p[j]) || (p[j] == <span class="string">'.'</span> &amp;&amp; s[i] != <span class="string">'\0'</span>)) &#123;</span><br><span class="line">            <span class="keyword">if</span>(matchHelper(s, p, i, j+<span class="number">2</span>)) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            ++i;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> matchHelper(s, p, i, j+<span class="number">2</span>);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isMatch</span>(<span class="params"><span class="keyword">string</span> s, <span class="keyword">string</span> p</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> matchHelper(s, p, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
-</div>
+    <time datetime="2016-03-26T09:00:57.000Z" itemprop="datePublished">2016-03-26</time>
+  </a>
+</section>
 
 
-  <div class="article-tags">
+
+
+
+
   
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2016/03/13/LeetCode-Regular-Expression-Matching/#comments" class="ds-thread-count comments-count-link" data-thread-key="2016/03/13/LeetCode-Regular-Expression-Matching/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/03/13/LeetCode-Palindrome-Number/" title="LeetCode Palindrome Number" itemprop="url">LeetCode Palindrome Number</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2016-03-13T09:46:37.000Z" itemprop="datePublished"> 发表于 2016-03-13</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a><strong>tips</strong></h4><ol>
-<li>负数直接判断不是回文</li>
-<li>左右依次比较</li>
-<li>去除两边数字的方法：<figure class="highlight cos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># <span class="keyword">x</span>:待去除的数字，比如：<span class="number">121</span></span><br><span class="line"># <span class="keyword">d</span>:对应<span class="number">121</span>为<span class="number">100</span>，<span class="number">12321</span>位<span class="number">10000</span> </span><br><span class="line"></span><br><span class="line"><span class="keyword">x</span> = <span class="keyword">x</span> % <span class="keyword">d</span> / <span class="number">10</span></span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<figure class="highlight cos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> Solution &#123;  </span><br><span class="line">public:  </span><br><span class="line">    bool isPalindrome(int <span class="keyword">x</span>) &#123;  </span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">x</span> &lt; <span class="number">0</span>) <span class="keyword">return</span> false<span class="comment">;  </span></span><br><span class="line">        int <span class="keyword">d</span> = <span class="number">1</span><span class="comment">;  </span></span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">x</span>/<span class="keyword">d</span> &gt;= <span class="number">10</span>) <span class="keyword">d</span> *= <span class="number">10</span><span class="comment">;  </span></span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">x</span> &gt; <span class="number">0</span>) &#123;  </span><br><span class="line">            int left = <span class="keyword">x</span> / <span class="keyword">d</span><span class="comment">;  </span></span><br><span class="line">            int right = <span class="keyword">x</span> % <span class="number">10</span><span class="comment">;  </span></span><br><span class="line">            <span class="keyword">if</span>(left != right) &#123;  </span><br><span class="line">                <span class="keyword">return</span> false<span class="comment">;  </span></span><br><span class="line">            &#125;  </span><br><span class="line">            <span class="keyword">x</span> = <span class="keyword">x</span> % <span class="keyword">d</span> / <span class="number">10</span><span class="comment">;  </span></span><br><span class="line">            <span class="keyword">d</span> = <span class="keyword">d</span> / <span class="number">100</span><span class="comment">;  </span></span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="keyword">return</span> true<span class="comment">;  </span></span><br><span class="line">    &#125;  </span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
-</div>
-
-
-  <div class="article-tags">
+<section class="post" itemscope itemprop="blogitem">
   
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2016/03/13/LeetCode-Palindrome-Number/#comments" class="ds-thread-count comments-count-link" data-thread-key="2016/03/13/LeetCode-Palindrome-Number/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/03/13/LeetCode-String-to-Integer/" title="LeetCode String to Integer" itemprop="url">LeetCode String to Integer</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2016-03-13T09:43:37.000Z" itemprop="datePublished"> 发表于 2016-03-13</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a><strong>tips</strong></h4><ol>
-<li>考虑whitespace</li>
-<li>考虑正负符号</li>
-<li>考虑正溢出和负溢出</li>
-<li>考虑不能转化情况，返回0</li>
-</ol>
-<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    <span class="keyword">int</span> myAtoi(string <span class="keyword">str</span>) &#123;</span><br><span class="line">        <span class="keyword">int</span> n = <span class="keyword">str</span>.<span class="keyword">length</span>()<span class="comment">;</span></span><br><span class="line">        <span class="keyword">int</span> p = <span class="number">0</span><span class="comment">;</span></span><br><span class="line">        bool sign = <span class="number">0</span><span class="comment">;// 0 -&gt; '+' , 1 -&gt; '-'</span></span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">0</span><span class="comment">;</span></span><br><span class="line">        <span class="comment">//whitespace</span></span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">str</span>[p] == <span class="string">' '</span> &amp;&amp; p &lt; n) p++<span class="comment">;</span></span><br><span class="line">        <span class="comment">//'+' and '-'</span></span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">str</span>[p] == <span class="string">'+'</span>) &#123;</span><br><span class="line">            p++<span class="comment">;</span></span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span>(<span class="keyword">str</span>[p] == <span class="string">'-'</span>)&#123;</span><br><span class="line">            p++<span class="comment">;</span></span><br><span class="line">            sign = <span class="number">1</span><span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//digits</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="comment">; p &lt; n; p++) &#123;</span></span><br><span class="line">            <span class="keyword">if</span>(<span class="keyword">str</span>[p] &lt; <span class="string">'0'</span> || <span class="keyword">str</span>[p] &gt; <span class="string">'9'</span>) <span class="keyword">break</span><span class="comment">;</span></span><br><span class="line">            <span class="keyword">if</span>(res &gt; INT_MAX / <span class="number">10</span> || (res == INT_MAX / <span class="number">10</span> &amp;&amp; (<span class="keyword">str</span>[p] - <span class="string">'0'</span>) &gt; INT_MAX % <span class="number">10</span>)) &#123;</span><br><span class="line">                <span class="keyword">return</span> sign == <span class="number">1</span> ? INT_MIN : INT_MAX<span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">            res = res * <span class="number">10</span> + (<span class="keyword">str</span>[p] - <span class="string">'0'</span>)<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sign == <span class="number">1</span> ? (<span class="number">-1</span>) * res : res<span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
-</div>
-
-
-  <div class="article-tags">
+    <a href="/2016/03/23/Flume-Source对多行的处理/" title="Flume Source对多行的处理" itemprop="url">
   
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2016/03/13/LeetCode-String-to-Integer/#comments" class="ds-thread-count comments-count-link" data-thread-key="2016/03/13/LeetCode-String-to-Integer/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
+    <h1 itemprop="name">Flume Source对多行的处理</h1>
     
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
+     
+           <p itemprop="description" >ExecSource会readLine()读取日志中的每一行，把其作为每一个flume event的body放进去，这对于大部分这种每行就可以结束的日志记录，是完全可以的：122016-03-18 17:53:48,374 INFO namenode.FSNamesystem (</p>
+        
     
-      <a href="/2016/03/12/LeetCode-Reverse-Integer/" title="LeetCode Reverse Integer" itemprop="url">LeetCode Reverse Integer</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2016-03-12T13:45:58.000Z" itemprop="datePublished"> 发表于 2016-03-12</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a><strong>tips</strong></h4><ol>
-<li>INT_MAX＝2147483647，10位数，20多亿</li>
-<li>负数与正数处理方式一样</li>
-<li>判断是否溢出：<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="keyword">next</span> / <span class="number">10</span> != res) &#123;</span><br><span class="line">                res = <span class="number">0</span><span class="comment">;</span></span><br><span class="line">                <span class="keyword">break</span><span class="comment">;</span></span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    <span class="keyword">int</span> reverse(<span class="keyword">int</span> x) &#123;</span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">0</span><span class="comment">;</span></span><br><span class="line">        <span class="keyword">while</span>(x != <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> <span class="keyword">next</span> = res * <span class="number">10</span> + x % <span class="number">10</span><span class="comment">;</span></span><br><span class="line">            x = x / <span class="number">10</span><span class="comment">;</span></span><br><span class="line">            <span class="keyword">if</span>(<span class="keyword">next</span> / <span class="number">10</span> != res) &#123;</span><br><span class="line">                res = <span class="number">0</span><span class="comment">;</span></span><br><span class="line">                <span class="keyword">break</span><span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">            res = <span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res<span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
-</div>
+    <time datetime="2016-03-23T14:41:36.000Z" itemprop="datePublished">2016-03-23</time>
+  </a>
+</section>
 
 
-  <div class="article-tags">
+
+
+
+
   
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2016/03/12/LeetCode-Reverse-Integer/#comments" class="ds-thread-count comments-count-link" data-thread-key="2016/03/12/LeetCode-Reverse-Integer/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/03/12/LeetCode-Longest-Palindromic-Substring/" title="LeetCode Longest Palindromic Substring" itemprop="url">LeetCode Longest Palindromic Substring</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2016-03-12T13:04:14.000Z" itemprop="datePublished"> 发表于 2016-03-12</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a><strong>tips</strong></h4><ol>
-<li>最长回文子串问题</li>
-<li>暴力解法O(N^3)</li>
-<li>DP, time complexcity O(N^2)</li>
-<li>DP, space complexcity O(N^2)</li>
-<li>DP重在递推方程<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">p[<span class="string">i</span>][<span class="symbol">j</span>] = 1 </span><br><span class="line">从i开始以j结尾的子串是回文串</span><br><span class="line">p[<span class="string">i</span>][<span class="symbol">j</span>] != 1</span><br><span class="line">从i开始以j结尾的子串不是回文串</span><br><span class="line"></span><br><span class="line">1&gt;</span><br><span class="line">p[<span class="string">i</span>][<span class="symbol">i</span>] = 1</span><br><span class="line"></span><br><span class="line">2&gt;</span><br><span class="line">p[<span class="string">i</span>][<span class="symbol">i+1</span>] = 1 only if s[i] == s[i+1]</span><br><span class="line"></span><br><span class="line">3&gt;</span><br><span class="line">p[<span class="string">i</span>][<span class="symbol">j</span>] = 1 only if s[<span class="string">i</span>] == s[<span class="string">j</span>] &amp;&amp; p[<span class="string">i+1</span>][<span class="symbol">j-1</span>] == 1</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    string longestPalindrome(string s) &#123;</span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">1</span>, begin = <span class="number">0</span><span class="comment">;</span></span><br><span class="line">        <span class="keyword">int</span> n = s.<span class="keyword">length</span>()<span class="comment">;</span></span><br><span class="line">        <span class="comment">// vector&lt;vector&lt;bool&gt;&gt; p(n, vector&lt;bool&gt;(n, 0)); -&gt; timeout</span></span><br><span class="line">        bool p[<span class="number">1000</span>][<span class="number">1000</span>] = &#123;<span class="number">0</span>&#125;<span class="comment">;</span></span><br><span class="line">        <span class="comment">//init: len = 1</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span><span class="comment">; i &lt; n; ++i) &#123;</span></span><br><span class="line">            p[i][i] = <span class="number">1</span><span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//init: len = 2</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span><span class="comment">; i &lt; n - 1; ++i) &#123;</span></span><br><span class="line">            <span class="keyword">if</span>(s[i] == s[i + <span class="number">1</span>]) &#123;</span><br><span class="line">                p[i][i + <span class="number">1</span>] = <span class="number">1</span><span class="comment">;</span></span><br><span class="line">                res = <span class="number">2</span><span class="comment">;</span></span><br><span class="line">                begin = i<span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//dp: len = 3, ..., n</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> len = <span class="number">3</span><span class="comment">; len &lt;= n; ++len) &#123;</span></span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span><span class="comment">; i &lt; n - len + 1; ++i) &#123;</span></span><br><span class="line">                <span class="keyword">int</span> j = i + len - <span class="number">1</span><span class="comment">;</span></span><br><span class="line">                <span class="keyword">if</span>(s[i] == s[j] &amp;&amp; p[i + <span class="number">1</span>][j - <span class="number">1</span>] == <span class="number">1</span>) &#123;</span><br><span class="line">                    p[i][j] = <span class="number">1</span><span class="comment">;</span></span><br><span class="line">                    res = len<span class="comment">;</span></span><br><span class="line">                    begin = i<span class="comment">;</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> s.substr(begin, res)<span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
-</div>
-
-
-  <div class="article-tags">
+<section class="post" itemscope itemprop="blogitem">
   
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2016/03/12/LeetCode-Longest-Palindromic-Substring/#comments" class="ds-thread-count comments-count-link" data-thread-key="2016/03/12/LeetCode-Longest-Palindromic-Substring/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/03/12/LeetCode-Median-of-Two-Sorted-Arrays/" title="LeetCode Median of Two Sorted Arrays" itemprop="url">LeetCode Median of Two Sorted Arrays</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2016-03-12T09:40:44.000Z" itemprop="datePublished"> 发表于 2016-03-12</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a><strong>tips</strong></h4><ol>
-<li>median, 找中位数</li>
-<li>奇数数组中位数，a[n/2 + 1]</li>
-<li>偶数数组中位数，(a[n/2]+a[n/2+1])/2.0</li>
-<li>化简为两个有序数组找第k大元素问题，普通解法O(m+n)，用递归可以达到O(log(m+n))</li>
-</ol>
-<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    <span class="keyword">double</span> findMedianSortedArrays(vector&lt;<span class="keyword">int</span>&gt;&amp; nums1, vector&lt;<span class="keyword">int</span>&gt;&amp; nums2) &#123;</span><br><span class="line">        <span class="keyword">int</span> total = nums1.size() + nums2.size()<span class="comment">;</span></span><br><span class="line">        <span class="keyword">if</span>(total &amp; <span class="number">1</span>) &#123;<span class="comment">//odd</span></span><br><span class="line">            <span class="keyword">return</span> findKth(nums1, nums2, <span class="number">0</span>, <span class="number">0</span>, total / <span class="number">2</span> + <span class="number">1</span>)<span class="comment">;</span></span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;<span class="comment">//not odd</span></span><br><span class="line">            <span class="keyword">return</span> (findKth(nums1, nums2, <span class="number">0</span>, <span class="number">0</span>, total / <span class="number">2</span>) + findKth(nums1, nums2, <span class="number">0</span>, <span class="number">0</span>, total / <span class="number">2</span> + <span class="number">1</span>)) / <span class="number">2.0</span><span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">double</span> findKth(vector&lt;<span class="keyword">int</span>&gt;&amp; nums1, vector&lt;<span class="keyword">int</span>&gt;&amp; nums2, <span class="keyword">int</span> nums1_start, <span class="keyword">int</span> nums2_start, <span class="keyword">int</span> k) &#123;</span><br><span class="line">        <span class="keyword">if</span>(nums1_start &gt;= nums1.size()) &#123;</span><br><span class="line">            <span class="keyword">return</span> nums2[nums2_start + k - <span class="number">1</span>]<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(nums2_start &gt;= nums2.size()) &#123;</span><br><span class="line">            <span class="keyword">return</span> nums1[nums1_start + k - <span class="number">1</span>]<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(k == <span class="number">1</span>) <span class="keyword">return</span> min(nums1[nums1_start], nums2[nums2_start])<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> nums1_key = nums1_start + k / <span class="number">2</span>  - <span class="number">1</span>&gt;= nums1.size() ? INT_MAX : nums1[nums1_start + k / <span class="number">2</span> - <span class="number">1</span>]<span class="comment">;</span></span><br><span class="line">        <span class="keyword">int</span> nums2_key = nums2_start + k / <span class="number">2</span>  - <span class="number">1</span>&gt;= nums2.size() ? INT_MAX : nums2[nums2_start + k / <span class="number">2</span> - <span class="number">1</span>]<span class="comment">;</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span>(nums1_key &lt; nums2_key) &#123;</span><br><span class="line">            <span class="keyword">return</span> findKth(nums1, nums2, nums1_start + k / <span class="number">2</span>, nums2_start, k - k / <span class="number">2</span>)<span class="comment">;</span></span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> findKth(nums1, nums2, nums1_start, nums2_start + k / <span class="number">2</span>, k - k / <span class="number">2</span>)<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
-</div>
-
-
-  <div class="article-tags">
+    <a href="/2016/03/14/LeetCode-Longest-Common-Prefix/" title="LeetCode Longest Common Prefix" itemprop="url">
   
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2016/03/12/LeetCode-Median-of-Two-Sorted-Arrays/#comments" class="ds-thread-count comments-count-link" data-thread-key="2016/03/12/LeetCode-Median-of-Two-Sorted-Arrays/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
+    <h1 itemprop="name">LeetCode Longest Common Prefix</h1>
     
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
+     
+           <p itemprop="description" >tips12</p>
+        
     
-      <a href="/2016/03/12/LeetCode-Longest-Substring-Without-Repeating-Characters/" title="LeetCode Longest Substring Without Repeating Characters" itemprop="url">LeetCode Longest Substring Without Repeating Characters</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2016-03-12T05:44:13.000Z" itemprop="datePublished"> 发表于 2016-03-12</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a><strong>tips</strong></h4><ol>
-<li>求没有重复字符的最长子串</li>
-<li>memset(who, value, length)</li>
-<li>left记录子串的最左边界，如果当前字符在left右面出现过，最更新left</li>
-<li>time complexcity: O(N)</li>
-<li>space complexcity: O(1)</li>
-</ol>
-<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    <span class="keyword">int</span> lengthOfLongestSubstring(string s) &#123;</span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">0</span>, ans = <span class="number">0</span><span class="comment">;</span></span><br><span class="line">        <span class="keyword">int</span> last[<span class="number">255</span>]<span class="comment">;</span></span><br><span class="line">        <span class="keyword">memset</span>(last, <span class="number">-1</span>, sizeof(last))<span class="comment">;</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span><span class="comment">; i &lt; s.size(); ++i) &#123;</span></span><br><span class="line">            <span class="keyword">if</span>(last[s[i]] &gt;= left) &#123;</span><br><span class="line">                left = last[s[i]] + <span class="number">1</span><span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">            last[s[i]] = i<span class="comment">;</span></span><br><span class="line">            ans = max(ans, i - left + <span class="number">1</span>)<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans<span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
-</div>
+    <time datetime="2016-03-14T00:31:22.000Z" itemprop="datePublished">2016-03-14</time>
+  </a>
+</section>
 
 
-  <div class="article-tags">
+
+
+
+
   
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
-  </div>
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2016/03/13/LeetCode-Regular-Expression-Matching/" title="LeetCode Regular Expression Matching" itemprop="url">
+  
+    <h1 itemprop="name">LeetCode Regular Expression Matching</h1>
+    
+     
+           <p itemprop="description" >tips
+字符串正则匹配
+递归解法，一层一层往下递归
 
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2016/03/12/LeetCode-Longest-Substring-Without-Repeating-Characters/#comments" class="ds-thread-count comments-count-link" data-thread-key="2016/03/12/LeetCode-Longest-Substring-Without-Repeating-Characters/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
+123456789101112131415161718192021222324252627282930class Solution &amp;#123;public:    bool isMatch(string s, string</p>
+        
+    
+    <time datetime="2016-03-13T14:53:59.000Z" itemprop="datePublished">2016-03-13</time>
+  </a>
+</section>
 
 
 
 
 
 
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2016/03/13/LeetCode-Palindrome-Number/" title="LeetCode Palindrome Number" itemprop="url">
+  
+    <h1 itemprop="name">LeetCode Palindrome Number</h1>
+    
+     
+           <p itemprop="description" >tips
+负数直接判断不是回文
+左右依次比较
+去除两边数字的方法：1234# x:待去除的数字，比如：121# d:对应121为100，12321位10000 x = x % d / 10
 
-  <nav id="page-nav" class="clearfix">
+
+123456789101112131415161718class Solution &amp;</p>
+        
+    
+    <time datetime="2016-03-13T09:46:37.000Z" itemprop="datePublished">2016-03-13</time>
+  </a>
+</section>
+
+
+
+
+
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2016/03/13/LeetCode-String-to-Integer/" title="LeetCode String to Integer" itemprop="url">
+  
+    <h1 itemprop="name">LeetCode String to Integer</h1>
+    
+     
+           <p itemprop="description" >tips
+考虑whitespace
+考虑正负符号
+考虑正溢出和负溢出
+考虑不能转化情况，返回0
+
+123456789101112131415161718192021222324252627class Solution &amp;#123;public:    int myAtoi(str</p>
+        
+    
+    <time datetime="2016-03-13T09:43:37.000Z" itemprop="datePublished">2016-03-13</time>
+  </a>
+</section>
+
+
+
+
+
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2016/03/12/LeetCode-Reverse-Integer/" title="LeetCode Reverse Integer" itemprop="url">
+  
+    <h1 itemprop="name">LeetCode Reverse Integer</h1>
+    
+     
+           <p itemprop="description" >tips
+INT_MAX＝2147483647，10位数，20多亿
+负数与正数处理方式一样
+判断是否溢出：1234if(next / 10 != res) &amp;#123;                res = 0;                break;          </p>
+        
+    
+    <time datetime="2016-03-12T13:45:58.000Z" itemprop="datePublished">2016-03-12</time>
+  </a>
+</section>
+
+
+
+
+
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2016/03/12/LeetCode-Longest-Palindromic-Substring/" title="LeetCode Longest Palindromic Substring" itemprop="url">
+  
+    <h1 itemprop="name">LeetCode Longest Palindromic Substring</h1>
+    
+     
+           <p itemprop="description" >tips
+最长回文子串问题
+暴力解法O(N^3)
+DP, time complexcity O(N^2)
+DP, space complexcity O(N^2)
+DP重在递推方程12345678910111213p[i][j] = 1 从i开始以j结尾的子串是回文串p[i][j</p>
+        
+    
+    <time datetime="2016-03-12T13:04:14.000Z" itemprop="datePublished">2016-03-12</time>
+  </a>
+</section>
+
+
+
+
+
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2016/03/12/LeetCode-Median-of-Two-Sorted-Arrays/" title="LeetCode Median of Two Sorted Arrays" itemprop="url">
+  
+    <h1 itemprop="name">LeetCode Median of Two Sorted Arrays</h1>
+    
+     
+           <p itemprop="description" >tips
+median, 找中位数
+奇数数组中位数，a[n/2 + 1]
+偶数数组中位数，(a[n/2]+a[n/2+1])/2.0
+化简为两个有序数组找第k大元素问题，普通解法O(m+n)，用递归可以达到O(log(m+n))
+
+123456789101112131415161</p>
+        
+    
+    <time datetime="2016-03-12T09:40:44.000Z" itemprop="datePublished">2016-03-12</time>
+  </a>
+</section>
+
+
+
+
+
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2016/03/12/LeetCode-Longest-Substring-Without-Repeating-Characters/" title="LeetCode Longest Substring Without Repeating Characters" itemprop="url">
+  
+    <h1 itemprop="name">LeetCode Longest Substring Without Repeating Characters</h1>
+    
+     
+           <p itemprop="description" >tips
+求没有重复字符的最长子串
+memset(who, value, length)
+left记录子串的最左边界，如果当前字符在left右面出现过，最更新left
+time complexcity: O(N)
+space complexcity: O(1)
+
+12345678</p>
+        
+    
+    <time datetime="2016-03-12T05:44:13.000Z" itemprop="datePublished">2016-03-12</time>
+  </a>
+</section>
+
+
+
+
+
+
+
+  <nav id="page-nav" class="clearfix unexpand">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next<span></span></a>
   </nav>
 

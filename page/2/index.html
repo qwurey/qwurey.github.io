@@ -74,947 +74,244 @@
     <div id="container">
       <div id="main">
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/03/12/LeetCode-Add-Two-Numbers/" title="LeetCode Add Two Numbers" itemprop="url">LeetCode Add Two Numbers</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2016-03-12T03:02:25.000Z" itemprop="datePublished"> 发表于 2016-03-12</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a>tips</h4><ol>
-<li>使用链表实现高精度整形加法</li>
-<li>链表元素和链表指针</li>
-<li>time complexity: O(max(len(l1),len(l2)))</li>
-<li>space complexity: O(max(len(l1),len(l2)))</li>
-</ol>
-<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Definition for singly-linked list.</span><br><span class="line"> * struct ListNode &#123;</span><br><span class="line"> *     int val;</span><br><span class="line"> *     ListNode *next;</span><br><span class="line"> *     ListNode(int x) : val(x), next(NULL) &#123;&#125;</span><br><span class="line"> * &#125;;</span><br><span class="line"> */</span></span><br><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) &#123;</span><br><span class="line">        ListNode* head = new ListNode(<span class="number">0</span>)<span class="comment">;</span></span><br><span class="line">        ListNode* p = head<span class="comment">;</span></span><br><span class="line">        <span class="keyword">int</span> carry = <span class="number">0</span><span class="comment">;</span></span><br><span class="line">        <span class="keyword">while</span>(true) &#123;</span><br><span class="line">            <span class="keyword">if</span>(l1 != NULL) &#123;</span><br><span class="line">                carry += l1-&gt;val<span class="comment">;</span></span><br><span class="line">                l1 = l1-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span>(l2 != NULL) &#123;</span><br><span class="line">                carry += l2-&gt;val<span class="comment">;</span></span><br><span class="line">                l2 = l2-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">            p-&gt;val = carry % <span class="number">10</span><span class="comment">;</span></span><br><span class="line">            carry /= <span class="number">10</span><span class="comment">;</span></span><br><span class="line">            <span class="keyword">if</span>(l1 != NULL || l2 != NULL || carry != <span class="number">0</span>) &#123;</span><br><span class="line">                p-&gt;<span class="keyword">next</span> = new ListNode(<span class="number">0</span>)<span class="comment">;</span></span><br><span class="line">                p = p-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">            &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">break</span><span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> head<span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
-</div>
-
-
-  <div class="article-tags">
   
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2016/03/12/LeetCode-Add-Two-Numbers/#comments" class="ds-thread-count comments-count-link" data-thread-key="2016/03/12/LeetCode-Add-Two-Numbers/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/03/12/LeetCode-Two-Sum/" title="LeetCode Two Sum" itemprop="url">LeetCode Two Sum</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2016-03-12T02:58:21.000Z" itemprop="datePublished"> 发表于 2016-03-12</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a>tips</h4><ol>
-<li>hash_table: unordered_map</li>
-<li>没有找到：mapping.find(gap) != mapping.end()</li>
-<li>vector向量</li>
-</ol>
-<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    vector&lt;<span class="keyword">int</span>&gt; twoSum(vector&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> target) &#123;</span><br><span class="line">        unordered_map&lt;<span class="keyword">int</span>, <span class="keyword">int</span>&gt; mapping<span class="comment">;</span></span><br><span class="line">        vector&lt;<span class="keyword">int</span>&gt; res<span class="comment">;</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span><span class="comment">; i &lt; nums.size(); ++i) &#123;</span></span><br><span class="line">            mapping[nums[i]] = i<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span><span class="comment">; i &lt; nums.size(); ++i) &#123;</span></span><br><span class="line">            const <span class="keyword">int</span> gap = target - nums[i]<span class="comment">;</span></span><br><span class="line">            <span class="keyword">if</span>(mapping.find(gap) != mapping.<span class="keyword">end</span>() &amp;&amp; mapping[gap] &gt; i) &#123;</span><br><span class="line">                res.push_back(i)<span class="comment">;</span></span><br><span class="line">                res.push_back(mapping[gap])<span class="comment">;</span></span><br><span class="line">                <span class="keyword">return</span> res<span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res<span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
-</div>
-
-
-  <div class="article-tags">
+<section class="post" itemscope itemprop="blogitem">
   
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2016/03/12/LeetCode-Two-Sum/#comments" class="ds-thread-count comments-count-link" data-thread-key="2016/03/12/LeetCode-Two-Sum/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/03/11/Maven：mirror和repository区别/" title="Maven：mirror和repository区别" itemprop="url">Maven：mirror和repository区别</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2016-03-11T14:13:38.000Z" itemprop="datePublished"> 发表于 2016-03-11</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="一、repository用法"><a href="#一、repository用法" class="headerlink" title="一、repository用法"></a><strong>一、repository用法</strong></h3><p>使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。</p>
-<p>maven中的repo有两种类型：</p>
-<ol>
-<li>remote repository：相当于公共的仓库，大家都能访问到，一般可以用URL的形式访问</li>
-<li>local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:\Users\｛用户名｝.m2\repository目录</li>
-</ol>
-<p>自动下载原则：repository里存放的都是各种jar包和maven插件。当向仓库请求插件或依赖的时候，会先检查local repository，如果local repository有则直接返回，否则会向remote repository请求，并缓存到local repository。也可以把做的东西放到本地仓库，仅供本地使用；或上传到远程仓库，供大家使用。</p>
-<p>其中，remote repository主要有3种类型：</p>
-<ol>
-<li>中央仓库：<a href="http://repo1.maven.org/maven2/" target="_blank" rel="external">http://repo1.maven.org/maven2/</a> </li>
-<li>私服：内网自建的maven repository，其URL是一个内部网址 </li>
-<li>其他公共仓库：其他可以互联网公共访问maven repository，例如 jboss repository等</li>
-</ol>
-<p>一个repo的定义如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">repository</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">id</span>&gt;</span>central<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">url</span>&gt;</span>http://maven.oa.com/nexus/content/groups/public<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">releases</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">enabled</span>&gt;</span>true<span class="tag">&lt;/<span class="name">enabled</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">releases</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">snapshots</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">enabled</span>&gt;</span>false<span class="tag">&lt;/<span class="name">enabled</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">snapshots</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">repository</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<h3 id="二、mirror用法"><a href="#二、mirror用法" class="headerlink" title="二、mirror用法"></a><strong>二、mirror用法</strong></h3><p>mirror相当于一个拦截器，可以拦截去往指定remote repository id的请求，把请求里的remote repository url，重定向到mirror里配置的地址。</p>
-<p>那么为什么要这么用呢？</p>
-<p>配置两个Repository之间的镜像关系，一般是出于访问速度和下载速度考虑。<br>例如， 有一个项目，需要在公司和住所都编码，并在项目pom.xml配置了A Maven库。在公司，是电信网络，访问A库很快，所以maven管理依赖和插件都从A库下载；在住所，是网通网络，访问A库很慢，但是访问B库很快。这时，在住所的setting.xml里，只要配置一下<mirrors><mirror>….</mirror></mirrors>，让B库成为A库的mirror，即可不用更改项目pom.xml里对于A库的相关配置。</p>
-<p>但是需要注意的是，如果配置了A库的镜像B库，那么当B库不稳定、不可访问或者停止服务的时候，maven此时也不会去访问A库，因而无法下载所需的构件。</p>
-<p>配置方法：</p>
-<p>在<code>&lt;mirrorOf&gt;&lt;/mirrorOf&gt;</code> 放置repo id，当然，这是mirror最基本的用法。</p>
-<p>为了满足一些复杂的需求，Maven还支持更高级的镜像配置：</p>
-<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 匹配所有远程仓库，此时所有的请求都会发往镜像库</span></span><br><span class="line"><span class="variable">&lt;mirrorOf&gt;</span><span class="keyword">*</span><span class="variable">&lt;/mirrorOf&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 匹配仓库repo1和repo2，使用逗号分隔多个远程仓库</span></span><br><span class="line"><span class="variable">&lt;mirrorOf&gt;</span>repo1,repo2<span class="variable">&lt;/mirrorOf&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 匹配所有远程仓库，repo1除外，使用感叹号将仓库从匹配中排除</span></span><br><span class="line"><span class="variable">&lt;mirrorOf&gt;</span><span class="keyword">*</span>,!repo1<span class="variable">&lt;/miiroOf&gt;</span></span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/tool/">tool</a>
-</div>
-
-
-  <div class="article-tags">
+    <a href="/2016/03/12/LeetCode-Add-Two-Numbers/" title="LeetCode Add Two Numbers" itemprop="url">
   
-  <span></span> <a href="/tags/maven/">maven</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2016/03/11/Maven：mirror和repository区别/#comments" class="ds-thread-count comments-count-link" data-thread-key="2016/03/11/Maven：mirror和repository区别/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
+    <h1 itemprop="name">LeetCode Add Two Numbers</h1>
     
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
+     
+           <p itemprop="description" >tips
+使用链表实现高精度整形加法
+链表元素和链表指针
+time complexity: O(max(len(l1),len(l2)))
+space complexity: O(max(len(l1),len(l2)))
+
+123456789101112131415161718</p>
+        
     
-      <a href="/2016/03/11/RPM打包规范/" title="RPM打包规范" itemprop="url">RPM打包规范</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2016-03-11T14:13:38.000Z" itemprop="datePublished"> 发表于 2016-03-11</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h4 id="RPM打包规范："><a href="#RPM打包规范：" class="headerlink" title="RPM打包规范："></a><strong>RPM打包规范：</strong></h4><p>如果rpm的版本&lt;=4.4.x，那么rpmbuid工具其默认的工作路径是/usr/src/redhat，这就使得普通用户不能制作rpm包，因为权限的问题，在制作rpm软件包时必须切换到root身份才可以。所以，rpm从4.5.x版本开始，将rpmbuid的默认工作路径移动到用户家目录下的rpmbuild目录里，即$HOME/rpmbuild，并且推荐用户在制作rpm软件包时尽量不要以root身份进行操作。</p>
-<p>查看rpm版本：<br><figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rpm <span class="comment">--version</span></span><br></pre></td></tr></table></figure></p>
-<p>关于rpmbuild默认工作路径的确定，通常由在/usr/lib/rpm/macros这个文件里的一个叫做%_topdir的宏变量来定义。如果用户想更改这个目录名，rpm官方并不推荐直接更改这个目录，而是在用户家目录下建立一个名为.rpmmacros的隐藏文件，然后在里面重新定义%_topdir，指向一个新的目录名。这样就可以满足某些“高级”用户的差异化需求了，比如：</p>
-<p>vi .rpmmacros<br><figure class="highlight haml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">%<span class="selector-tag">_topdir</span></span>       /home/ambari/rpm</span><br><span class="line"><span class="tag">%<span class="selector-tag">_tmppath</span></span>      /home/ambari/rpm/tmp</span><br></pre></td></tr></table></figure></p>
-<p>在%_topdir目录下一般需要建立6个目录： </p>
-<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">目录名		说明									macros中的宏名</span><br><span class="line">BUILD		编译rpm包的临时目录					<span class="meta">%</span>_builddir</span><br><span class="line">BUILDROOT	编译后生成的软件临时安装目录			<span class="meta">%</span>_buildrootdir</span><br><span class="line">RPMS		最终生成的可安装rpm包的所在目录		<span class="meta">%</span>_rpmdir</span><br><span class="line">SOURCES		所有源代码和补丁文件的存放目录			<span class="meta">%</span>_sourcedir</span><br><span class="line">SPECS		存放SPEC文件的目录<span class="comment">(重要)</span>				<span class="meta">%</span>_specdir</span><br><span class="line">SRPMS		软件最终的rpm源码格式存放路径<span class="comment">(暂时忽略掉，别挂在心上)</span>	<span class="meta">%</span>_srcrpmdir</span><br></pre></td></tr></table></figure>
-<p>当上述目录建立好之后，将所有用于生成rpm包的源代码、shell脚本、配置文件都拷贝到SOURCES目录里，注意通常情况下源码的压缩格式都为*.tar.gz格式(当然还可以为其他格式，但那就是另外一种方式，这里先不介绍)。然后，将最最最重要的SPEC文件，命名格式一般是“软件名-版本.spec”的形式，将其拷贝到SPECS目录下，切换到该目录下执行：<br><figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">rpmbuild</span> -<span class="keyword">bb </span>软件名-版本.spec</span><br></pre></td></tr></table></figure></p>
-<p>最终我们想要的rpm软件包就安安稳稳地躺在RPMS目录下了。对，就这么简单。</p>
-<h4 id="SPEC文件"><a href="#SPEC文件" class="headerlink" title="SPEC文件"></a><strong>SPEC文件</strong></h4><p>这里的关键就是上面的SPEC文件的写法，我们可以用rpmdev-newspec -o Name-version.spec命令来生成SPEC文件的模板，然后在上面修改就可。例如：<br><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rpmdev-newspec -o Name-<span class="keyword">version</span>.<span class="keyword">spec</span></span><br><span class="line">vi Name-<span class="keyword">version</span>.<span class="keyword">spec</span></span><br></pre></td></tr></table></figure></p>
-<p>模版内容如下：<br><figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">Name:           Name-version</span><br><span class="line">Version:</span><br><span class="line">Release:        <span class="number">1</span>%&#123;?dist&#125;</span><br><span class="line">Summary:</span><br><span class="line"></span><br><span class="line">Group:</span><br><span class="line">License:</span><br><span class="line">URL:</span><br><span class="line">Source<span class="number">0</span>:</span><br><span class="line">BuildRoot:      %&#123;_tmppath&#125;/%&#123;name&#125;-%&#123;version&#125;-%&#123;release&#125;-root-%(%&#123;__id_u&#125; -n)</span><br><span class="line"></span><br><span class="line">BuildRequires:</span><br><span class="line">Requires:</span><br><span class="line"></span><br><span class="line"><span class="meta">%description</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">%prep</span></span><br><span class="line"><span class="meta">%setup</span> -q</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">%build</span></span><br><span class="line"><span class="meta">%configure</span></span><br><span class="line">make %&#123;?_smp_mflags&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">%install</span></span><br><span class="line">rm -rf $RPM_BUILD_ROOT</span><br><span class="line">make install DESTDIR=$RPM_BUILD_ROOT</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">%clean</span></span><br><span class="line">rm -rf $RPM_BUILD_ROOT</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">%files</span></span><br><span class="line"><span class="meta">%defattr</span>(-,root,root,-)</span><br><span class="line"><span class="meta">%doc</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">%changelog</span></span><br></pre></td></tr></table></figure></p>
-<p>其实SPEC文件的核心是它定义了一些“阶段”(%prep、%build、%install和%clean)，当rpmbuild执行时它首先会去解析SPEC文件，然后依次执行每个“阶段”里的指令。</p>
-<p>系统打包的动作过程<br>    1）读取并解析 filename.spec 文件<br>    2）运行 %prep 部分来将源代码解包到一个临时目录，并应用所有的补丁程序。<br>    3）运行 %build 部分来编译代码。<br>    4）运行 %install 部分将代码安装到构建机器的目录中。<br>    5）读取 %files 部分的文件列表，收集文件并创建二进制和源 RPM 文件。<br>    6）运行 %clean 部分来除去临时构建目录。 </p>
-<h4 id="打rpm包的基本思路"><a href="#打rpm包的基本思路" class="headerlink" title="打rpm包的基本思路"></a><strong>打rpm包的基本思路</strong></h4><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>） 取回软件的源代码和相关的补丁 </span><br><span class="line"><span class="number">2</span>） 测试所需的补丁，以便于顺利的构建整个程序 </span><br><span class="line"><span class="number">3</span>） 把文件放到正确的位置 </span><br><span class="line"><span class="number">4</span>） 编辑<span class="keyword">spec</span>文件 </span><br><span class="line"><span class="number">5</span>） 使用rpmbuild构建rpm包</span><br></pre></td></tr></table></figure>
-<p>rpmbuild命令：rpmbuild命令会根据spec文件来生成rpm包，主要用到以下几个参数：</p>
-<figure class="highlight haml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">rpmbuild  --help </span><br><span class="line">-<span class="ruby">bp 执行到%prep阶段结束</span><br><span class="line"></span>-<span class="ruby">bc 执行到%build阶段结束</span><br><span class="line"></span>-<span class="ruby">bi 执行到%install阶段结束 </span><br><span class="line"></span>-<span class="ruby">bl 检测%files文件是否有丢失</span><br><span class="line"></span>-<span class="ruby">ba 创建src.rpm和二进制包 </span><br><span class="line"></span>-<span class="ruby">bs 只创建src.rpm源码包 </span><br><span class="line"></span>-<span class="ruby">bb 只创建二进制rpm包</span></span><br></pre></td></tr></table></figure>
-<p>一般常用到的参数：<br><figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># 同时产生rpm和srpm包</span></span><br><span class="line">rpmbuild -ba spec</span><br><span class="line"></span><br><span class="line"><span class="meta">#只产生rpm包</span></span><br><span class="line">rpmbuild -bb spec</span><br><span class="line"></span><br><span class="line"><span class="meta"># 用srpm包生成rpm包</span></span><br><span class="line">rpmbuild --rebuild src.rpm</span><br></pre></td></tr></table></figure></p>
-<p>rpmdev-setuptree是rpmdevtools中带的初始化环境脚本，执行后会在<strong>用户主目录下</strong>创建rpmbuild目录和.rpmmacros文件，同时生成所需的子目录和默认的控制参数，执行：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rpmdev-setuptree</span><br></pre></td></tr></table></figure>
-<figure class="highlight cos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ls -al ~/</span><br><span class="line">结果：</span><br><span class="line">drwxrwxr-<span class="keyword">x</span>  <span class="number">7</span> urey urey     <span class="number">4096</span> Feb <span class="number">26</span> <span class="number">19</span>:<span class="number">49</span> rpmbuild</span><br><span class="line">-rw-rw-<span class="keyword">r</span>--  <span class="number">1</span> urey urey      <span class="number">161</span> Feb <span class="number">26</span> <span class="number">19</span>:<span class="number">49</span> .rpmmacros</span><br></pre></td></tr></table></figure>
-<p>生成的目录结构：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">rpmbuild/</span><br><span class="line">    ├── B<span class="built_in">UILD</span>   <span class="meta">#打包过程中的工作目录</span></span><br><span class="line">    ├── RPMS    <span class="meta">#RPM包存放目录</span></span><br><span class="line">    ├── SOURCES <span class="meta">#源码和补丁目录</span></span><br><span class="line">    ├── SPECS   <span class="meta">#SPEC文件目录</span></span><br><span class="line">    └── SRPMS   <span class="meta">#src rpm包存放目录</span></span><br></pre></td></tr></table></figure></p>
-<p>默认的全局控制宏文件.rpmmacros内容：<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cat ～/.rpmmacros </span><br><span class="line">%_topdir      <span class="string">%(echo $HOME)</span>/rpmbuild</span><br><span class="line">%_smp_mflags  -j3</span><br><span class="line">%__arch_install_post   /usr/<span class="class"><span class="keyword">lib</span>/<span class="title">rpm</span>/<span class="title">check</span>-<span class="title">rpaths</span>   /<span class="title">usr</span>/<span class="title">lib</span>/<span class="title">rpm</span>/<span class="title">check</span>-<span class="title">buildroot</span></span></span><br></pre></td></tr></table></figure></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/tool/">tool</a>
-</div>
+    <time datetime="2016-03-12T03:02:25.000Z" itemprop="datePublished">2016-03-12</time>
+  </a>
+</section>
 
 
-  <div class="article-tags">
+
+
+
+
   
-  <span></span> <a href="/tags/linux/">linux</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2016/03/11/RPM打包规范/#comments" class="ds-thread-count comments-count-link" data-thread-key="2016/03/11/RPM打包规范/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/03/06/Hadoop实现KMeans聚类/" title="Hadoop实现KMeans聚类" itemprop="url">Hadoop实现KMeans聚类</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2016-03-06T13:21:34.000Z" itemprop="datePublished"> 发表于 2016-03-06</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>翻到以前的一次课程作业，今天有时间重新整理了一下。<br><br><br><br></p>
-<h4 id="一、中文文本聚类的一般过程"><a href="#一、中文文本聚类的一般过程" class="headerlink" title="一、中文文本聚类的一般过程"></a><strong>一、中文文本聚类的一般过程</strong></h4><p>文本聚类一般包括以下几个过程：</p>
-<ol>
-<li>模式表示：包括特征抽取及选择，把数据对象表示成适合于算法的可计算形式;</li>
-<li>定义模式之间的距离测量公式;</li>
-<li>聚类算法实现;</li>
-<li>评价输出结果;      </li>
-</ol>
-<p>具体过程如下图所示：<br><img src="/images/13/arch.png" alt="arch"></p>
-<p><br></p>
-<h4 id="二、中文分词"><a href="#二、中文分词" class="headerlink" title="二、中文分词"></a><strong>二、中文分词</strong></h4><p>文本由大量字符所构成的字符串组成,它属于一种非结构化的数据,为了将其变为计算机机可以处理的形式,必须进行预处理。预处理的第一个关键步骤就 是分词。将连续的字序列按一定规则分隔为分散的有独立意义的词序列,然后过滤其中的停用词(Stop word),得到文本的关键词集合,这些关键词构成了初始特征项(词)集合。</p>
-<p>本实验使用的 IKAnalyzer2012 进行分词,IKAnalyzer 是一个开源的,基于java语言开发的轻量级的中文分词工具包。对分好的词语进行去停词处理,一共使用了 1208 个常见的停用词。    </p>
-<p><br></p>
-<h4 id="三、TF-IDF-模型"><a href="#三、TF-IDF-模型" class="headerlink" title="三、TF-IDF 模型"></a><strong>三、TF-IDF 模型</strong></h4><p>TF-IDF(term frequency–inverse document frequency)是一种用于资讯 检索与文本挖掘的常用加权技术。TF-IDF 是一种统计方法,用以评估一个字词(term)对于一个文件集(docs)或一个语料库中的其中一份文件(doc)的重要程度。</p>
-<p>TF-IDF 的主要思想是:如果某个词或短语在一篇文章中出现的频率(TF)高, 并且在其他文章中很少出现,则认为此词或者短语具有很好的类别区分能力,适合用来分类。</p>
-<p>TF-IDF 实际上是:$TF\ast IDF$,TF 是词频(Term Frequency),IDF 是逆向文件 频率(Inverse Document Frequency)。TF-IDF 的计算也由这两部分组成:</p>
-<ol>
-<li><p>词频(term frequency,TF)指的是某一个给定的词语在该文件中出现的频 率。这个数字是对词数(term count)的归一化,以防止它偏向长的文件。(同一 个词语在长文件里可能会比短文件有更高的词数,而不管该词语重要与否。)提 取文档中所有出现的词语形成 textVector,统计textVector 中每一个词语在每一篇文档中的频率 TF( i, j),其中 i 指的是 textVector 中的第 i 个词语, j 指的是第j 篇文档。对于在某一特定文件里的词语ti来说,它的重要性可表示为:<br>$$TF_{reg}(i,j)=\frac{TF(i,j)}{max_{k\varepsilon textVector(TF(k,j))}}$$</p>
-</li>
-<li><p>逆向文件频率(inverse document frequency,IDF)是一个词语普遍重要性 的度量。某一特定词语的 IDF,可以由总文件数目除以包含该词语之文件的数目, 再将得到的商取对数得到,计算 IDF 的公式为:</p>
-</li>
-</ol>
-<p>$$IDF(i)=log\frac{N}{N_{i}}$$</p>
-<p>其中,N 为文档的总数,Ni 指的是 textVector 中第 i 个词语在多少篇文档中出现。</p>
-<p>所以计算特征向量方法为公式:</p>
-<p>$$TextVector(i,j)=TF_{reg}(i,j)\ast IDF(i)$$</p>
-<p>假设两个文档 dx、dy 的特征向量的值分别为：$(X_{i})_{1}^{n}$ 和 $(Y_{i})_{1}^{n}$</p>
-<p>则两个文档的相似度计算方法为:</p>
-<p>$$sim(d_{x},d_{y})= \frac{\sum_{1}^{n}x_{i}y_{i}}{\sqrt{\sum_{1}^{n}x_{i}^{2}}\ast \sqrt{\sum_{1}^{n}y_{i}^{2}}}$$   </p>
-<p><br></p>
-<h4 id="四、KMeans算法"><a href="#四、KMeans算法" class="headerlink" title="四、KMeans算法"></a><strong>四、KMeans算法</strong></h4><p>k-means基本算法的过程比较简单,首先,选择 k 个初始中心(k 是由用户 指定的聚类个数),每个点指派到最近的中心,而指派到一个中心的点集为一个聚类。然后根据指派到聚类的点,更新每个聚类的中心。重复指派个更新步骤, 直到聚类中心不发生变化,或每个聚类的内容不发生变化,即达到收敛状态。</p>
-<h4 id="五、MapReduce实现-K-means-算法"><a href="#五、MapReduce实现-K-means-算法" class="headerlink" title="五、MapReduce实现 K-means 算法"></a><strong>五、MapReduce实现 K-means 算法</strong></h4><p>k-means 聚类算法进行 MapReduce 的基本思路:对串行算法中每 1 次迭代启 动对应的 1 次 MapReduce 计算过程,完成数据记录到聚类中心的距离计算以及新 的聚类中心的计算。</p>
-<p>基于 MapReduce 的 k-means 并行算法主要有两部分,第一部分用于数据处理, 第二部分是 k-means 并行算法的实现部分。基于 MapReduce 的 k-means 算法的流程图如下图所示：</p>
-<p><img src="/images/13/process.png" alt="process"></p>
-<h5 id="I、详细设计方案"><a href="#I、详细设计方案" class="headerlink" title="I、详细设计方案"></a>I、详细设计方案</h5><p>项目类说明：</p>
-<p><img src="/images/13/class.png" alt="class"></p>
-<p>详细设计方案如下图：</p>
-<p><img src="/images/13/detail.png" alt="detail"></p>
-<h5 id="II、MR过程设计"><a href="#II、MR过程设计" class="headerlink" title="II、MR过程设计"></a>II、MR过程设计</h5><p>MapReduce 程序是由如下 5 个 Job 构成,前面的 Job 的输出是后面 Job 的输入,刚开始的输入是没有经过分词的原始数据。</p>
-<p>(1)、第 1 个 Job:提取内容、分词、去停词、统计单词在其文档中出现的次数, 输出为:key = 单词@文档号 , value = 单词在该文档中出现次数;输出结果如下图所示:</p>
-<p><img src="/images/13/p1.png" alt="p1"><br>(2)、第 2 个 Job:统计每个文档总词数,输出为:key = 单词@文档号 , value = 单词在该文档中出现次数/该文档总词数;输出结果如下图所示:</p>
-<p><img src="/images/13/p2.png" alt="p2"></p>
-<p>(3)、第 3 个 Job:写词表到 hdfs 上,计算 tfidf,输出为:key = 单词@文档号 , value = TFIDF;输出结果如下图所示:</p>
-<p><img src="/images/13/p3.png" alt="p3"></p>
-<p>(4)、第4个Job:写文档编号到hdfs上,写中心点信息,输出为:key = 文 档号 , value = 单词 1:tfidf1/单词 2:tfidf2/… …/单词 N:tfidfN;输出结果如下图所示：</p>
-<p><img src="/images/13/p4.png" alt="p4"></p>
-<p>(5)、第 5 个 Job:K-means 迭代,输出为 key = 文档号 , value = 聚类号; 输出结果见下图所示，输出文档向量 Vector 由文章号 ID 和该文章下的词和词 的 TFIDF 值组成：</p>
-<p><img src="/images/13/p5.png" alt="p5"></p>
-<p>数据源共有 12142 个文件,使用的 k-means 算法的参数设置如下:设置了 50个聚类中心,最多迭代 10 次(即如果前 10 次中某两次的迭代中心没有发生变 化,则认为已经收敛,跳出迭代循环)。</p>
-<h4 id="III、结果分析"><a href="#III、结果分析" class="headerlink" title="III、结果分析"></a>III、结果分析</h4><p>Mapreduce 下程序运行后产生文件如图：</p>
-<p><img src="/images/13/file_struc.png" alt="file_struc"></p>
-<p>MapReduce 下程序运行后输出结果如下图所示,是相应的 0 到 49一共 50 个聚类下面的文件统计,比如第一行表明在第 0 个聚类中共有 850 个文 件,第二行列出了相应的 850 个文件的文件编号,依此类推:</p>
-<p><img src="/images/13/output.png" alt="output"></p>
-<p>MapReduce 下迭代次数如下图所示,可以看到,程序一共迭代了 10 次(depth_0 是准备聚类前的输出,depth_1 到 depth_10 是每次迭代的输出结果):</p>
-<p><img src="/images/13/iteration.png" alt="depth"></p>
-<p>通过不同次的实验结果发现,初始的聚类中心对最后的聚类结果存在影响,<br>迭代次数对最后的聚类结果存在影响,并且孤立点即聚类中不相似的文档对最后 的聚类结果也存在着影响。</p>
-<p>第二个需要改进的地方是目前比较相似度的文档向量矩阵维数可能很大,所 以效率不是很高,可以取每个文档 TFIDF 值最高的前 20 个词构建文档向量矩阵, 这样或许可以提高效率。</p>
-<p>从运行时间、磁盘利用率也看出了MR不适合做迭代类型的任务，中间结果都要落地到HDFS上，再读出进行下一次job的计算。迭代式任务还是需要使用spark这类计算模型提高效率。</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2016/03/06/Hadoop实现KMeans聚类/#comments" class="ds-thread-count comments-count-link" data-thread-key="2016/03/06/Hadoop实现KMeans聚类/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2016/02/27/2016-02-27-shi-shi-ri-zhi-shou-ji-cha-xun-fen-xi-xi-tong-flume-plus-elasticsearch-plus-kibana/" title="实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)" itemprop="url">实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2016-02-27T09:22:17.000Z" itemprop="datePublished"> 发表于 2016-02-27</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <blockquote>
-<p>“世界上有2种人，一种懂二进制，一种不懂二进制” ——匿名</p>
-</blockquote>
-<h1 id="实时日志收集，查询，分析系统"><a href="#实时日志收集，查询，分析系统" class="headerlink" title="实时日志收集，查询，分析系统"></a>实时日志收集，查询，分析系统</h1><p><strong>设计方案：</strong>Flume（日志收集） +　ElasticSearch（日志查询）+ Kibana（日志分析与展示）</p>
-<p><strong>实验使用场景：</strong>通过ambari部署集群后，可以添加自己的日志系统，记录每个组件的产生的日志，实时的查询分析</p>
-<h4 id="一、Flume概述："><a href="#一、Flume概述：" class="headerlink" title="一、Flume概述："></a>一、Flume概述：</h4><p>Apache Flume is a distributed, reliable, and available system for efficiently collecting, aggregating and moving large amounts of log data from many different sources to a centralized data store.</p>
-<p>The use of Apache Flume is not only restricted to log data aggregation. Since data sources are customizable, Flume can be used to transport massive quantities of event data including but not limited to network traffic data, social-media-generated data, email messages and pretty much any data source possible.</p>
-<h4 id="二、Flume架构"><a href="#二、Flume架构" class="headerlink" title="二、Flume架构"></a>二、Flume架构</h4><p>每一个Flume agent包含<strong>三种类型</strong>的组件：source（从数据源获取生成event data），channel（接收source给put来的event data），sink（从channel取走event data）</p>
-<p><em>注意上面写的是一个flume agent包含<strong>三种</strong>而不是<strong>三个</strong></em></p>
-<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/flume_arch.png" width="500" height="260" alt="flume-arch" align="center"></p>
-<p>解释下什么是event data？</p>
-<p>官方解释：A Flume event is defined as a unit of data flow having a byte payload and an optional set of string attributes. </p>
-<p>简单理解：flume event data = headers + body，其中body的类型是byte[]，headers的类型是Map<string, string="">，event代表着一个数据流的最小完整单元，如果是source是从文本文件中读数据，那event的body通常就是每行的内容，headers可以自行添加。</string,></p>
-<h4 id="三、Flume需要理解的内容"><a href="#三、Flume需要理解的内容" class="headerlink" title="三、Flume需要理解的内容"></a>三、Flume需要理解的内容</h4><ol>
-<li><p>如何配好一个最简单的flume.conf，使得flume agent正常工作；</p>
-</li>
-<li><p>Flume的flow的种类和适用场景；</p>
-</li>
-<li><p>Flume的官方提供的sources，channels，sinks，如提供的不满足需求，可自定义适用于自己场景的source、channel和sink；</p>
-</li>
-</ol>
-<h4 id="四、ElasticSearch概述"><a href="#四、ElasticSearch概述" class="headerlink" title="四、ElasticSearch概述"></a>四、ElasticSearch概述</h4><p>Elasticsearch是一个基于Apache Lucene(TM)的开源的、实时的、分布式的、全文存储、搜索、分析引擎。</p>
-<p>Lucene使用起来非常复杂，ES（ElasticSearch）可以看成对其进行了封装，提供了丰富的REST API，上手非常容易。</p>
-<h4 id="五、ElasticSearch的数据模型的简单理解"><a href="#五、ElasticSearch的数据模型的简单理解" class="headerlink" title="五、ElasticSearch的数据模型的简单理解"></a>五、ElasticSearch的数据模型的简单理解</h4><p>在Elasticsearch中，有几个概念（关键词），有别于我们使用的关系型数据库中的概念，注意类比：<br><figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">R<span class="function"><span class="title">elational</span> DB	-&gt;</span> D<span class="function"><span class="title">atabases</span> 		-&gt;</span> T<span class="function"><span class="title">ables</span> -&gt;</span> R<span class="function"><span class="title">ows</span> 		-&gt;</span> Columns</span><br><span class="line">E<span class="function"><span class="title">lasticsearch</span>	-&gt;</span> I<span class="function"><span class="title">ndices</span>(Index) 	-&gt;</span> T<span class="function"><span class="title">ypes</span>  -&gt;</span> D<span class="function"><span class="title">ocuments</span> 	-&gt;</span> Fields</span><br></pre></td></tr></table></figure></p>
-<p>Elasticsearch集群可以包含多个索引(indices)（数据库），每一个索引可以包含多个类型(types)（表），每一个类型包含多个文档(documents)（行），然后每个文档包含多个字段(Fields)（列）。</p>
-<p>如何定位es中的一个文档（Document）？</p>
-<p>通过Index（索引:    文档存储的地方） +　Type（类型:文档代表的对象的类）+ Document_ID（唯一标识：文档的唯一标识），在ES内部的元数据表示为：_index + _type + _id。</p>
-<h4 id="六、Kibana概述"><a href="#六、Kibana概述" class="headerlink" title="六、Kibana概述"></a>六、Kibana概述</h4><p>可以看成是ES的一个插件，提供的功能：</p>
-<ol>
-<li><p>Flexible analytics and visualization platform</p>
-</li>
-<li><p>Real-time summary and charting of streaming data</p>
-</li>
-<li><p>Intuitive interface for a variety of users</p>
-</li>
-<li><p>Instant sharing and embedding of dashboards</p>
-</li>
-</ol>
-<h4 id="七、系统实现："><a href="#七、系统实现：" class="headerlink" title="七、系统实现："></a>七、系统实现：</h4><p>环境：<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">（1）<span class="selector-tag">JDK</span>版本：<span class="selector-tag">java</span> <span class="selector-tag">-version</span></span><br><span class="line"><span class="selector-tag">java</span> <span class="selector-tag">version</span> "1<span class="selector-class">.7</span><span class="selector-class">.0_75</span>"</span><br><span class="line"><span class="selector-tag">OpenJDK</span> <span class="selector-tag">Runtime</span> <span class="selector-tag">Environment</span> (<span class="selector-tag">rhel-2</span><span class="selector-class">.5</span><span class="selector-class">.4</span><span class="selector-class">.0</span><span class="selector-class">.el6_6-x86_64</span> <span class="selector-tag">u75-b13</span>)</span><br><span class="line"><span class="selector-tag">OpenJDK</span> 64<span class="selector-tag">-Bit</span> <span class="selector-tag">Server</span> <span class="selector-tag">VM</span> (<span class="selector-tag">build</span> 24<span class="selector-class">.75-b04</span>, <span class="selector-tag">mixed</span> <span class="selector-tag">mode</span>)</span><br><span class="line">（2）<span class="selector-tag">Flume1</span><span class="selector-class">.6</span><span class="selector-class">.0</span></span><br><span class="line">（3）<span class="selector-tag">ElasticSearch1</span><span class="selector-class">.7</span><span class="selector-class">.5</span></span><br></pre></td></tr></table></figure></p>
-<p>注意：我这里实验显示Flume1.6.0不能导数据到ES2.2.0</p>
-<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/log_arch.png" width="600" height="330" alt="log-arch" align="center"></p>
-<p>Flume使用的conf，可以简单的设置如下：<br><figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">agent</span>.sources = yarnSrc hbaseSrc</span><br><span class="line"><span class="built_in">agent</span>.channels = memoryChannel</span><br><span class="line"><span class="built_in">agent</span>.sinks = elasticsearch</span><br><span class="line"></span><br><span class="line"><span class="meta"># source1:hdfsSrc</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hdfsSrc.<span class="built_in">type</span> = <span class="built_in">exec</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hdfsSrc.command = tail -F /var/<span class="built_in">log</span>/tbds/hdfs/hdfs/hadoop-hdfs-datanode-<span class="number">10.151</span>.<span class="number">139.111</span>.<span class="built_in">log</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hdfsSrc.channels = memoryChannel</span><br><span class="line"></span><br><span class="line"><span class="meta"># source2:yarnSrc</span></span><br><span class="line"><span class="built_in">agent</span>.sources.yarnSrc.<span class="built_in">type</span> = <span class="built_in">exec</span></span><br><span class="line"><span class="built_in">agent</span>.sources.yarnSrc.command = tail -F /var/<span class="built_in">log</span>/tbds/yarn/yarn/yarn-yarn-nodemanager-<span class="number">10.151</span>.<span class="number">139.111</span>.<span class="built_in">log</span></span><br><span class="line"><span class="built_in">agent</span>.sources.yarnSrc.channels = memoryChannel</span><br><span class="line"></span><br><span class="line"><span class="meta"># source3:hbaseSrc</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hbaseSrc.<span class="built_in">type</span> = <span class="built_in">exec</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hbaseSrc.command = tail -F /var/<span class="built_in">log</span>/tbds/hbase/hbase-hbase-regionserver-<span class="number">10.151</span>.<span class="number">139.111</span>.<span class="built_in">log</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hbaseSrc.channels = memoryChannel</span><br><span class="line"></span><br><span class="line"><span class="meta"># sink1:localSink</span></span><br><span class="line"><span class="built_in">agent</span>.sinks.localSink.<span class="built_in">type</span> = file_roll</span><br><span class="line"><span class="built_in">agent</span>.sinks.localSink.sink.directory = /var/<span class="built_in">log</span>/flume</span><br><span class="line"><span class="built_in">agent</span>.sinks.localSink.sink.rollInterval = <span class="number">0</span></span><br><span class="line"><span class="built_in">agent</span>.sinks.localSink.channel = memoryChannel</span><br><span class="line"></span><br><span class="line"><span class="meta"># sink2:esSink</span></span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.channel = memoryChannel</span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.<span class="built_in">type</span> = org.apache.flume.sink.elasticsearch.ElasticSearchSink</span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.hostNames = <span class="number">10.151</span>.<span class="number">139.111</span>:<span class="number">9300</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.indexName = basis_log_info</span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.batchSize = <span class="number">100</span></span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.indexType = logs</span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.clusterName = my-test-es-cluster</span><br><span class="line"><span class="built_in">agent</span>.sinks.elasticsearch.serializer = org.apache.flume.sink.elasticsearch.ElasticSearchLogStashEventSerializer</span><br><span class="line"></span><br><span class="line"><span class="meta"># channel1</span></span><br><span class="line"><span class="built_in">agent</span>.channels.memoryChannel.<span class="built_in">type</span> = memory</span><br><span class="line"><span class="built_in">agent</span>.channels.memoryChannel.capacity = <span class="number">100</span></span><br></pre></td></tr></table></figure></p>
-<p>注意要在flume/lib下加入两个包：<br>lucene-core-4.10.4.jar<br>elasticsearch-1.7.5.jar<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The elasticsearch and lucene-core jars required <span class="keyword">for</span> your environment must be placed in the <span class="class"><span class="keyword">lib</span> <span class="title">directory</span> <span class="title">of</span> <span class="title">the</span> <span class="title">Apache</span> <span class="title">Flume</span> <span class="title">installation</span>.</span></span><br></pre></td></tr></table></figure></p>
-<p>之后分别运行elasticsearch和flume即可。</p>
-<h4 id="八、系统改进："><a href="#八、系统改进：" class="headerlink" title="八、系统改进："></a>八、系统改进：</h4><ol>
-<li><p>配置flume interceptor加入各类headers，重写ElasticSearchLogStashEventSerializer使得event的header部分可以作为es的文档的field</p>
-</li>
-<li><p>memory channel与file channel的结合，参见美团日志系统的改进</p>
-</li>
-<li><p>日志若是错误信息，并不是每一行都是作为es的一条文档，而是若干行的内容才是es的一个文档的message</p>
-</li>
-</ol>
-<h4 id="九、系统实现效果："><a href="#九、系统实现效果：" class="headerlink" title="九、系统实现效果："></a>九、系统实现效果：</h4><p>导入es的文档数据结构：</p>
-<p><img src="" width="600" height="330" alt="es-data-structure" align="center"></p>
-<p>Kibana展示：</p>
-<p><img src="" width="600" height="330" alt="kibana-result" align="center"></p>
-<p>References：</p>
-<ol>
-<li><p>Apache Flume：<a href="https://flume.apache.org/" target="_blank" rel="external">https://flume.apache.org/</a></p>
-</li>
-<li><p>elastic.co：<a href="https://www.elastic.co/" target="_blank" rel="external">https://www.elastic.co/</a> </p>
-</li>
-<li><p>Elasticsearch权威指南（中文版）：<a href="https://www.gitbook.com/book/looly/elasticsearch-the-definitive-guide-cn/details" target="_blank" rel="external">https://www.gitbook.com/book/looly/elasticsearch-the-definitive-guide-cn/details</a></p>
-</li>
-<li><p>Kibana ：<a href="https://www.elastic.co/products/kibana" target="_blank" rel="external">https://www.elastic.co/products/kibana</a></p>
-</li>
-</ol>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/flume/">flume</a>
-</div>
-
-
-  <div class="article-tags">
+<section class="post" itemscope itemprop="blogitem">
   
-  <span></span> <a href="/tags/flume/">flume</a><a href="/tags/elasticsearch/">elasticsearch</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2016/02/27/2016-02-27-shi-shi-ri-zhi-shou-ji-cha-xun-fen-xi-xi-tong-flume-plus-elasticsearch-plus-kibana/#comments" class="ds-thread-count comments-count-link" data-thread-key="2016/02/27/2016-02-27-shi-shi-ri-zhi-shou-ji-cha-xun-fen-xi-xi-tong-flume-plus-elasticsearch-plus-kibana/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/11/05/2015-11-05-puppetan-zhuang-yu-ji-ben-shi-yong/" title="puppet安装与基本使用" itemprop="url">puppet安装与基本使用</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2015-11-05T08:01:14.000Z" itemprop="datePublished"> 发表于 2015-11-05</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <blockquote>
-<p>“Talk is cheap. Show me the code” —— Linux</p>
-</blockquote>
-<h4 id="一、puppet基本介绍"><a href="#一、puppet基本介绍" class="headerlink" title="一、puppet基本介绍"></a>一、puppet基本介绍</h4><p>puppet是一个开源的软件自动化配置和部署工具。它是典型C／S架构，由puppet master和若干puppet client组成。</p>
-<h4 id="二、安装过程"><a href="#二、安装过程" class="headerlink" title="二、安装过程"></a>二、安装过程</h4><h5 id="1-设置hosts："><a href="#1-设置hosts：" class="headerlink" title="1. 设置hosts："></a>1. 设置hosts：</h5><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">172<span class="selector-class">.16</span><span class="selector-class">.14</span><span class="selector-class">.150</span>	<span class="selector-tag">master</span><span class="selector-class">.hp</span>	# <span class="selector-tag">puppet</span> <span class="selector-tag">master</span></span><br><span class="line">172<span class="selector-class">.16</span><span class="selector-class">.14</span><span class="selector-class">.151</span>	<span class="selector-tag">slave1</span><span class="selector-class">.hp</span>	# <span class="selector-tag">puppet</span> <span class="selector-tag">client</span></span><br></pre></td></tr></table></figure>
-<h5 id="2-为了方便，进行前期准备："><a href="#2-为了方便，进行前期准备：" class="headerlink" title="2. 为了方便，进行前期准备："></a>2. 为了方便，进行前期准备：</h5><p>(1). 关闭SELinu<br>(2). 关闭防火墙</p>
-<h5 id="3-安装puppet官方源："><a href="#3-安装puppet官方源：" class="headerlink" title="3. 安装puppet官方源："></a>3. 安装puppet官方源：</h5><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget http:<span class="comment">//yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm</span></span><br><span class="line">rpm -ivh puppetlabs-release-<span class="number">6</span>-<span class="number">7</span><span class="selector-class">.noarch</span><span class="selector-class">.rpm</span></span><br><span class="line">yum update</span><br></pre></td></tr></table></figure>
-<h5 id="4-puppet-master的安装与配置："><a href="#4-puppet-master的安装与配置：" class="headerlink" title="4. puppet master的安装与配置："></a>4. puppet master的安装与配置：</h5><p>安装puppet server：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y <span class="keyword">install</span> puppet-<span class="keyword">server</span></span><br></pre></td></tr></table></figure>
-<p>启动puppet server：</p>
-<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service puppetmaster <span class="literal">start</span></span><br></pre></td></tr></table></figure>
-<p>查看证书，由于puppet默认将server本机当成一个client，所以已经将本机管理起来，自动签发了一个证书：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[urey@master ~]$ sudo puppet cert list --all</span><br><span class="line">+ "master.hp" (SHA256) 89:94:59:7C:85:F2:03:27:82:72:09:63:F4:86:C3:A4:2E:15:EE:7F:A5:31:C1:57:91:29:E4:9A:1B:87:F5:9B (alt names: "DNS:master.hp", "DNS:puppet", "DNS:puppet.hp")</span><br></pre></td></tr></table></figure>
-<h5 id="5-puppet-client的安装与配置："><a href="#5-puppet-client的安装与配置：" class="headerlink" title="5. puppet client的安装与配置："></a>5. puppet client的安装与配置：</h5><p>安装puppet client：</p>
-<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y <span class="keyword">install</span> puppet</span><br></pre></td></tr></table></figure>
-<p>启动puppet client：</p>
-<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service puppet <span class="literal">start</span></span><br></pre></td></tr></table></figure>
-<h5 id="6-puppet-server与puppet-client交互："><a href="#6-puppet-server与puppet-client交互：" class="headerlink" title="6. puppet server与puppet client交互："></a>6. puppet server与puppet client交互：</h5><p>由于server还没有给client发证书，所以还不能与server通信，但是需要发出请求，一旦server签收，就可以正常通信了。在client运行：</p>
-<figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">puppet</span> <span class="comment">agent</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">no</span><span class="literal">-</span><span class="comment">daemonize</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">onetime</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">verbose</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">debug</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">server=master</span><span class="string">.</span><span class="comment">hp</span></span><br></pre></td></tr></table></figure>
-<p>在server端查看，<code>＋</code> 号代表已经签收，可以看到，目前<code>slave1.hp</code>还没有被签收：</p>
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[urey<span class="meta">@master</span> ~]$ sudo puppet cert list --all</span><br><span class="line">  <span class="string">"slave1.hp"</span> (SHA256) <span class="string">F7:</span><span class="string">D4:</span><span class="number">2</span><span class="string">D:</span><span class="number">2</span><span class="string">C:</span><span class="number">6</span><span class="string">D:</span><span class="number">63</span>:<span class="string">A8:</span><span class="number">78</span>:<span class="number">13</span>:<span class="string">CE:</span><span class="string">A7:</span><span class="number">0</span><span class="string">A:</span><span class="number">2</span><span class="string">A:</span><span class="number">4</span><span class="string">E:</span><span class="number">0</span><span class="string">F:</span><span class="string">E0:</span><span class="number">9</span><span class="string">E:</span><span class="string">D7:</span><span class="number">71</span>:<span class="string">BC:</span><span class="number">0</span><span class="string">F:</span><span class="number">3</span><span class="string">F:</span><span class="number">52</span>:<span class="number">68</span>:<span class="number">21</span>:<span class="string">B4:</span><span class="number">17</span>:<span class="number">4</span><span class="string">B:</span><span class="string">B7:</span><span class="number">08</span>:<span class="string">FC:</span><span class="number">6</span>E</span><br><span class="line">+ <span class="string">"master.hp"</span> (SHA256) <span class="number">89</span>:<span class="number">94</span>:<span class="number">59</span>:<span class="number">7</span><span class="string">C:</span><span class="number">85</span>:<span class="string">F2:</span><span class="number">03</span>:<span class="number">27</span>:<span class="number">82</span>:<span class="number">72</span>:<span class="number">09</span>:<span class="number">63</span>:<span class="string">F4:</span><span class="number">86</span>:<span class="string">C3:</span><span class="string">A4:</span><span class="number">2</span><span class="string">E:</span><span class="number">15</span>:<span class="string">EE:</span><span class="number">7</span><span class="string">F:</span><span class="string">A5:</span><span class="number">31</span>:<span class="string">C1:</span><span class="number">57</span>:<span class="number">91</span>:<span class="number">29</span>:<span class="string">E4:</span><span class="number">9</span><span class="string">A:</span><span class="number">1</span><span class="string">B:</span><span class="number">87</span>:<span class="string">F5:</span><span class="number">9</span>B (alt <span class="string">names:</span> <span class="string">"DNS:master.hp"</span>, <span class="string">"DNS:puppet"</span>, <span class="string">"DNS:puppet.hp"</span>)</span><br></pre></td></tr></table></figure>
-<p>server通过 <code>sign</code> 签收：</p>
-<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">puppet cert <span class="comment">--sign slave1.hp</span></span><br></pre></td></tr></table></figure>
-<p>再次查看：</p>
-<figure class="highlight qml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">puppet cert <span class="built_in">list</span> --all</span><br><span class="line">[urey@master ~]$ sudo puppet cert <span class="built_in">list</span> --all</span><br><span class="line">+ <span class="string">"master.hp"</span> (SHA256) <span class="number">89</span>:<span class="number">94</span>:<span class="number">59</span>:<span class="number">7</span><span class="attribute">C</span>:<span class="number">85</span>:<span class="attribute">F2</span>:<span class="number">03</span>:<span class="number">27</span>:<span class="number">82</span>:<span class="number">72</span>:<span class="number">09</span>:<span class="number">63</span>:<span class="attribute">F4</span>:<span class="number">86</span>:<span class="attribute">C3</span>:<span class="attribute">A4</span>:<span class="number">2</span><span class="attribute">E</span>:<span class="number">15</span>:<span class="attribute">EE</span>:<span class="number">7</span><span class="attribute">F</span>:<span class="attribute">A5</span>:<span class="number">31</span>:<span class="attribute">C1</span>:<span class="number">57</span>:<span class="number">91</span>:<span class="number">29</span>:<span class="attribute">E4</span>:<span class="number">9</span><span class="attribute">A</span>:<span class="number">1</span><span class="attribute">B</span>:<span class="number">87</span>:<span class="attribute">F5</span>:<span class="number">9</span>B (alt <span class="attribute">names</span>: <span class="string">"DNS:master.hp"</span>, <span class="string">"DNS:puppet"</span>, <span class="string">"DNS:puppet.hp"</span>)</span><br><span class="line">+ <span class="string">"slave1.hp"</span> (SHA256) <span class="number">1</span><span class="attribute">A</span>:<span class="number">23</span>:<span class="attribute">D6</span>:<span class="attribute">D4</span>:<span class="number">31</span>:<span class="number">92</span>:<span class="attribute">AF</span>:<span class="number">7</span><span class="attribute">D</span>:<span class="attribute">F4</span>:<span class="attribute">CA</span>:<span class="attribute">A3</span>:<span class="number">83</span>:<span class="number">0</span><span class="attribute">A</span>:<span class="number">68</span>:<span class="attribute">DF</span>:<span class="number">24</span>:<span class="number">11</span>:<span class="attribute">DB</span>:<span class="number">0</span><span class="attribute">A</span>:<span class="attribute">D5</span>:<span class="number">6</span><span class="attribute">C</span>:<span class="attribute">A8</span>:<span class="number">0</span><span class="attribute">A</span>:<span class="number">3</span><span class="attribute">C</span>:<span class="attribute">EE</span>:<span class="number">6</span><span class="attribute">C</span>:<span class="number">9</span><span class="attribute">F</span>:<span class="attribute">E0</span>:<span class="number">62</span>:<span class="attribute">B4</span>:<span class="attribute">D3</span>:<span class="attribute">B0</span></span><br></pre></td></tr></table></figure>
-<p>这样，client和server可以正常通信了。</p>
-<p>如果不想这么麻烦，每次server查看有哪些client发出请求，再一一签收的话，server可以通过编辑配置文件来自动完成签收。</p>
-<h5 id="1-关闭server，修改配置文件，使得server添加自动签发证书："><a href="#1-关闭server，修改配置文件，使得server添加自动签发证书：" class="headerlink" title="1. 关闭server，修改配置文件，使得server添加自动签发证书："></a>1. 关闭server，修改配置文件，使得server添加自动签发证书：</h5><p>编辑 /etc/puppet/puppet.conf 文件， 在[main]段内加入 autosign = true，server = master.com</p>
-<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">[main]</span><br><span class="line">    <span class="comment"># The Puppet log directory.</span></span><br><span class="line">    <span class="comment"># The default value is '$vardir/log'.</span></span><br><span class="line">    <span class="attr">logdir</span> = /var/log/puppet</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Where Puppet PID files are kept.</span></span><br><span class="line">    <span class="comment"># The default value is '$vardir/run'.</span></span><br><span class="line">    <span class="attr">rundir</span> = /var/run/puppet</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Where SSL certificates are kept.</span></span><br><span class="line">    <span class="comment"># The default value is '$confdir/ssl'.</span></span><br><span class="line">    <span class="attr">ssldir</span> = $vardir/ssl</span><br><span class="line">    <span class="attr">autosign</span> = <span class="literal">true</span></span><br><span class="line">    <span class="attr">server</span> = master.hp</span><br><span class="line"></span><br><span class="line">[agent]</span><br><span class="line">    <span class="comment"># The file in which puppetd stores a list of the classes</span></span><br><span class="line">    <span class="comment"># associated with the retrieved configuratiion.  Can be loaded in</span></span><br><span class="line">    <span class="comment"># the separate ``puppet`` executable using the ``--loadclasses``</span></span><br><span class="line">    <span class="comment"># option.</span></span><br><span class="line">    <span class="comment"># The default value is '$confdir/classes.txt'.</span></span><br><span class="line">    <span class="attr">classfile</span> = $vardir/classes.txt</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Where puppetd caches the local configuration.  An</span></span><br><span class="line">    <span class="comment"># extension indicating the cache format is added automatically.</span></span><br><span class="line">    <span class="comment"># The default value is '$confdir/localconfig'.</span></span><br><span class="line">    <span class="attr">localconfig</span> = $vardir/localconfig</span><br></pre></td></tr></table></figure>
-<p>重启server。</p>
-<h5 id="2-关闭client，编辑-etc-puppet-puppet-conf-文件，在-agent-段内加入-listen-true，server-master-com，为客户端指定puppet服务器-并开启Master的推送功能："><a href="#2-关闭client，编辑-etc-puppet-puppet-conf-文件，在-agent-段内加入-listen-true，server-master-com，为客户端指定puppet服务器-并开启Master的推送功能：" class="headerlink" title="2. 关闭client，编辑 /etc/puppet/puppet.conf 文件，在[agent]段内加入 listen = true，server = master.com，为客户端指定puppet服务器,并开启Master的推送功能："></a>2. 关闭client，编辑 /etc/puppet/puppet.conf 文件，在[agent]段内加入 listen = true，server = master.com，为客户端指定puppet服务器,并开启Master的推送功能：</h5><figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[agent]</span><br><span class="line">    <span class="comment"># The file in which puppetd stores a list of the classes</span></span><br><span class="line">    <span class="comment"># associated with the retrieved configuratiion.  Can be loaded in</span></span><br><span class="line">    <span class="comment"># the separate ``puppet`` executable using the ``--loadclasses``</span></span><br><span class="line">    <span class="comment"># option.</span></span><br><span class="line">    <span class="comment"># The default value is '$confdir/classes.txt'.</span></span><br><span class="line">    <span class="attr">classfile</span> = $vardir/classes.txt</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Where puppetd caches the local configuration.  An</span></span><br><span class="line">    <span class="comment"># extension indicating the cache format is added automatically.</span></span><br><span class="line">    <span class="comment"># The default value is '$confdir/localconfig'.</span></span><br><span class="line">    <span class="attr">localconfig</span> = $vardir/localconfig</span><br><span class="line">    <span class="attr">listen</span> = <span class="literal">true</span></span><br><span class="line">    <span class="attr">server</span> = master.hp</span><br></pre></td></tr></table></figure>
-<p>编辑 /etc/puppet/auth.conf 文件， 在 auth / 最下面加入以下语句：</p>
-<figure class="highlight nimrod"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">path /run</span><br><span class="line"><span class="keyword">method</span> save</span><br><span class="line">allow master.com</span><br></pre></td></tr></table></figure>
-<p>好了，这样，client请求server后，server会自动sign相应的client。</p>
-<h4 id="三、puppet目录结构"><a href="#三、puppet目录结构" class="headerlink" title="三、puppet目录结构"></a>三、puppet目录结构</h4><h5 id="1-server端的目录结构："><a href="#1-server端的目录结构：" class="headerlink" title="1. server端的目录结构："></a>1. server端的目录结构：</h5><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[urey@master ~]$ <span class="keyword">ls</span> /etc/puppet/</span><br><span class="line">auth.<span class="keyword">conf</span>  environments  fileserver.<span class="keyword">conf</span>  manifests  modules  puppet.<span class="keyword">conf</span></span><br></pre></td></tr></table></figure>
-<p>server上代码的目录结构如下：</p>
-<p>|– auth.conf # 访问认证文件</p>
-<p>|– environments # 环境</p>
-<p>|– fileserver.conf # 自带的文件服务器配置文件，用户控制客户端访问文件资源的权限</p>
-<p>|– manifests</p>
-<p>|– |– site.pp # puppet的主入口文件，主要用于全局配置</p>
-<p>|– |– xx.pp # puppet各个模块汇总  如abc.com.pp</p>
-<p>|– |– nodes.pp # 节点配置文件，用于配置客户端节点应用哪些具体的配置</p>
-<p>|– modules # puppet的各个模块所在文件</p>
-<p>|– puppet.conf # 整个puppet的主配置文件，主要由两部分组成：[main]和[agent]，定义了一些基础的文件目录</p>
-<h5 id="2-client端的目录结构："><a href="#2-client端的目录结构：" class="headerlink" title="2. client端的目录结构："></a>2. client端的目录结构：</h5><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[urey@slave1 ~]$ <span class="keyword">ls</span> /etc/puppet/</span><br><span class="line">auth.<span class="keyword">conf</span>  modules  puppet.<span class="keyword">conf</span></span><br></pre></td></tr></table></figure>
-<p>client上代码的目录结构如下：</p>
-<p>|– auth.conf # 访问认证文件</p>
-<p>|– modules # puppet的各个模块所在文件</p>
-<p>|– puppet.conf # puppet主文件所在目录，主要由两部分组成：[main]和[agent]，定义了一些基础的文件目录</p>
-<h4 id="四、User-Cases"><a href="#四、User-Cases" class="headerlink" title="四、User Cases"></a>四、User Cases</h4><p>到这里，终于可以看一下puppet的强大了。</p>
-<p>我们在server端编写一段code：</p>
-<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[urey@<span class="keyword">master</span> <span class="title">~]$</span> sudo vim /etc/puppet/manifests/site.pp</span><br></pre></td></tr></table></figure>
-<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">node</span> <span class="title">default</span> &#123;</span><br><span class="line">        file &#123;</span><br><span class="line">                <span class="string">"/tmp/helloworld.txt"</span>: content =&gt; <span class="string">"hello, world"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在client端之行puppet，执行后查看对应目录下生成了相应的文件：</p>
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[urey<span class="meta">@slave</span>1 ~]$ puppet agent --test --server=master.hp</span><br><span class="line"><span class="string">Info:</span> Caching certificate <span class="keyword">for</span> slave1.hp</span><br><span class="line"><span class="string">Info:</span> Caching certificate_revocation_list <span class="keyword">for</span> ca</span><br><span class="line"><span class="string">Info:</span> Caching certificate <span class="keyword">for</span> slave1.hp</span><br><span class="line"><span class="string">Info:</span> Retrieving pluginfacts</span><br><span class="line"><span class="string">Notice:</span> <span class="regexp">/File[/</span>home<span class="regexp">/urey/</span>.puppet<span class="regexp">/var/</span>facts.d]/<span class="string">mode:</span> mode changed <span class="string">'0775'</span> to <span class="string">'0755'</span></span><br><span class="line"><span class="string">Info:</span> Retrieving plugin</span><br><span class="line"><span class="string">Info:</span> Caching catalog <span class="keyword">for</span> slave1.hp</span><br><span class="line"><span class="string">Info:</span> Applying configuration version <span class="string">'1446715692'</span></span><br><span class="line"><span class="string">Notice:</span> <span class="regexp">/Stage[main]/</span>Main<span class="regexp">/Node[default]/</span>File[<span class="regexp">/tmp/</span>helloworld.txt]/<span class="string">ensure:</span> defined content <span class="keyword">as</span> <span class="string">'&#123;md5&#125;e4d7f1b4ed2e42d15898f4b27b019da4'</span></span><br><span class="line"><span class="string">Info:</span> Creating state file <span class="regexp">/home/</span>urey<span class="regexp">/.puppet/</span>var<span class="regexp">/state/</span>state.yaml</span><br><span class="line"><span class="string">Notice:</span> Finished catalog run <span class="keyword">in</span> <span class="number">0.02</span> seconds</span><br><span class="line">[urey<span class="meta">@slave</span>1 ~]$ cat <span class="regexp">/tmp/</span>helloworld.txt</span><br><span class="line">[urey<span class="meta">@slave</span>1 ~]$ hello,world</span><br></pre></td></tr></table></figure>
-<p>puppet需要学习的还有很多，未完待续。</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/tool/">tool</a>
-</div>
-
-
-  <div class="article-tags">
+    <a href="/2016/03/12/LeetCode-Two-Sum/" title="LeetCode Two Sum" itemprop="url">
   
-  <span></span> <a href="/tags/puppet/">puppet</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2015/11/05/2015-11-05-puppetan-zhuang-yu-ji-ben-shi-yong/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/11/05/2015-11-05-puppetan-zhuang-yu-ji-ben-shi-yong/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
+    <h1 itemprop="name">LeetCode Two Sum</h1>
     
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
+     
+           <p itemprop="description" >tips
+hash_table: unordered_map
+没有找到：mapping.find(gap) != mapping.end()
+vector向量
+
+12345678910111213141516171819class Solution &amp;#123;public:  </p>
+        
     
-      <a href="/2015/11/03/2015-11-03-ambarijian-jie/" title="Ambari简介" itemprop="url">Ambari简介</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2015-11-03T11:03:57.000Z" itemprop="datePublished"> 发表于 2015-11-03</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <blockquote>
-<p>“计算机没什么用。他们只会告诉你答案。” —— 巴勃罗·毕加索，画家</p>
-</blockquote>
-<h4 id="一、Apache-Ambari"><a href="#一、Apache-Ambari" class="headerlink" title="一、Apache Ambari"></a><strong>一、Apache Ambari</strong></h4><p>Apache Ambari项目通过提供配置部署、管理、监控功能，目的在使Hadoop的管理更简单。它提供了一个直观的,易于使用的web UI和其背后的一套RESTful api。</p>
-<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Ambari enables System Administrators <span class="built_in">to</span>:</span><br><span class="line"></span><br><span class="line">Provision <span class="keyword">a</span> Hadoop Cluster</span><br><span class="line">Ambari provides <span class="keyword">a</span> step-<span class="keyword">by</span>-step wizard <span class="keyword">for</span> installing Hadoop services across <span class="keyword">any</span> <span class="built_in">number</span> <span class="keyword">of</span> hosts.</span><br><span class="line">Ambari handles configuration <span class="keyword">of</span> Hadoop services <span class="keyword">for</span> <span class="keyword">the</span> cluster.</span><br><span class="line">Manage <span class="keyword">a</span> Hadoop Cluster</span><br><span class="line">Ambari provides central management <span class="keyword">for</span> starting, stopping, <span class="keyword">and</span> reconfiguring Hadoop services across <span class="keyword">the</span> entire cluster.</span><br><span class="line">Monitor <span class="keyword">a</span> Hadoop Cluster</span><br><span class="line">Ambari provides <span class="keyword">a</span> dashboard <span class="keyword">for</span> monitoring health <span class="keyword">and</span> status <span class="keyword">of</span> <span class="keyword">the</span> Hadoop cluster.</span><br><span class="line">Ambari leverages Ambari Metrics System <span class="keyword">for</span> metrics collection.</span><br><span class="line">Ambari leverages Ambari Alert Framework <span class="keyword">for</span> <span class="keyword">system</span> alerting <span class="keyword">and</span> will notify you when your attention is needed (e.g., <span class="keyword">a</span> node goes down, remaining disk <span class="literal">space</span> is low, etc).</span><br><span class="line">Ambari enables Application Developers <span class="keyword">and</span> System Integrators <span class="built_in">to</span>:</span><br><span class="line"></span><br><span class="line">Easily integrate Hadoop provisioning, management, <span class="keyword">and</span> monitoring capabilities <span class="built_in">to</span> their own applications <span class="keyword">with</span> <span class="keyword">the</span> Ambari REST APIs.</span><br></pre></td></tr></table></figure>
-<h4 id="二、Ambari设计目标"><a href="#二、Ambari设计目标" class="headerlink" title="二、Ambari设计目标"></a><strong>二、Ambari设计目标</strong></h4><ol>
-<li>Platform Independence：系统需要有平台无关，支持大多数的操作系统。</li>
-<li>Pluggable Components：可增添的组件</li>
-<li>Version Management &amp; Upgrade：支持组件的多版本管理和升级</li>
-<li>Extensibility：可扩展性</li>
-<li>Failure Recovery：错误恢复</li>
-<li>Security：安全性</li>
-<li>Error Trace：错误追踪，给用户足够的细节处理错误</li>
-<li>Near Real-Time and Intermediate Feedback for Operations：对于长时间的操作，给用户展示中间过程，提供更好的体验</li>
-</ol>
-<p>详细介绍可以参看官网的：Ambari-Architecture.pdf</p>
-<h4 id="三、Ambari术语理解"><a href="#三、Ambari术语理解" class="headerlink" title="三、Ambari术语理解"></a><strong>三、Ambari术语理解</strong></h4><ol>
-<li>Hadoop Stack：Ambari被认为是用来快速部署、管理、监控Hadoop生态系统各个组件的工具，或者将来可以定义为一个管理大数据平台（不仅仅限于Hadoop生态系统），所以有若干个支持的组件，形象化的成为Hadoop Stack（Hadoop栈 或 Hadoop组件栈）。</li>
-<li>Service：Hadoo Stack中提供的一个栈（服务），比如：Hive、Spark等等，一个Service可以包含若干个Component，比如：HDFS Service包含NameNode、Secondary NameNode（SNameNode）、DataNode。当然，Service也可能只是一个client library，比如：Pig不包含任何的daemon services，只包含一个client library。</li>
-<li>Component：上面已经介绍。这里要说明的是一个Component可能跨多个节点，比如：DataNode。</li>
-<li>Node\Host：集群中的一个机器。</li>
-<li>Node-Component：特定机器上的特定组件，比如：一台机器上的DataNode。</li>
-<li>Operation：一个操作。一个操作可能包含若干个Action（动作）。</li>
-<li>Task：发送给Node执行的任务，一个Action可能包含若干个Task。</li>
-<li>Stage：一系列Task的集合。</li>
-<li>Action：一个动作包含一个Task或多个Task。每个动作都有一个action id。若不特别说明，Stage和Action一一对应。比如：HDFS rebalancing，HBase smoke test等等。</li>
-<li>Stage Plan：一个Operation包含很多个Task，需要在不同的节点上执行，这就需要一个调用顺序。可以并行执行的tasks是一个Stage Plan，即每一个Stage Plan时流水线工作。</li>
-<li>Manifest：用来定义一个Task，它会被发送到节点上去执行，因此一个manifest必须是可序列化的。Manifest当然必须可以被永久存储在磁盘上用来recovery或者record。</li>
-<li>Role：可以对应一个组件，比如：NameNode或者DataNode等等，也可以对应一个Action，比如：HDFS rebalancing或者HBase smoke test等等。</li>
-</ol>
-<h4 id="四、Ambari架构"><a href="#四、Ambari架构" class="headerlink" title="四、Ambari架构"></a><strong>四、Ambari架构</strong></h4><p>Ambari由Ambari server和若干个Ambari agent组成。类似于master-slave架构。server通过给agent发送命令控制agent的配置、安装和管理。agent定期汇报heartbeat。server还暴露出api供外接访问，server将系统的数据存在默认的postgres db中。</p>
-<p><strong>Ambari整体架构图：</strong></p>
-<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/ambari.png" width="600" height="400" alt="Ambari-arch" align="center"></p>
-<p><strong>Ambari Server的架构：</strong><br><img src="http://7xlhna.com1.z0.glb.clouddn.com/ambari-server.png" width="600" height="400" alt="ambari-server" align="center"></p>
-<p><strong>Ambari Agent的架构：</strong></p>
-<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/ambari-agent.png" width="600" height="400" alt="ambari-agent" align="center"></p>
-<h4 id="五、Some-Use-cases"><a href="#五、Some-Use-cases" class="headerlink" title="五、Some Use cases"></a><strong>五、Some Use cases</strong></h4><p>通过几个实例来了解server和agent如何交互以及server内部各组件工作的流程：</p>
-<p><strong>I 以给现有cluster增加一个HBase service为例</strong><br>HBase的master和slaves将会部署在现有cluster的若干nodes上</p>
-<ol>
-<li><p>API请求调用到达Coordinator的API handler。</p>
-</li>
-<li><p>API handler构建steps用来开始一个service，steps包含：检查prerequisites，顺序安装服务的各个Components，重新配置Nagios server增加对新服务的监视，这里是对HBase server的监视。</p>
-</li>
-<li><p>Coordinator与Dependency Tracker通信确定prerequisites：HBase需要HDFS和ZooKeeper Component，需要Nagios Server提供的对HBase的监视client，和这些required component的required state。至此，Coordinator获得了它想要知道的全部信息，最后它将这些component的desired state写进DB。</p>
-</li>
-<li><p>在上一步，Coordinator还可能获得API提供的其它信息。这种情况这里不再讨论。</p>
-</li>
-<li>Coordinator将components list以及它们的desired state发送给Stage Planner。Stage Planner返回每个node应该执行的操作序列。Stage Planner还会通过Manifest Generator生成manifest。</li>
-<li>Coordinator将<code>this ordered list of stages</code>发送给Action Manager，使用的是同一个request id。</li>
-<li>Action Manager更新FSM中的每个node的state。</li>
-<li>Action Manger对每个操作构建一个action id，并写入Plan，将这些操作集合放入队列，等待发送给相应的agent。</li>
-<li>Heartbeat Handler收集agent报上来的信息，将action的response发送给Action Manager，Action Manger更新FSM。当所有nodes执行完毕对应的action后，这个action才宣告执行完毕；当一个Stage的所有actions都执行完毕后，这个Stage才宣告执行完毕。</li>
-</ol>
-<p><strong>II</strong></p>
-<ul>
-<li><p>a1</p>
-<ul>
-<li><p>1</p>
-</li>
-<li><p>2</p>
-</li>
-</ul>
-</li>
-<li><p>b2</p>
-</li>
-</ul>
-<p>参考资料：</p>
-<ol>
-<li><a href="http://ambari.apache.org/" target="_blank" rel="external">http://ambari.apache.org/</a></li>
-</ol>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/ambari/">ambari</a>
-</div>
+    <time datetime="2016-03-12T02:58:21.000Z" itemprop="datePublished">2016-03-12</time>
+  </a>
+</section>
 
 
-  <div class="article-tags">
+
+
+
+
   
-  <span></span> <a href="/tags/ambari/">ambari</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2015/11/03/2015-11-03-ambarijian-jie/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/11/03/2015-11-03-ambarijian-jie/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/10/26/2015-10-26-bug-no-such-file-or-directory-jekyll/" title="BUG:No Such File or Directory - Jekyll" itemprop="url">BUG:No Such File or Directory - Jekyll</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2015-10-26T13:34:17.000Z" itemprop="datePublished"> 发表于 2015-10-26</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <blockquote>
-<p>“版本管理是一个艰巨的任务” —— 无名</p>
-</blockquote>
-<h4 id="当Octopress遇上OSX-EI-Captain"><a href="#当Octopress遇上OSX-EI-Captain" class="headerlink" title="当Octopress遇上OSX EI Captain"></a><strong>当Octopress遇上OSX EI Captain</strong></h4><p>前一阶段升级了最新的OSX系统，谁知写完日志好端端的<code>rake generate</code>失效了，下意识的<code>rake preview</code>，报错：</p>
-<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Errno::ENOENT: <span class="keyword">No</span> Such <span class="keyword">File</span> <span class="keyword">or</span> Directory - Jekyll</span><br></pre></td></tr></table></figure>
-<p>这下慌乱了，本来对<code>ruby</code>就不熟，这怎么调错，还好前人早已总结：</p>
-<p><a href="http://schalkneethling.github.io/blog/2015/10/16/errno-enoent-no-such-file-or-directory-jekyll-octopress-el-capitan/" target="_blank" rel="external">Errno::ENOENT: No Such File or Directory - Jekyll ~ Octopress and El Capitan</a></p>
-<p>我小结一下：是新系统下，需要新的依赖库，而这些库需要ruby2.2.3的版本安装，而系统默认是2.2.0。</p>
-<p>我在安装完ruby2.2.3后，<code>ruby -v</code>后仍是2.2.0，也没有折腾，直接改了<code>~/.bash_profile</code>里面的<code>PATH</code>路径，加上了新安装好的ruby所在的<code>bin</code>目录，之后升级完+安装完相应的包后就可以<code>rake generate &amp;&amp; deploy</code>了。</p>
-<p>在CSDN上写文章很方便，移到这里好多细节需要自己处理，图片啊，表格啊，markdown语言啊，着实不容易，但是能增加一点点成就感呢。😄</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/life/">life</a>
-</div>
-
-
-  <div class="article-tags">
+<section class="post" itemscope itemprop="blogitem">
   
-  <span></span> <a href="/tags/tips/">tips</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2015/10/26/2015-10-26-bug-no-such-file-or-directory-jekyll/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/10/26/2015-10-26-bug-no-such-file-or-directory-jekyll/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2015/10/09/2015-10-09-pgxlde-jdbcfang-wen/" title="PGXL的JDBC访问" itemprop="url">PGXL的JDBC访问</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2015-10-09T13:34:17.000Z" itemprop="datePublished"> 发表于 2015-10-09</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <blockquote>
-<p>“任何傻瓜都能写出计算机可以理解的代码。好的程序员能写出人能读懂的代码” —— Martin Fowler</p>
-</blockquote>
-<h4 id="PGXL集群的配置"><a href="#PGXL集群的配置" class="headerlink" title="PGXL集群的配置"></a><strong>PGXL集群的配置</strong></h4><p>见前面的博文<a href="http://blog.csdn.net/yeruby/article/details/48996027" target="_blank" rel="external">《Postgres-XL集群的搭建》</a>。</p>
-<h4 id="JDBC连接PGXL集群"><a href="#JDBC连接PGXL集群" class="headerlink" title="JDBC连接PGXL集群"></a><strong>JDBC连接PGXL集群</strong></h4><p>PGXL底层为PostgreSQL，这意味着它支持所有支持PostgresSQL类型的驱动，包括： JDBC, ODBC, OLE DB, Python, Ruby, perl DBI, Tcl, and Erlang.</p>
-<p>这里在cnode5上连接cnode5的Coordinator进行操作：</p>
-<p>建立Java Project，导入相应的PostgreSQL的jdbc驱动；</p>
-<p>编写代码，注意以下变量含义：</p>
-<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">String</span> url = <span class="string">"jdbc:postgresql://172.16.15.135:20004/test"</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">String</span> usr = <span class="string">"postgres"</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">String</span> psd = <span class="string">"333333"</span>;</span><br></pre></td></tr></table></figure>
-<p>Coordinator的port为20004，数据库test，user为postgres；</p>
-<p>完整code：</p>
-<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">package indi.qw.pgxljdbc.demo<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">import java.sql.Connection<span class="comment">;</span></span><br><span class="line">import java.sql.DriverManager<span class="comment">;</span></span><br><span class="line">import java.sql.ResultSet<span class="comment">;</span></span><br><span class="line">import java.sql.Statement<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">public class PGXLJDBCDemo &#123;</span><br><span class="line">	static String url = <span class="string">"jdbc:postgresql://172.16.15.135:20004/test"</span><span class="comment">;</span></span><br><span class="line">    static String usr = <span class="string">"postgres"</span><span class="comment">;</span></span><br><span class="line">    static String psd = <span class="string">"333333"</span><span class="comment">;</span></span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		Connection conn = null<span class="comment">;</span></span><br><span class="line">        try &#123;</span><br><span class="line">            Class.forName(<span class="string">"org.postgresql.Driver"</span>)<span class="comment">;</span></span><br><span class="line">            conn = DriverManager.getConnection(url, usr, psd)<span class="comment">;</span></span><br><span class="line">            Statement st = conn.createStatement()<span class="comment">;</span></span><br><span class="line">            ResultSet rs = st.executeQuery(<span class="string">"SELECT * FROM TEST"</span>)<span class="comment">;</span></span><br><span class="line">            <span class="keyword">while</span> (rs.<span class="keyword">next</span>()) &#123;</span><br><span class="line">               <span class="keyword">System</span>.out.<span class="keyword">print</span>(rs.getString(<span class="number">1</span>))<span class="comment">;</span></span><br><span class="line">               <span class="keyword">System</span>.out.<span class="keyword">print</span>(<span class="string">"\n"</span>)<span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">            rs.close()<span class="comment">;</span></span><br><span class="line">            st.close()<span class="comment">;</span></span><br><span class="line">            conn.close()<span class="comment">;</span></span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            e.printStackTrace()<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/pg/">pg</a>
-</div>
-
-
-  <div class="article-tags">
+    <a href="/2016/03/11/Maven：mirror和repository区别/" title="Maven：mirror和repository区别" itemprop="url">
   
-  <span></span> <a href="/tags/pgxl/">pgxl</a><a href="/tags/postgres-xl/">postgres-xl</a>
-  </div>
+    <h1 itemprop="name">Maven：mirror和repository区别</h1>
+    
+     
+           <p itemprop="description" >一、repository用法使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。
+maven中的repo有两种类型：
 
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2015/10/09/2015-10-09-pgxlde-jdbcfang-wen/#comments" class="ds-thread-count comments-count-link" data-thread-key="2015/10/09/2015-10-09-pgxlde-jdbcfang-wen/" data-count-type="comments">&nbsp;</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
+remote repository：相当于公共的仓库，大家都能访问到，一</p>
+        
+    
+    <time datetime="2016-03-11T14:13:38.000Z" itemprop="datePublished">2016-03-11</time>
+  </a>
+</section>
 
 
 
 
 
 
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2016/03/11/RPM打包规范/" title="RPM打包规范" itemprop="url">
+  
+    <h1 itemprop="name">RPM打包规范</h1>
+    
+     
+           <p itemprop="description" >RPM打包规范：如果rpm的版本&amp;lt;=4.4.x，那么rpmbuid工具其默认的工作路径是/usr/src/redhat，这就使得普通用户不能制作rpm包，因为权限的问题，在制作rpm软件包时必须切换到root身份才可以。所以，rpm从4.5.x版本开始，将rpmbuid的默</p>
+        
+    
+    <time datetime="2016-03-11T14:13:38.000Z" itemprop="datePublished">2016-03-11</time>
+  </a>
+</section>
 
-  <nav id="page-nav" class="clearfix">
+
+
+
+
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2016/03/06/Hadoop实现KMeans聚类/" title="Hadoop实现KMeans聚类" itemprop="url">
+  
+    <h1 itemprop="name">Hadoop实现KMeans聚类</h1>
+    
+     
+           <p itemprop="description" >翻到以前的一次课程作业，今天有时间重新整理了一下。
+一、中文文本聚类的一般过程文本聚类一般包括以下几个过程：
+
+模式表示：包括特征抽取及选择，把数据对象表示成适合于算法的可计算形式;
+定义模式之间的距离测量公式;
+聚类算法实现;
+评价输出结果;      
+
+具体过程如下图所示：</p>
+        
+    
+    <time datetime="2016-03-06T13:21:34.000Z" itemprop="datePublished">2016-03-06</time>
+  </a>
+</section>
+
+
+
+
+
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2016/02/27/2016-02-27-shi-shi-ri-zhi-shou-ji-cha-xun-fen-xi-xi-tong-flume-plus-elasticsearch-plus-kibana/" title="实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)" itemprop="url">
+  
+    <h1 itemprop="name">实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)</h1>
+    
+     
+           <p itemprop="description" >“世界上有2种人，一种懂二进制，一种不懂二进制” ——匿名
+
+实时日志收集，查询，分析系统设计方案：Flume（日志收集） +　ElasticSearch（日志查询）+ Kibana（日志分析与展示）
+实验使用场景：通过ambari部署集群后，可以添加自己的日志系统，记录每个组件</p>
+        
+    
+    <time datetime="2016-02-27T09:22:17.000Z" itemprop="datePublished">2016-02-27</time>
+  </a>
+</section>
+
+
+
+
+
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2015/11/05/2015-11-05-puppetan-zhuang-yu-ji-ben-shi-yong/" title="puppet安装与基本使用" itemprop="url">
+  
+    <h1 itemprop="name">puppet安装与基本使用</h1>
+    
+     
+           <p itemprop="description" >“Talk is cheap. Show me the code” —— Linux
+
+一、puppet基本介绍puppet是一个开源的软件自动化配置和部署工具。它是典型C／S架构，由puppet master和若干puppet client组成。
+二、安装过程1. 设置host</p>
+        
+    
+    <time datetime="2015-11-05T08:01:14.000Z" itemprop="datePublished">2015-11-05</time>
+  </a>
+</section>
+
+
+
+
+
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2015/11/03/2015-11-03-ambarijian-jie/" title="Ambari简介" itemprop="url">
+  
+    <h1 itemprop="name">Ambari简介</h1>
+    
+     
+           <p itemprop="description" >“计算机没什么用。他们只会告诉你答案。” —— 巴勃罗·毕加索，画家
+
+一、Apache AmbariApache Ambari项目通过提供配置部署、管理、监控功能，目的在使Hadoop的管理更简单。它提供了一个直观的,易于使用的web UI和其背后的一套RESTful api。</p>
+        
+    
+    <time datetime="2015-11-03T11:03:57.000Z" itemprop="datePublished">2015-11-03</time>
+  </a>
+</section>
+
+
+
+
+
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2015/10/26/2015-10-26-bug-no-such-file-or-directory-jekyll/" title="BUG:No Such File or Directory - Jekyll" itemprop="url">
+  
+    <h1 itemprop="name">BUG:No Such File or Directory - Jekyll</h1>
+    
+     
+           <p itemprop="description" >“版本管理是一个艰巨的任务” —— 无名
+
+当Octopress遇上OSX EI Captain前一阶段升级了最新的OSX系统，谁知写完日志好端端的rake generate失效了，下意识的rake preview，报错：
+1Errno::ENOENT: No Such File</p>
+        
+    
+    <time datetime="2015-10-26T13:34:17.000Z" itemprop="datePublished">2015-10-26</time>
+  </a>
+</section>
+
+
+
+
+
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2015/10/09/2015-10-09-pgxlde-jdbcfang-wen/" title="PGXL的JDBC访问" itemprop="url">
+  
+    <h1 itemprop="name">PGXL的JDBC访问</h1>
+    
+     
+           <p itemprop="description" >“任何傻瓜都能写出计算机可以理解的代码。好的程序员能写出人能读懂的代码” —— Martin Fowler
+
+PGXL集群的配置见前面的博文《Postgres-XL集群的搭建》。
+JDBC连接PGXL集群PGXL底层为PostgreSQL，这意味着它支持所有支持PostgresS</p>
+        
+    
+    <time datetime="2015-10-09T13:34:17.000Z" itemprop="datePublished">2015-10-09</time>
+  </a>
+</section>
+
+
+
+
+
+
+
+  <nav id="page-nav" class="clearfix unexpand">
     <a class="extend prev" rel="prev" href="/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/">Next<span></span></a>
   </nav>
 

@@ -4,22 +4,23 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Urey on the way</title>
+    <title>LeetCode Longest Common Prefix | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Urey on the way">
-<meta property="og:url" content="http://qiaowei.xyz/page/2/index.html">
+    <meta name="description" content="tips以一个串为基准，其它串依次与该串比较，不断调整缩小common prefix">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LeetCode Longest Common Prefix">
+<meta property="og:url" content="http://qiaowei.xyz/2015/03/14/LeetCode-Longest-Common-Prefix/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description">
+<meta property="og:description" content="tips以一个串为基准，其它串依次与该串比较，不断调整缩小common prefix">
+<meta property="og:updated_time" content="2016-03-27T03:04:18.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Urey on the way">
-<meta name="twitter:description">
+<meta name="twitter:title" content="LeetCode Longest Common Prefix">
+<meta name="twitter:description" content="tips以一个串为基准，其它串依次与该串比较，不断调整缩小common prefix">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -72,248 +73,95 @@
 </div>
     </header>
     <div id="container">
-      <div id="main">
-
+      <div id="main" class="post" itemscope itemprop="blogPost">
   
-<section class="post" itemscope itemprop="blogitem">
-  
-    <a href="/2016/03/12/LeetCode-Two-Sum/" title="LeetCode Two Sum" itemprop="url">
-  
-    <h1 itemprop="name">LeetCode Two Sum</h1>
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
     
-     
-           <p itemprop="description" >tips
-hash_table: unordered_map
-没有找到：mapping.find(gap) != mapping.end()
-vector向量
-
-12345678910111213141516171819class Solution &amp;#123;public:  </p>
-        
+      <a href="/2015/03/14/LeetCode-Longest-Common-Prefix/" title="LeetCode Longest Common Prefix" itemprop="url">LeetCode Longest Common Prefix</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
+		
+  <p class="article-time">
+    <time datetime="2015-03-14T00:31:22.000Z" itemprop="datePublished"> 发表于 2015-03-14</time>
     
-    <time datetime="2016-03-12T02:58:21.000Z" itemprop="datePublished">2016-03-12</time>
-  </a>
-</section>
-
-
-
-
-
-
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#code"><span class="toc-number">2.</span> <span class="toc-text">code</span></a></li></ol>
+		
+		</div>
+		
+		<h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a><strong>tips</strong></h4><p>以一个串为基准，其它串依次与该串比较，不断调整缩小common prefix<br><a id="more"></a></p>
+<h4 id="code"><a href="#code" class="headerlink" title="code"></a><strong>code</strong></h4><figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    string longestCommonPrefix(vector&lt;string&gt;&amp; strs) &#123;</span><br><span class="line">        <span class="keyword">if</span>(strs.size() == <span class="number">0</span>) <span class="keyword">return</span> <span class="string">""</span><span class="comment">;</span></span><br><span class="line">        <span class="keyword">int</span> rightMax = strs[<span class="number">0</span>].size()<span class="comment">;</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">1</span><span class="comment">; i &lt; strs.size(); ++i) &#123;</span></span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j = <span class="number">0</span><span class="comment">; j &lt; rightMax; j++) &#123;</span></span><br><span class="line">                <span class="keyword">if</span>(strs[i][j] != strs[<span class="number">0</span>][j]) &#123;</span><br><span class="line">                    rightMax = j<span class="comment">;</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> strs[<span class="number">0</span>].substr(<span class="number">0</span>, rightMax)<span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
   
-<section class="post" itemscope itemprop="blogitem">
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
+</div>
+
+
+  <div class="article-tags">
   
-    <a href="/2016/03/11/RPM打包规范/" title="RPM打包规范" itemprop="url">
-  
-    <h1 itemprop="name">RPM打包规范</h1>
-    
-     
-           <p itemprop="description" >RPM打包规范：如果rpm的版本&amp;lt;=4.4.x，那么rpmbuid工具其默认的工作路径是/usr/src/redhat，这就使得普通用户不能制作rpm包，因为权限的问题，在制作rpm软件包时必须切换到root身份才可以。所以，rpm从4.5.x版本开始，将rpmbuid的默</p>
-        
-    
-    <time datetime="2016-03-11T14:13:38.000Z" itemprop="datePublished">2016-03-11</time>
-  </a>
-</section>
-
-
-
-
-
-
-  
-<section class="post" itemscope itemprop="blogitem">
-  
-    <a href="/2016/03/11/Maven：mirror和repository区别/" title="Maven：mirror和repository区别" itemprop="url">
-  
-    <h1 itemprop="name">Maven：mirror和repository区别</h1>
-    
-     
-           <p itemprop="description" >一、repository用法使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。
-maven中的repo有两种类型：
-
-remote repository：相当于公共的仓库，大家都能访问到，一</p>
-        
-    
-    <time datetime="2016-03-11T14:13:38.000Z" itemprop="datePublished">2016-03-11</time>
-  </a>
-</section>
-
-
-
-
-
-
-  
-<section class="post" itemscope itemprop="blogitem">
-  
-    <a href="/2016/03/06/Hadoop实现KMeans聚类/" title="Hadoop实现KMeans聚类" itemprop="url">
-  
-    <h1 itemprop="name">Hadoop实现KMeans聚类</h1>
-    
-     
-           <p itemprop="description" >翻到以前的一次课程作业，今天有时间重新整理了一下。
-一、中文文本聚类的一般过程文本聚类一般包括以下几个过程：
-
-模式表示：包括特征抽取及选择，把数据对象表示成适合于算法的可计算形式;
-定义模式之间的距离测量公式;
-聚类算法实现;
-评价输出结果;      
-
-具体过程如下图所示：</p>
-        
-    
-    <time datetime="2016-03-06T13:21:34.000Z" itemprop="datePublished">2016-03-06</time>
-  </a>
-</section>
-
-
-
-
-
-
-  
-<section class="post" itemscope itemprop="blogitem">
-  
-    <a href="/2016/02/27/2016-02-27-shi-shi-ri-zhi-shou-ji-cha-xun-fen-xi-xi-tong-flume-plus-elasticsearch-plus-kibana/" title="实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)" itemprop="url">
-  
-    <h1 itemprop="name">实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)</h1>
-    
-     
-           <p itemprop="description" >“世界上有2种人，一种懂二进制，一种不懂二进制” ——匿名
-
-实时日志收集，查询，分析系统设计方案：Flume（日志收集） +　ElasticSearch（日志查询）+ Kibana（日志分析与展示）
-实验使用场景：通过ambari部署集群后，可以添加自己的日志系统，记录每个组件</p>
-        
-    
-    <time datetime="2016-02-27T09:22:17.000Z" itemprop="datePublished">2016-02-27</time>
-  </a>
-</section>
-
-
-
-
-
-
-  
-<section class="post" itemscope itemprop="blogitem">
-  
-    <a href="/2015/11/05/2015-11-05-puppetan-zhuang-yu-ji-ben-shi-yong/" title="puppet安装与基本使用" itemprop="url">
-  
-    <h1 itemprop="name">puppet安装与基本使用</h1>
-    
-     
-           <p itemprop="description" >“Talk is cheap. Show me the code” —— Linux
-
-一、puppet基本介绍puppet是一个开源的软件自动化配置和部署工具。它是典型C／S架构，由puppet master和若干puppet client组成。
-二、安装过程1. 设置host</p>
-        
-    
-    <time datetime="2015-11-05T08:01:14.000Z" itemprop="datePublished">2015-11-05</time>
-  </a>
-</section>
-
-
-
-
-
-
-  
-<section class="post" itemscope itemprop="blogitem">
-  
-    <a href="/2015/11/03/2015-11-03-ambarijian-jie/" title="Ambari简介" itemprop="url">
-  
-    <h1 itemprop="name">Ambari简介</h1>
-    
-     
-           <p itemprop="description" >“计算机没什么用。他们只会告诉你答案。” —— 巴勃罗·毕加索，画家
-
-一、Apache AmbariApache Ambari项目通过提供配置部署、管理、监控功能，目的在使Hadoop的管理更简单。它提供了一个直观的,易于使用的web UI和其背后的一套RESTful api。</p>
-        
-    
-    <time datetime="2015-11-03T11:03:57.000Z" itemprop="datePublished">2015-11-03</time>
-  </a>
-</section>
-
-
-
-
-
-
-  
-<section class="post" itemscope itemprop="blogitem">
-  
-    <a href="/2015/10/26/2015-10-26-bug-no-such-file-or-directory-jekyll/" title="BUG:No Such File or Directory - Jekyll" itemprop="url">
-  
-    <h1 itemprop="name">BUG:No Such File or Directory - Jekyll</h1>
-    
-     
-           <p itemprop="description" >“版本管理是一个艰巨的任务” —— 无名
-
-当Octopress遇上OSX EI Captain前一阶段升级了最新的OSX系统，谁知写完日志好端端的rake generate失效了，下意识的rake preview，报错：
-1Errno::ENOENT: No Such File</p>
-        
-    
-    <time datetime="2015-10-26T13:34:17.000Z" itemprop="datePublished">2015-10-26</time>
-  </a>
-</section>
-
-
-
-
-
-
-  
-<section class="post" itemscope itemprop="blogitem">
-  
-    <a href="/2015/10/09/2015-10-09-pgxlde-jdbcfang-wen/" title="PGXL的JDBC访问" itemprop="url">
-  
-    <h1 itemprop="name">PGXL的JDBC访问</h1>
-    
-     
-           <p itemprop="description" >“任何傻瓜都能写出计算机可以理解的代码。好的程序员能写出人能读懂的代码” —— Martin Fowler
-
-PGXL集群的配置见前面的博文《Postgres-XL集群的搭建》。
-JDBC连接PGXL集群PGXL底层为PostgreSQL，这意味着它支持所有支持PostgresS</p>
-        
-    
-    <time datetime="2015-10-09T13:34:17.000Z" itemprop="datePublished">2015-10-09</time>
-  </a>
-</section>
-
-
-
-
-
-
-  
-<section class="post" itemscope itemprop="blogitem">
-  
-    <a href="/2015/10/09/2015-10-09-postgresqlde-jdbcfang-wen/" title="PostgreSQL的JDBC访问" itemprop="url">
-  
-    <h1 itemprop="name">PostgreSQL的JDBC访问</h1>
-    
-     
-           <p itemprop="description" >“过去的代码都是未经测试的代码” —— 无名
-
-JDBC的版本选择官网有给出具体的jdk与postgresql driver的版本对应关系：https://jdbc.postgresql.org/download.html
-这里使用jdk1.7，对应：JDBC41 Postgre</p>
-        
-    
-    <time datetime="2015-10-09T12:45:33.000Z" itemprop="datePublished">2015-10-09</time>
-  </a>
-</section>
-
-
-
-
-
-
-
-  <nav id="page-nav" class="clearfix unexpand">
-    <a class="extend prev" rel="prev" href="/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/">Next<span></span></a>
-  </nav>
+  <span></span> <a href="/tags/leetcode/">leetcode</a>
+  </div>
 
 </div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://qiaowei.xyz/2015/03/14/LeetCode-Longest-Common-Prefix/" data-title="LeetCode Longest Common Prefix | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/08/31/2015-08-31-ban-jia-la/" title="搬家啦">
+  <strong>上一篇：</strong><br/>
+  <span>
+  搬家啦</span>
+</a>
+</div>
+
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2015/03/14/LeetCode-Longest-Common-Prefix/" data-title="LeetCode Longest Common Prefix" data-url="http://qiaowei.xyz/2015/03/14/LeetCode-Longest-Common-Prefix/"></div>
+</section>
+
+
+</div>  
       <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#code"><span class="toc-number">2.</span> <span class="toc-text">code</span></a></li></ol>
+ 
+  </div>
 
 <div id="asidepart">
 <div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
@@ -525,6 +373,11 @@ $(document).ready(function(){
     o.css("top",Math.max(80,260-$(this).scrollTop()));
   });
   
+        getSize();
+        if (myWidth >= 1024) {
+          c.click();
+        }
+  
   $(window).resize(function(){
     getSize(); 
     if (myWidth >= 1024) {
@@ -533,14 +386,103 @@ $(document).ready(function(){
       m.removeClass('moveMain');
       a.css('display', 'block').removeClass('fadeOut');
       o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
         
     }
   });
 });
 </script>
 
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
 
 
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"urey"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
 
 
 
@@ -630,4 +572,4 @@ $(document).ready(function(){
 <!-- Tiny_search End -->
 
   </body>
- </html>
+</html>

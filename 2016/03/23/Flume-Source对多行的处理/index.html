@@ -17,7 +17,7 @@
 <meta property="og:url" content="http://qiaowei.xyz/2016/03/23/Flume-Source对多行的处理/index.html">
 <meta property="og:site_name" content="Urey on the way">
 <meta property="og:description" content="ExecSource会readLine()读取日志中的每一行，把其作为每一个flume event的body放进去，这对于大部分这种每行就可以结束的日志记录，是完全可以的：122016-03-18 17:53:48,374 INFO namenode.FSNamesystem (FSNamesystem.java:listCorruptFileBlocks(7217)) - there are n">
-<meta property="og:updated_time" content="2016-03-22T14:42:35.000Z">
+<meta property="og:updated_time" content="2016-03-29T13:13:32.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Flume Source对多行的处理">
 <meta name="twitter:description" content="ExecSource会readLine()读取日志中的每一行，把其作为每一个flume event的body放进去，这对于大部分这种每行就可以结束的日志记录，是完全可以的：122016-03-18 17:53:48,374 INFO namenode.FSNamesystem (FSNamesystem.java:listCorruptFileBlocks(7217)) - there are n">
@@ -106,7 +106,8 @@
 <p>对于上面举的例子来说（即符合标准log4j的日志），如果每一行开头满足下面这条正则表达式：<br><figure class="highlight cos"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\<span class="keyword">s</span>?\<span class="keyword">d</span>\<span class="keyword">d</span>\<span class="keyword">d</span>\<span class="keyword">d</span>-\<span class="keyword">d</span>\<span class="keyword">d</span>-\<span class="keyword">d</span>\<span class="keyword">d</span>\<span class="keyword">s</span>\<span class="keyword">d</span>\<span class="keyword">d</span>:\<span class="keyword">d</span>\<span class="keyword">d</span>:\<span class="keyword">d</span>\<span class="keyword">d</span>,\<span class="keyword">d</span>\<span class="keyword">d</span>\<span class="keyword">d</span></span><br></pre></td></tr></table></figure></p>
 <p>就当作一条新的日志，如果不满足，就说明该行内容是上一条日志（已规定格式开头的那条）的一部分。</p>
 <p>当然，我增加了可以自定义配置以哪种方式开头视为一条日志的regex配置，可以对不通的source进行不通的配置，已满足要求。</p>
-<p>有了这样的约束，就可以写出将某些多行看作一个flume event的ExecSource，我把它开源到了github上，如有兴趣，欢迎前去试用，如有任何建议，欢迎提出与指正：MultiLineExecSource<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">github.com<span class="regexp">/qwurey/</span>flume-<span class="keyword">source</span>-multiline</span><br></pre></td></tr></table></figure></p>
+<p>有了这样的约束，就可以写出将某些多行看作一个flume event的ExecSource，我把它开源到了github上，如有兴趣，欢迎前去试用，如有任何建议，欢迎提出与指正：MultiLineExecSource</p>
+<p>地址是： <a href="https://github.com/qwurey/flume-source-multiline" target="_blank" rel="external">https://github.com/qwurey/flume-source-multiline</a></p>
 <p>该版本基于<code>flume-ng-core 1.6.0</code></p>
   
 	</div>

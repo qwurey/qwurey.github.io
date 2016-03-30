@@ -18,7 +18,7 @@
 <meta property="og:site_name" content="Urey on the way">
 <meta property="og:description" content="开发Client、Source、Sink的方法">
 <meta property="og:image" content="http://qiaowei.xyz/images/flume_transaction.png">
-<meta property="og:updated_time" content="2016-03-30T13:45:54.000Z">
+<meta property="og:updated_time" content="2016-03-30T13:48:34.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Flume开发特定组件">
 <meta name="twitter:description" content="开发Client、Source、Sink的方法">
@@ -101,13 +101,14 @@
 		
 		</div>
 		
-		<p>开发Client、Source、Sink的方法<br><a id="more"></a></p>
-<h4 id="开发定制的组件方法小结"><a href="#开发定制的组件方法小结" class="headerlink" title="开发定制的组件方法小结"></a>开发定制的组件方法小结</h4><ol>
+		<p>开发Client、Source、Sink的方法<br><a id="more"></a><br><br></p>
+<h4 id="开发定制的组件方法小结"><a href="#开发定制的组件方法小结" class="headerlink" title="开发定制的组件方法小结"></a><strong>开发定制的组件方法小结</strong></h4><ol>
 <li>开发自己的Client，使用Flume提供的Client SDK，使得上层应用可以通过该client往已经存在的Flume Source中发数据，比如通过Avro Source或者Thrift Source；</li>
 <li>开发自己的Source，与上层应用通过某种IPC或者RPC Protocol通信；</li>
 <li>开发自己的Sink，将event存到下一个flume agent或者外部存储系统中；</li>
 </ol>
-<h4 id="根据Flume-Client-SDK开发特定的Client"><a href="#根据Flume-Client-SDK开发特定的Client" class="headerlink" title="根据Flume Client SDK开发特定的Client"></a>根据Flume Client SDK开发特定的Client</h4><p>如果flume提供的source不能满足应用需求，比如使用了Avro Source，但是上层的应用并没有实现Avro RPC Protocol，那么就需要我们根据Flume提供的Client SDK，开发一个RPC client，在这里，确切的说，就是开发一个Avro RPC client。</p>
+<p><br></p>
+<h4 id="根据Flume-Client-SDK开发特定的Client"><a href="#根据Flume-Client-SDK开发特定的Client" class="headerlink" title="根据Flume Client SDK开发特定的Client"></a><strong>根据Flume Client SDK开发特定的Client</strong></h4><p>如果flume提供的source不能满足应用需求，比如使用了Avro Source，但是上层的应用并没有实现Avro RPC Protocol，那么就需要我们根据Flume提供的Client SDK，开发一个RPC client，在这里，确切的说，就是开发一个Avro RPC client。</p>
 <p>Flume Client SDK有以下几类：</p>
 <ol>
 <li>RPC Client：支持Avro RPC Protocol和Thrift RPC Protocol；</li>
@@ -115,9 +116,10 @@
 <li>Failover Client：包装了Avro RPC Client，提供容错特性（目前并不支持Thrift）；</li>
 <li>LoadBalancing RPC client：提供了负载均衡的特性（目前并不支持Thrift）；</li>
 </ol>
-<h4 id="开发自己的Source"><a href="#开发自己的Source" class="headerlink" title="开发自己的Source"></a>开发自己的Source</h4><p>开发自己的Source、Sink都需要涉及到flume transaction的背景知识。Channel作为Source和Sink的中间的连接器，是实现transaction的核心部件。</p>
+<p><br></p>
+<h4 id="开发自己的Source"><a href="#开发自己的Source" class="headerlink" title="开发自己的Source"></a><strong>开发自己的Source</strong></h4><p>开发自己的Source、Sink都需要涉及到flume transaction的背景知识。Channel作为Source和Sink的中间的连接器，是实现transaction的核心部件。</p>
 <p>Source通过ChannelProcessor来与具体的Channel实现transaction：Source会put event to Channel中；<br>Sink则显式地通过Channel来实现transaction：Sink会take event from Channel里；</p>
-<p>官方经典的图示：</p>
+<p><br><br>官方经典的图示：</p>
 <p><img src="/images/flume_transaction.png" style="display:block;margin:auto"></p>
 <p><br><br><br><br>Reference:</p>
 <p><a href="https://flume.apache.org/FlumeDeveloperGuide.html" target="_blank" rel="external">https://flume.apache.org/FlumeDeveloperGuide.html</a></p>

@@ -4,41 +4,25 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>LeetCode Median of Two Sorted Arrays | Urey on the way</title>
+    <title>Flume开发特定组件 | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="tips
-median, 找中位数
-奇数数组中位数，a[n/2 + 1]
-偶数数组中位数，(a[n/2]+a[n/2+1])/2.0
-化简为两个有序数组找第k大元素问题，普通解法O(m+n)，用递归可以达到O(log(m+n))
-
-1234567891011121314151617181920212223242526272829class Solution &amp;#123;public:    dou">
+    <meta name="description" content="开发Client、Source、Sink的方法">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LeetCode Median of Two Sorted Arrays">
-<meta property="og:url" content="http://qiaowei.xyz/2016/03/12/LeetCode-Median-of-Two-Sorted-Arrays/index.html">
+<meta property="og:title" content="Flume开发特定组件">
+<meta property="og:url" content="http://qiaowei.xyz/2016/03/30/Flume开发特定组件/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="tips
-median, 找中位数
-奇数数组中位数，a[n/2 + 1]
-偶数数组中位数，(a[n/2]+a[n/2+1])/2.0
-化简为两个有序数组找第k大元素问题，普通解法O(m+n)，用递归可以达到O(log(m+n))
-
-1234567891011121314151617181920212223242526272829class Solution &amp;#123;public:    dou">
-<meta property="og:updated_time" content="2016-03-12T09:45:58.000Z">
+<meta property="og:description" content="开发Client、Source、Sink的方法">
+<meta property="og:image" content="http://qiaowei.xyz/images/flume_transaction.png">
+<meta property="og:updated_time" content="2016-03-30T13:45:54.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LeetCode Median of Two Sorted Arrays">
-<meta name="twitter:description" content="tips
-median, 找中位数
-奇数数组中位数，a[n/2 + 1]
-偶数数组中位数，(a[n/2]+a[n/2+1])/2.0
-化简为两个有序数组找第k大元素问题，普通解法O(m+n)，用递归可以达到O(log(m+n))
-
-1234567891011121314151617181920212223242526272829class Solution &amp;#123;public:    dou">
+<meta name="twitter:title" content="Flume开发特定组件">
+<meta name="twitter:description" content="开发Client、Source、Sink的方法">
+<meta name="twitter:image" content="http://qiaowei.xyz/images/flume_transaction.png">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -97,14 +81,14 @@ median, 找中位数
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/03/12/LeetCode-Median-of-Two-Sorted-Arrays/" title="LeetCode Median of Two Sorted Arrays" itemprop="url">LeetCode Median of Two Sorted Arrays</a>
+      <a href="/2016/03/30/Flume开发特定组件/" title="Flume开发特定组件" itemprop="url">Flume开发特定组件</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2016-03-12T09:40:44.000Z" itemprop="datePublished"> 发表于 2016-03-12</time>
+    <time datetime="2016-03-30T13:37:50.000Z" itemprop="datePublished"> 发表于 2016-03-30</time>
     
   </p>
 </header>
@@ -113,17 +97,30 @@ median, 找中位数
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#开发定制的组件方法小结"><span class="toc-number">1.</span> <span class="toc-text">开发定制的组件方法小结</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#根据Flume-Client-SDK开发特定的Client"><span class="toc-number">2.</span> <span class="toc-text">根据Flume Client SDK开发特定的Client</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#开发自己的Source"><span class="toc-number">3.</span> <span class="toc-text">开发自己的Source</span></a></li></ol>
 		
 		</div>
 		
-		<h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a><strong>tips</strong></h4><ol>
-<li>median, 找中位数</li>
-<li>奇数数组中位数，a[n/2 + 1]</li>
-<li>偶数数组中位数，(a[n/2]+a[n/2+1])/2.0</li>
-<li>化简为两个有序数组找第k大元素问题，普通解法O(m+n)，用递归可以达到O(log(m+n))</li>
+		<p>开发Client、Source、Sink的方法<br><a id="more"></a></p>
+<h4 id="开发定制的组件方法小结"><a href="#开发定制的组件方法小结" class="headerlink" title="开发定制的组件方法小结"></a>开发定制的组件方法小结</h4><ol>
+<li>开发自己的Client，使用Flume提供的Client SDK，使得上层应用可以通过该client往已经存在的Flume Source中发数据，比如通过Avro Source或者Thrift Source；</li>
+<li>开发自己的Source，与上层应用通过某种IPC或者RPC Protocol通信；</li>
+<li>开发自己的Sink，将event存到下一个flume agent或者外部存储系统中；</li>
 </ol>
-<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    <span class="keyword">double</span> findMedianSortedArrays(vector&lt;<span class="keyword">int</span>&gt;&amp; nums1, vector&lt;<span class="keyword">int</span>&gt;&amp; nums2) &#123;</span><br><span class="line">        <span class="keyword">int</span> total = nums1.size() + nums2.size()<span class="comment">;</span></span><br><span class="line">        <span class="keyword">if</span>(total &amp; <span class="number">1</span>) &#123;<span class="comment">//odd</span></span><br><span class="line">            <span class="keyword">return</span> findKth(nums1, nums2, <span class="number">0</span>, <span class="number">0</span>, total / <span class="number">2</span> + <span class="number">1</span>)<span class="comment">;</span></span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;<span class="comment">//not odd</span></span><br><span class="line">            <span class="keyword">return</span> (findKth(nums1, nums2, <span class="number">0</span>, <span class="number">0</span>, total / <span class="number">2</span>) + findKth(nums1, nums2, <span class="number">0</span>, <span class="number">0</span>, total / <span class="number">2</span> + <span class="number">1</span>)) / <span class="number">2.0</span><span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">double</span> findKth(vector&lt;<span class="keyword">int</span>&gt;&amp; nums1, vector&lt;<span class="keyword">int</span>&gt;&amp; nums2, <span class="keyword">int</span> nums1_start, <span class="keyword">int</span> nums2_start, <span class="keyword">int</span> k) &#123;</span><br><span class="line">        <span class="keyword">if</span>(nums1_start &gt;= nums1.size()) &#123;</span><br><span class="line">            <span class="keyword">return</span> nums2[nums2_start + k - <span class="number">1</span>]<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(nums2_start &gt;= nums2.size()) &#123;</span><br><span class="line">            <span class="keyword">return</span> nums1[nums1_start + k - <span class="number">1</span>]<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(k == <span class="number">1</span>) <span class="keyword">return</span> min(nums1[nums1_start], nums2[nums2_start])<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> nums1_key = nums1_start + k / <span class="number">2</span>  - <span class="number">1</span>&gt;= nums1.size() ? INT_MAX : nums1[nums1_start + k / <span class="number">2</span> - <span class="number">1</span>]<span class="comment">;</span></span><br><span class="line">        <span class="keyword">int</span> nums2_key = nums2_start + k / <span class="number">2</span>  - <span class="number">1</span>&gt;= nums2.size() ? INT_MAX : nums2[nums2_start + k / <span class="number">2</span> - <span class="number">1</span>]<span class="comment">;</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span>(nums1_key &lt; nums2_key) &#123;</span><br><span class="line">            <span class="keyword">return</span> findKth(nums1, nums2, nums1_start + k / <span class="number">2</span>, nums2_start, k - k / <span class="number">2</span>)<span class="comment">;</span></span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> findKth(nums1, nums2, nums1_start, nums2_start + k / <span class="number">2</span>, k - k / <span class="number">2</span>)<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<h4 id="根据Flume-Client-SDK开发特定的Client"><a href="#根据Flume-Client-SDK开发特定的Client" class="headerlink" title="根据Flume Client SDK开发特定的Client"></a>根据Flume Client SDK开发特定的Client</h4><p>如果flume提供的source不能满足应用需求，比如使用了Avro Source，但是上层的应用并没有实现Avro RPC Protocol，那么就需要我们根据Flume提供的Client SDK，开发一个RPC client，在这里，确切的说，就是开发一个Avro RPC client。</p>
+<p>Flume Client SDK有以下几类：</p>
+<ol>
+<li>RPC Client：支持Avro RPC Protocol和Thrift RPC Protocol；</li>
+<li>Secure RPC client：目前仅支持Thrift（As of Flume 1.6.0, Thrift source and sink supports kerberos based authentication）；</li>
+<li>Failover Client：包装了Avro RPC Client，提供容错特性（目前并不支持Thrift）；</li>
+<li>LoadBalancing RPC client：提供了负载均衡的特性（目前并不支持Thrift）；</li>
+</ol>
+<h4 id="开发自己的Source"><a href="#开发自己的Source" class="headerlink" title="开发自己的Source"></a>开发自己的Source</h4><p>开发自己的Source、Sink都需要涉及到flume transaction的背景知识。Channel作为Source和Sink的中间的连接器，是实现transaction的核心部件。</p>
+<p>Source通过ChannelProcessor来与具体的Channel实现transaction：Source会put event to Channel中；<br>Sink则显式地通过Channel来实现transaction：Sink会take event from Channel里；</p>
+<p>官方经典的图示：</p>
+<p><img src="/images/flume_transaction.png" style="display:block;margin:auto"></p>
+<p><br><br><br><br>Reference:</p>
+<p><a href="https://flume.apache.org/FlumeDeveloperGuide.html" target="_blank" rel="external">https://flume.apache.org/FlumeDeveloperGuide.html</a></p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -131,13 +128,13 @@ median, 找中位数
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
+  <a class="article-category-link" href="/categories/flume/">flume</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
+  <span></span> <a href="/tags/flume/">flume</a>
   </div>
 
 </div>
@@ -146,7 +143,7 @@ median, 找中位数
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2016/03/12/LeetCode-Median-of-Two-Sorted-Arrays/" data-title="LeetCode Median of Two Sorted Arrays | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2016/03/30/Flume开发特定组件/" data-title="Flume开发特定组件 | Urey on the way" data-tsina="1758475283" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -159,19 +156,11 @@ median, 找中位数
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2016/03/12/LeetCode-Longest-Palindromic-Substring/" title="LeetCode Longest Palindromic Substring">
-  <strong>上一篇：</strong><br/>
-  <span>
-  LeetCode Longest Palindromic Substring</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2016/03/12/LeetCode-Longest-Substring-Without-Repeating-Characters/"  title="LeetCode Longest Substring Without Repeating Characters">
+<a href="/2016/03/26/Ambari删除服务的方法小结/"  title="Ambari删除服务的方法小结">
  <strong>下一篇：</strong><br/> 
- <span>LeetCode Longest Substring Without Repeating Characters
+ <span>Ambari删除服务的方法小结
 </span>
 </a>
 </div>
@@ -180,7 +169,7 @@ median, 找中位数
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2016/03/12/LeetCode-Median-of-Two-Sorted-Arrays/" data-title="LeetCode Median of Two Sorted Arrays" data-url="http://qiaowei.xyz/2016/03/12/LeetCode-Median-of-Two-Sorted-Arrays/"></div>
+	<div class="ds-thread" data-thread-key="2016/03/30/Flume开发特定组件/" data-title="Flume开发特定组件" data-url="http://qiaowei.xyz/2016/03/30/Flume开发特定组件/"></div>
 </section>
 
 
@@ -190,7 +179,7 @@ median, 找中位数
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#开发定制的组件方法小结"><span class="toc-number">1.</span> <span class="toc-text">开发定制的组件方法小结</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#根据Flume-Client-SDK开发特定的Client"><span class="toc-number">2.</span> <span class="toc-text">根据Flume Client SDK开发特定的Client</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#开发自己的Source"><span class="toc-number">3.</span> <span class="toc-text">开发自己的Source</span></a></li></ol>
  
   </div>
 

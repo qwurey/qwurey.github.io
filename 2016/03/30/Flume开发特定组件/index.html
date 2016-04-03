@@ -18,7 +18,7 @@
 <meta property="og:site_name" content="Urey on the way">
 <meta property="og:description" content="开发Client、Source、Sink的方法">
 <meta property="og:image" content="http://qiaowei.xyz/images/flume_transaction.png">
-<meta property="og:updated_time" content="2016-04-03T03:00:56.000Z">
+<meta property="og:updated_time" content="2016-04-03T03:02:36.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Flume开发特定组件">
 <meta name="twitter:description" content="开发Client、Source、Sink的方法">
@@ -121,8 +121,8 @@
 <p>Source通过ChannelProcessor来与具体的Channel实现transaction：Source会put event to Channel中；</p>
 <p><br></p>
 <h4 id="开发自己的Sink"><a href="#开发自己的Sink" class="headerlink" title="开发自己的Sink"></a><strong>开发自己的Sink</strong></h4><p>Sink显式的通过Channel来实现transaction：Sink会take event from Channel里；</p>
-<p>source、channel、sink之间有关transaction的操作流程：</p>
-<p><br><br>官方经典的图示：</p>
+<p><br><br>source、channel、sink之间有关transaction的操作流程：</p>
+<p>官方经典的图示：</p>
 <p><img src="/images/flume_transaction.png" style="display:block;margin:auto"></p>
 <p><br><br><br><br>Reference:</p>
 <p><a href="https://flume.apache.org/FlumeDeveloperGuide.html" target="_blank" rel="external">https://flume.apache.org/FlumeDeveloperGuide.html</a></p>

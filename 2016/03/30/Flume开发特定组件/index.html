@@ -18,7 +18,7 @@
 <meta property="og:site_name" content="Urey on the way">
 <meta property="og:description" content="开发Client、Source、Sink的方法">
 <meta property="og:image" content="http://qiaowei.xyz/images/flume_transaction.png">
-<meta property="og:updated_time" content="2016-03-30T13:48:34.000Z">
+<meta property="og:updated_time" content="2016-04-03T03:00:56.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Flume开发特定组件">
 <meta name="twitter:description" content="开发Client、Source、Sink的方法">
@@ -97,7 +97,7 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#开发定制的组件方法小结"><span class="toc-number">1.</span> <span class="toc-text">开发定制的组件方法小结</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#根据Flume-Client-SDK开发特定的Client"><span class="toc-number">2.</span> <span class="toc-text">根据Flume Client SDK开发特定的Client</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#开发自己的Source"><span class="toc-number">3.</span> <span class="toc-text">开发自己的Source</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#开发定制的组件方法小结"><span class="toc-number">1.</span> <span class="toc-text">开发定制的组件方法小结</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#根据Flume-Client-SDK开发特定的Client"><span class="toc-number">2.</span> <span class="toc-text">根据Flume Client SDK开发特定的Client</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#开发自己的Source"><span class="toc-number">3.</span> <span class="toc-text">开发自己的Source</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#开发自己的Sink"><span class="toc-number">4.</span> <span class="toc-text">开发自己的Sink</span></a></li></ol>
 		
 		</div>
 		
@@ -118,7 +118,10 @@
 </ol>
 <p><br></p>
 <h4 id="开发自己的Source"><a href="#开发自己的Source" class="headerlink" title="开发自己的Source"></a><strong>开发自己的Source</strong></h4><p>开发自己的Source、Sink都需要涉及到flume transaction的背景知识。Channel作为Source和Sink的中间的连接器，是实现transaction的核心部件。</p>
-<p>Source通过ChannelProcessor来与具体的Channel实现transaction：Source会put event to Channel中；<br>Sink则显式地通过Channel来实现transaction：Sink会take event from Channel里；</p>
+<p>Source通过ChannelProcessor来与具体的Channel实现transaction：Source会put event to Channel中；</p>
+<p><br></p>
+<h4 id="开发自己的Sink"><a href="#开发自己的Sink" class="headerlink" title="开发自己的Sink"></a><strong>开发自己的Sink</strong></h4><p>Sink显式的通过Channel来实现transaction：Sink会take event from Channel里；</p>
+<p>source、channel、sink之间有关transaction的操作流程：</p>
 <p><br><br>官方经典的图示：</p>
 <p><img src="/images/flume_transaction.png" style="display:block;margin:auto"></p>
 <p><br><br><br><br>Reference:</p>
@@ -181,7 +184,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#开发定制的组件方法小结"><span class="toc-number">1.</span> <span class="toc-text">开发定制的组件方法小结</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#根据Flume-Client-SDK开发特定的Client"><span class="toc-number">2.</span> <span class="toc-text">根据Flume Client SDK开发特定的Client</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#开发自己的Source"><span class="toc-number">3.</span> <span class="toc-text">开发自己的Source</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#开发定制的组件方法小结"><span class="toc-number">1.</span> <span class="toc-text">开发定制的组件方法小结</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#根据Flume-Client-SDK开发特定的Client"><span class="toc-number">2.</span> <span class="toc-text">根据Flume Client SDK开发特定的Client</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#开发自己的Source"><span class="toc-number">3.</span> <span class="toc-text">开发自己的Source</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#开发自己的Sink"><span class="toc-number">4.</span> <span class="toc-text">开发自己的Sink</span></a></li></ol>
  
   </div>
 

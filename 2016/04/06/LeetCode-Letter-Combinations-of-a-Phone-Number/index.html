@@ -4,41 +4,23 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Postgres-XL介绍 | Urey on the way</title>
+    <title>LeetCode Letter Combinations of a Phone Number | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="“沉默即赞同” —— 无名
-
-什么是Postgres-XLXL的意思是：eXtensible Lattice，可以扩展的格子，即将PostgreSQL应用在多机器上的分布式数据库的形象化表达。
-Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩展的、多租户安全的、基于PostgreSQL的数据库解决方案。
-Postgres-XL 可非常灵活的应付各种负载，比如：
-
-OLA">
+    <meta name="description" content="DFS">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Postgres-XL介绍">
-<meta property="og:url" content="http://qiaowei.xyz/2015/10/08/2015-10-08-postgres-xl-de-jie-shao/index.html">
+<meta property="og:title" content="LeetCode Letter Combinations of a Phone Number">
+<meta property="og:url" content="http://qiaowei.xyz/2016/04/06/LeetCode-Letter-Combinations-of-a-Phone-Number/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="“沉默即赞同” —— 无名
-
-什么是Postgres-XLXL的意思是：eXtensible Lattice，可以扩展的格子，即将PostgreSQL应用在多机器上的分布式数据库的形象化表达。
-Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩展的、多租户安全的、基于PostgreSQL的数据库解决方案。
-Postgres-XL 可非常灵活的应付各种负载，比如：
-
-OLA">
-<meta property="og:updated_time" content="2016-03-05T03:50:27.000Z">
+<meta property="og:description" content="DFS">
+<meta property="og:updated_time" content="2016-04-06T14:51:39.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Postgres-XL介绍">
-<meta name="twitter:description" content="“沉默即赞同” —— 无名
-
-什么是Postgres-XLXL的意思是：eXtensible Lattice，可以扩展的格子，即将PostgreSQL应用在多机器上的分布式数据库的形象化表达。
-Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩展的、多租户安全的、基于PostgreSQL的数据库解决方案。
-Postgres-XL 可非常灵活的应付各种负载，比如：
-
-OLA">
+<meta name="twitter:title" content="LeetCode Letter Combinations of a Phone Number">
+<meta name="twitter:description" content="DFS">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -97,14 +79,14 @@ OLA">
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/10/08/2015-10-08-postgres-xl-de-jie-shao/" title="Postgres-XL介绍" itemprop="url">Postgres-XL介绍</a>
+      <a href="/2016/04/06/LeetCode-Letter-Combinations-of-a-Phone-Number/" title="LeetCode Letter Combinations of a Phone Number" itemprop="url">LeetCode Letter Combinations of a Phone Number</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2015-10-08T11:32:26.000Z" itemprop="datePublished"> 发表于 2015-10-08</time>
+    <time datetime="2016-04-06T00:28:20.000Z" itemprop="datePublished"> 发表于 2016-04-06</time>
     
   </p>
 </header>
@@ -113,50 +95,12 @@ OLA">
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#什么是Postgres-XL"><span class="toc-number">1.</span> <span class="toc-text">什么是Postgres-XL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PostgreSQL与Postgres-XL"><span class="toc-number">2.</span> <span class="toc-text">PostgreSQL与Postgres-XL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Postgres-XC与Postgres-XL"><span class="toc-number">3.</span> <span class="toc-text">Postgres-XC与Postgres-XL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PGXL架构基本知识"><span class="toc-number">4.</span> <span class="toc-text">PGXL架构基本知识</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#如何实现High-Availability"><span class="toc-number">5.</span> <span class="toc-text">如何实现High Availability</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PGXL的license"><span class="toc-number">6.</span> <span class="toc-text">PGXL的license</span></a></li></ol>
+			
 		
 		</div>
 		
-		<blockquote>
-<p>“沉默即赞同” —— 无名</p>
-</blockquote>
-<h4 id="什么是Postgres-XL"><a href="#什么是Postgres-XL" class="headerlink" title="什么是Postgres-XL"></a><strong>什么是Postgres-XL</strong></h4><p>XL的意思是：eXtensible Lattice，可以扩展的格子，即将PostgreSQL应用在多机器上的分布式数据库的形象化表达。</p>
-<p>Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩展的、多租户安全的、基于PostgreSQL的数据库解决方案。</p>
-<p>Postgres-XL 可非常灵活的应付各种负载，比如：</p>
-<ul>
-<li>OLAP（通过MPP并行化）</li>
-<li>OLTP</li>
-<li>OLAP &amp; OLTP</li>
-<li>操作数据存储</li>
-<li>Key-value存储，包括JSON格式</li>
-</ul>
-<p>不同的应用场景：</p>
-<ul>
-<li>支持商业智能应用（数据仓库&amp;数据集市），因为PGXL支持MPP(Massively Parallel Processing)</li>
-<li>Web2.0，数据库扩容的解决方案</li>
-<li>遗留系统的数据库扩容的解决方案</li>
-<li>新应用，可以先使用PostgreSQL，之后随着数据库变大使用PGXL扩容</li>
-</ul>
-<p>PGXL底层为PostgreSQL，这意味着它支持所有支持PostgresSQL类型的驱动，包括： JDBC, ODBC, OLE DB, Python, Ruby, perl DBI, Tcl, and Erlang.</p>
-<h4 id="PostgreSQL与Postgres-XL"><a href="#PostgreSQL与Postgres-XL" class="headerlink" title="PostgreSQL与Postgres-XL"></a><strong>PostgreSQL与Postgres-XL</strong></h4><p>1994年，Postgre95发布，开源。<br>1996年，PostgreSQL继承了Postgre95，发布。<br>2010年，Postgres-XC发布。<br>2012年，前PGXC核心开发者创建StormDB公司，进行了一些改进，包括对MPP并行化的性能改进和多租户安全。<br>2013年，TransLattice收购了StormDB。<br>2014年，将项目开源，命名为Postgres-XL。</p>
-<h4 id="Postgres-XC与Postgres-XL"><a href="#Postgres-XC与Postgres-XL" class="headerlink" title="Postgres-XC与Postgres-XL"></a><strong>Postgres-XC与Postgres-XL</strong></h4><p>PGXL的架构师和开发者    很多都是以前做PGXC的，PGXL的部分代码是从PGXC移植过来的。</p>
-<p>比起功能性，PGXL更强调稳定性, 正确性和性能. </p>
-<p>PGXL增加了一些重要的性能提升，比如MPP和replan avoidance on the data nodes，这些都是PGXC没有的。</p>
-<p>PGXC目前集中在OLTP的业务上面，PGXL则更加灵活，可以应用于很多不同种类的业务上，比如可以用在大数据处理领域，除此，在多租户的环境中，PGXL也更加安全。</p>
-<p>PGXL的社区非常开放。</p>
-<h4 id="PGXL架构基本知识"><a href="#PGXL架构基本知识" class="headerlink" title="PGXL架构基本知识"></a><strong>PGXL架构基本知识</strong></h4><p>PGXL是一系列PostgreSQL数据库的集群，在上层看来就像使用一个数据库一样。根据设计方案的不同，每张表可以是replicated或是distributed的形式。</p>
-<p>PGXL有三个主要组件，分别是GTM，Coordinator和Datanode。</p>
-<ul>
-<li>GTM(Gloable Transaction Manager)负责提供事务的ACID属性；</li>
-<li>Datanode负责存储表的数据和本地执行由Coordinator派发的SQL任务；</li>
-<li>Coordinator负责处理每个来自Application的SQL任务，并且决定由哪个Datanode执行，然后将任务计划派发给相应的Datanode，根据需要收集结果返还给Application；</li>
-</ul>
-<p>GTM通常由一台独立的服务器承担，因为GTM需要处理来自所有Coordinator和Datanode的事务请求。为了将Coordinator和Datanode上进程的请求和响应聚集到一台机器上，可以配置GTM-Proxy。GTM-Proxy会减少GTM的负载，同时会帮助处理GTM失效的情况。即便如此，GTM还是可能会发生单点失效问题，这时可以配置一个GTM-Standby节点作为GTM的备用节点。</p>
-<p>每台机器最好同时配置一个Coordinator和一个Datanode，这样既不用担心二者的负载均衡，而且可以降低网络流量。</p>
-<h4 id="如何实现High-Availability"><a href="#如何实现High-Availability" class="headerlink" title="如何实现High Availability"></a><strong>如何实现High Availability</strong></h4><p>可以对每个节点增加slave，就类似PostgreSQL的streaming replication一样。</p>
-<p>GTM可以有一个GTM Standby。</p>
-<p>针对自动的failover，目前可以使用Corosync/Pacemaker，虽然它们现在还不是核心项目。</p>
-<h4 id="PGXL的license"><a href="#PGXL的license" class="headerlink" title="PGXL的license"></a><strong>PGXL的license</strong></h4><p>PGXL和PostgreSQL使用相同的LICENSE，截止到2015年，使用的还是Mozilla Public License.</p>
+		<p>DFS<br><a id="more"></a></p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    vector&lt;<span class="keyword">string</span>&gt; mapping = &#123;<span class="string">"abc"</span>, <span class="string">"def"</span>, <span class="string">"ghi"</span>, <span class="string">"jkl"</span>, <span class="string">"mno"</span>, <span class="string">"pqrs"</span>, <span class="string">"tuv"</span>, <span class="string">"wxyz"</span>&#125;;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">vector&lt;<span class="keyword">string</span>&gt; <span class="title">letterCombinations</span>(<span class="params"><span class="keyword">string</span> digits</span>) </span>&#123;</span><br><span class="line">        vector&lt;<span class="keyword">string</span>&gt; res;</span><br><span class="line">        <span class="keyword">if</span>(digits.size() == <span class="number">0</span>) <span class="keyword">return</span> res;</span><br><span class="line">        <span class="keyword">int</span> index = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">string</span> <span class="keyword">value</span> = <span class="string">""</span>;</span><br><span class="line">        dfs(index, digits, res, <span class="keyword">value</span>);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">dfs</span>(<span class="params"><span class="keyword">int</span> index, <span class="keyword">string</span> digits, vector&lt;<span class="keyword">string</span>&gt;&amp; res, <span class="keyword">string</span>&amp; <span class="keyword">value</span></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(index == digits.size()) &#123;</span><br><span class="line">            res.push_back(<span class="keyword">value</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; mapping[digits[index] - <span class="string">'2'</span>].size(); ++i) &#123;</span><br><span class="line">            <span class="keyword">value</span>.push_back(mapping[digits[index] - <span class="string">'2'</span>][i]);</span><br><span class="line">            dfs(index + <span class="number">1</span>, digits, res, <span class="keyword">value</span>);</span><br><span class="line">            <span class="keyword">value</span>.pop_back();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -164,13 +108,13 @@ OLA">
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/pgxl/">pgxl</a>
+  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/pgxl/">pgxl</a><a href="/tags/postgres-xl/">postgres-xl</a>
+  <span></span> <a href="/tags/leetcode/">leetcode</a>
   </div>
 
 </div>
@@ -179,7 +123,7 @@ OLA">
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2015/10/08/2015-10-08-postgres-xl-de-jie-shao/" data-title="Postgres-XL介绍 | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2016/04/06/LeetCode-Letter-Combinations-of-a-Phone-Number/" data-title="LeetCode Letter Combinations of a Phone Number | Urey on the way" data-tsina="1758475283" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -192,19 +136,11 @@ OLA">
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/10/09/2015-10-09-postgresqlde-jdbcfang-wen/" title="PostgreSQL的JDBC访问">
-  <strong>上一篇：</strong><br/>
-  <span>
-  PostgreSQL的JDBC访问</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/10/08/2015-10-08-postgres-xlji-qun-de-da-jian/"  title="Postgres-XL集群的搭建">
+<a href="/2016/04/06/LeetCode-3Sum-Closest/"  title="LeetCode 3Sum Closest">
  <strong>下一篇：</strong><br/> 
- <span>Postgres-XL集群的搭建
+ <span>LeetCode 3Sum Closest
 </span>
 </a>
 </div>
@@ -213,7 +149,7 @@ OLA">
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2015/10/08/2015-10-08-postgres-xl-de-jie-shao/" data-title="Postgres-XL介绍" data-url="http://qiaowei.xyz/2015/10/08/2015-10-08-postgres-xl-de-jie-shao/"></div>
+	<div class="ds-thread" data-thread-key="2016/04/06/LeetCode-Letter-Combinations-of-a-Phone-Number/" data-title="LeetCode Letter Combinations of a Phone Number" data-url="http://qiaowei.xyz/2016/04/06/LeetCode-Letter-Combinations-of-a-Phone-Number/"></div>
 </section>
 
 
@@ -223,7 +159,7 @@ OLA">
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#什么是Postgres-XL"><span class="toc-number">1.</span> <span class="toc-text">什么是Postgres-XL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PostgreSQL与Postgres-XL"><span class="toc-number">2.</span> <span class="toc-text">PostgreSQL与Postgres-XL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Postgres-XC与Postgres-XL"><span class="toc-number">3.</span> <span class="toc-text">Postgres-XC与Postgres-XL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PGXL架构基本知识"><span class="toc-number">4.</span> <span class="toc-text">PGXL架构基本知识</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#如何实现High-Availability"><span class="toc-number">5.</span> <span class="toc-text">如何实现High Availability</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PGXL的license"><span class="toc-number">6.</span> <span class="toc-text">PGXL的license</span></a></li></ol>
+ 
  
   </div>
 

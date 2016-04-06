@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>LeetCode 3Sum | Urey on the way</title>
+    <title>LeetCode 3Sum Closest | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
@@ -13,13 +13,13 @@
     
     <meta name="description" content="左右夹逼法（先排序）">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LeetCode 3Sum">
-<meta property="og:url" content="http://qiaowei.xyz/2016/04/05/LeetCode-3Sum/index.html">
+<meta property="og:title" content="LeetCode 3Sum Closest">
+<meta property="og:url" content="http://qiaowei.xyz/2016/04/06/LeetCode-3Sum-Closest/index.html">
 <meta property="og:site_name" content="Urey on the way">
 <meta property="og:description" content="左右夹逼法（先排序）">
-<meta property="og:updated_time" content="2016-04-05T00:38:56.000Z">
+<meta property="og:updated_time" content="2016-04-06T00:24:36.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LeetCode 3Sum">
+<meta name="twitter:title" content="LeetCode 3Sum Closest">
 <meta name="twitter:description" content="左右夹逼法（先排序）">
 
     
@@ -79,14 +79,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/04/05/LeetCode-3Sum/" title="LeetCode 3Sum" itemprop="url">LeetCode 3Sum</a>
+      <a href="/2016/04/06/LeetCode-3Sum-Closest/" title="LeetCode 3Sum Closest" itemprop="url">LeetCode 3Sum Closest</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-05T00:36:22.000Z" itemprop="datePublished"> 发表于 2016-04-05</time>
+    <time datetime="2016-04-06T00:23:22.000Z" itemprop="datePublished"> 发表于 2016-04-06</time>
     
   </p>
 </header>
@@ -99,9 +99,8 @@
 		
 		</div>
 		
-		<p>左右夹逼法（先排序）</p>
-<a id="more"></a>
-<figure class="highlight cos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    vector&lt;vector&lt;int&gt;&gt; threeSum(vector&lt;int&gt;&amp; nums) &#123;</span><br><span class="line">        vector&lt;vector&lt;int&gt;&gt; res<span class="comment">;</span></span><br><span class="line">        <span class="keyword">if</span>(nums.size() &lt; <span class="number">3</span>) <span class="keyword">return</span> res<span class="comment">;</span></span><br><span class="line">        sort(nums.begin(), nums.end())<span class="comment">;</span></span><br><span class="line">        const int target = <span class="number">0</span><span class="comment">;</span></span><br><span class="line">        auto last = nums.end()<span class="comment">;</span></span><br><span class="line">        <span class="keyword">for</span>(auto i = nums.begin()<span class="comment">; i &lt; last - 2; ++i) &#123;</span></span><br><span class="line">            <span class="keyword">if</span>(i &gt; nums.begin() &amp;&amp; *i == *(i - <span class="number">1</span>)) <span class="keyword">continue</span><span class="comment">;</span></span><br><span class="line">            auto <span class="keyword">j</span> = i + <span class="number">1</span><span class="comment">;</span></span><br><span class="line">            auto <span class="keyword">k</span> = last - <span class="number">1</span><span class="comment">;</span></span><br><span class="line">            <span class="keyword">while</span>(<span class="keyword">j</span> &lt; <span class="keyword">k</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span>(*i + *<span class="keyword">j</span> + *<span class="keyword">k</span> &lt; target) &#123;</span><br><span class="line">                    ++<span class="keyword">j</span><span class="comment">;</span></span><br><span class="line">                    <span class="keyword">while</span>(*<span class="keyword">j</span> == *(<span class="keyword">j</span>-<span class="number">1</span>) &amp;&amp; <span class="keyword">j</span> &lt; <span class="keyword">k</span>) ++<span class="keyword">j</span><span class="comment">;</span></span><br><span class="line">                &#125;<span class="keyword">else</span> <span class="keyword">if</span>(*i + *<span class="keyword">j</span> + *<span class="keyword">k</span> &gt; target) &#123;</span><br><span class="line">                    --<span class="keyword">k</span><span class="comment">;</span></span><br><span class="line">                    <span class="keyword">while</span>(*<span class="keyword">k</span> == *(<span class="keyword">k</span>+<span class="number">1</span>) &amp;&amp; <span class="keyword">j</span> &lt; <span class="keyword">k</span>) --<span class="keyword">k</span><span class="comment">;</span></span><br><span class="line">                &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                    res.push_back(&#123;*i, *<span class="keyword">j</span>, *<span class="keyword">k</span>&#125;)<span class="comment">;</span></span><br><span class="line">                    ++<span class="keyword">j</span><span class="comment">;</span></span><br><span class="line">                    --<span class="keyword">k</span><span class="comment">;</span></span><br><span class="line">                    <span class="keyword">while</span>(*<span class="keyword">j</span> == *(<span class="keyword">j</span>-<span class="number">1</span>) &amp;&amp; <span class="keyword">j</span> &lt; <span class="keyword">k</span>) ++<span class="keyword">j</span><span class="comment">;</span></span><br><span class="line">                    <span class="keyword">while</span>(*<span class="keyword">k</span> == *(<span class="keyword">k</span>+<span class="number">1</span>) &amp;&amp; <span class="keyword">j</span> &lt; <span class="keyword">k</span>) --<span class="keyword">k</span><span class="comment">;</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res<span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+		<p>左右夹逼法（先排序）<br><a id="more"></a></p>
+<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    <span class="keyword">int</span> threeSumClosest(vector&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> target) &#123;</span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">0</span><span class="comment">;</span></span><br><span class="line">        <span class="keyword">int</span> min_gap = INT_MAX<span class="comment">;</span></span><br><span class="line">        sort(nums.begin(), nums.<span class="keyword">end</span>())<span class="comment">;</span></span><br><span class="line">        auto last = nums.<span class="keyword">end</span>()<span class="comment">;</span></span><br><span class="line">        <span class="keyword">for</span>(auto i = nums.begin()<span class="comment">; i &lt; last - 2; ++i) &#123;</span></span><br><span class="line">            auto j = <span class="keyword">next</span>(i)<span class="comment">;</span></span><br><span class="line">            auto k = last - <span class="number">1</span><span class="comment">;</span></span><br><span class="line">            <span class="keyword">while</span>(j &lt; k) &#123;</span><br><span class="line">                const <span class="keyword">int</span> sum = *i + *j + *k<span class="comment">;</span></span><br><span class="line">                const <span class="keyword">int</span> gap = <span class="keyword">abs</span>(sum - target)<span class="comment">;</span></span><br><span class="line">                <span class="keyword">if</span>(gap &lt; min_gap) &#123;</span><br><span class="line">                    min_gap = gap<span class="comment">;</span></span><br><span class="line">                    res = sum<span class="comment">;</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span>(sum &gt; target) &#123;</span><br><span class="line">                    k--<span class="comment">;</span></span><br><span class="line">                &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                    j++<span class="comment">;</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res<span class="comment">;        </span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -124,7 +123,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2016/04/05/LeetCode-3Sum/" data-title="LeetCode 3Sum | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2016/04/06/LeetCode-3Sum-Closest/" data-title="LeetCode 3Sum Closest | Urey on the way" data-tsina="1758475283" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -137,19 +136,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2016/04/06/LeetCode-3Sum-Closest/" title="LeetCode 3Sum Closest">
-  <strong>上一篇：</strong><br/>
-  <span>
-  LeetCode 3Sum Closest</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2016/03/30/Flume开发特定组件/"  title="Flume开发特定组件">
+<a href="/2016/04/05/LeetCode-3Sum/"  title="LeetCode 3Sum">
  <strong>下一篇：</strong><br/> 
- <span>Flume开发特定组件
+ <span>LeetCode 3Sum
 </span>
 </a>
 </div>
@@ -158,7 +149,7 @@
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2016/04/05/LeetCode-3Sum/" data-title="LeetCode 3Sum" data-url="http://qiaowei.xyz/2016/04/05/LeetCode-3Sum/"></div>
+	<div class="ds-thread" data-thread-key="2016/04/06/LeetCode-3Sum-Closest/" data-title="LeetCode 3Sum Closest" data-url="http://qiaowei.xyz/2016/04/06/LeetCode-3Sum-Closest/"></div>
 </section>
 
 

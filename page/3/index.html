@@ -77,6 +77,29 @@
   
 <section class="post" itemscope itemprop="blogitem">
   
+    <a href="/2015/11/05/2015-11-05-puppetan-zhuang-yu-ji-ben-shi-yong/" title="puppet安装与基本使用" itemprop="url">
+  
+    <h1 itemprop="name">puppet安装与基本使用</h1>
+    
+     
+           <p itemprop="description" >“Talk is cheap. Show me the code” —— Linux
+
+一、puppet基本介绍puppet是一个开源的软件自动化配置和部署工具。它是典型C／S架构，由puppet master和若干puppet client组成。
+二、安装过程1. 设置host</p>
+        
+    
+    <time datetime="2015-11-05T08:01:14.000Z" itemprop="datePublished">2015-11-05</time>
+  </a>
+</section>
+
+
+
+
+
+
+  
+<section class="post" itemscope itemprop="blogitem">
+  
     <a href="/2015/11/03/2015-11-03-ambarijian-jie/" title="Ambari简介" itemprop="url">
   
     <h1 itemprop="name">Ambari简介</h1>
@@ -168,15 +191,14 @@ JDBC的版本选择官网有给出具体的jdk与postgresql driver的版本对�
   
 <section class="post" itemscope itemprop="blogitem">
   
-    <a href="/2015/10/08/2015-10-08-postgres-xl-de-jie-shao/" title="Postgres-XL介绍" itemprop="url">
+    <a href="/2015/10/08/2015-10-08-postgres-xlji-qun-de-da-jian/" title="Postgres-XL集群的搭建" itemprop="url">
   
-    <h1 itemprop="name">Postgres-XL介绍</h1>
+    <h1 itemprop="name">Postgres-XL集群的搭建</h1>
     
      
-           <p itemprop="description" >“沉默即赞同” —— 无名
+           <p itemprop="description" >“如果你惟一的工具是一把锤子，你往往会把一切问题看成钉子” —— 无名
 
-什么是Postgres-XLXL的意思是：eXtensible Lattice，可以扩展的格子，即将PostgreSQL应用在多机器上的分布式数据库的形象化表达。
-Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩展的、多租户</p>
+集群规划建立5个虚拟机构成的集群，虚拟机的os均为centos6.5，依次命名为cnode1，cnode2，cnode3，cnode4，cnode5，其中cnode1为gtm，其余4个节点均为coordin</p>
         
     
     <time datetime="2015-10-08T11:32:26.000Z" itemprop="datePublished">2015-10-08</time>
@@ -191,14 +213,15 @@ Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩�
   
 <section class="post" itemscope itemprop="blogitem">
   
-    <a href="/2015/10/08/2015-10-08-postgres-xlji-qun-de-da-jian/" title="Postgres-XL集群的搭建" itemprop="url">
+    <a href="/2015/10/08/2015-10-08-postgres-xl-de-jie-shao/" title="Postgres-XL介绍" itemprop="url">
   
-    <h1 itemprop="name">Postgres-XL集群的搭建</h1>
+    <h1 itemprop="name">Postgres-XL介绍</h1>
     
      
-           <p itemprop="description" >“如果你惟一的工具是一把锤子，你往往会把一切问题看成钉子” —— 无名
+           <p itemprop="description" >“沉默即赞同” —— 无名
 
-集群规划建立5个虚拟机构成的集群，虚拟机的os均为centos6.5，依次命名为cnode1，cnode2，cnode3，cnode4，cnode5，其中cnode1为gtm，其余4个节点均为coordin</p>
+什么是Postgres-XLXL的意思是：eXtensible Lattice，可以扩展的格子，即将PostgreSQL应用在多机器上的分布式数据库的形象化表达。
+Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩展的、多租户</p>
         
     
     <time datetime="2015-10-08T11:32:26.000Z" itemprop="datePublished">2015-10-08</time>
@@ -273,29 +296,6 @@ Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩�
 
 
 
-  
-<section class="post" itemscope itemprop="blogitem">
-  
-    <a href="/2015/09/04/2015-09-04-regexde-tan-lan-yu-lan-duo/" title="regex的贪婪与懒惰" itemprop="url">
-  
-    <h1 itemprop="name">regex的贪婪与懒惰</h1>
-    
-     
-           <p itemprop="description" >正则表达式有两种模式：贪婪模式与懒惰模式。
-　　贪婪模式：匹配尽可能多的字符。
-　　我们一般刚开始学习正则表达式使用到的都是贪婪模式下的表达。
-　　比如：将 a.*b  应用于串 “aabab” ，它会匹配 “aabab”整个串。注意，其实整个串“aabab”中的子串“aab”和</p>
-        
-    
-    <time datetime="2015-09-04T13:07:39.000Z" itemprop="datePublished">2015-09-04</time>
-  </a>
-</section>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix unexpand">
     <a class="extend prev" rel="prev" href="/page/2/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/4/">Next<span></span></a>
@@ -332,7 +332,7 @@ Postgres-XL 是一个完全满足ACID的、开源的、可方便进行水平扩�
 		  
 		
 		  
-			<li><a href="/categories/leetcode/" title="leetcode">leetcode<sup>13</sup></a></li>
+			<li><a href="/categories/leetcode/" title="leetcode">leetcode<sup>14</sup></a></li>
 		  
 		
 		  

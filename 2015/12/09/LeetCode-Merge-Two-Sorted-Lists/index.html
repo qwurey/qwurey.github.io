@@ -4,23 +4,23 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>LeetCode Letter Combinations of a Phone Number | Urey on the way</title>
+    <title>LeetCode Merge Two Sorted Lists | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="DFS">
+    <meta name="description" content="链表，一个一个串珠子">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LeetCode Letter Combinations of a Phone Number">
-<meta property="og:url" content="http://qiaowei.xyz/2016/04/06/LeetCode-Letter-Combinations-of-a-Phone-Number/index.html">
+<meta property="og:title" content="LeetCode Merge Two Sorted Lists">
+<meta property="og:url" content="http://qiaowei.xyz/2015/12/09/LeetCode-Merge-Two-Sorted-Lists/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="DFS">
-<meta property="og:updated_time" content="2016-04-06T14:51:39.000Z">
+<meta property="og:description" content="链表，一个一个串珠子">
+<meta property="og:updated_time" content="2016-04-09T09:23:01.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LeetCode Letter Combinations of a Phone Number">
-<meta name="twitter:description" content="DFS">
+<meta name="twitter:title" content="LeetCode Merge Two Sorted Lists">
+<meta name="twitter:description" content="链表，一个一个串珠子">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -79,14 +79,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/04/06/LeetCode-Letter-Combinations-of-a-Phone-Number/" title="LeetCode Letter Combinations of a Phone Number" itemprop="url">LeetCode Letter Combinations of a Phone Number</a>
+      <a href="/2015/12/09/LeetCode-Merge-Two-Sorted-Lists/" title="LeetCode Merge Two Sorted Lists" itemprop="url">LeetCode Merge Two Sorted Lists</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2016-04-06T00:28:20.000Z" itemprop="datePublished"> 发表于 2016-04-06</time>
+    <time datetime="2015-12-09T09:21:50.000Z" itemprop="datePublished"> 发表于 2015-12-09</time>
     
   </p>
 </header>
@@ -99,8 +99,9 @@
 		
 		</div>
 		
-		<p>DFS<br><a id="more"></a></p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    vector&lt;<span class="keyword">string</span>&gt; mapping = &#123;<span class="string">"abc"</span>, <span class="string">"def"</span>, <span class="string">"ghi"</span>, <span class="string">"jkl"</span>, <span class="string">"mno"</span>, <span class="string">"pqrs"</span>, <span class="string">"tuv"</span>, <span class="string">"wxyz"</span>&#125;;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">vector&lt;<span class="keyword">string</span>&gt; <span class="title">letterCombinations</span>(<span class="params"><span class="keyword">string</span> digits</span>) </span>&#123;</span><br><span class="line">        vector&lt;<span class="keyword">string</span>&gt; res;</span><br><span class="line">        <span class="keyword">if</span>(digits.size() == <span class="number">0</span>) <span class="keyword">return</span> res;</span><br><span class="line">        <span class="keyword">int</span> index = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">string</span> <span class="keyword">value</span> = <span class="string">""</span>;</span><br><span class="line">        dfs(index, digits, res, <span class="keyword">value</span>);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">dfs</span>(<span class="params"><span class="keyword">int</span> index, <span class="keyword">string</span> digits, vector&lt;<span class="keyword">string</span>&gt;&amp; res, <span class="keyword">string</span>&amp; <span class="keyword">value</span></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(index == digits.size()) &#123;</span><br><span class="line">            res.push_back(<span class="keyword">value</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; mapping[digits[index] - <span class="string">'2'</span>].size(); ++i) &#123;</span><br><span class="line">            <span class="keyword">value</span>.push_back(mapping[digits[index] - <span class="string">'2'</span>][i]);</span><br><span class="line">            dfs(index + <span class="number">1</span>, digits, res, <span class="keyword">value</span>);</span><br><span class="line">            <span class="keyword">value</span>.pop_back();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+		<p>链表，一个一个串珠子</p>
+<a id="more"></a>
+<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Definition for singly-linked list.</span><br><span class="line"> * struct ListNode &#123;</span><br><span class="line"> *     int val;</span><br><span class="line"> *     ListNode *next;</span><br><span class="line"> *     ListNode(int x) : val(x), next(NULL) &#123;&#125;</span><br><span class="line"> * &#125;;</span><br><span class="line"> */</span></span><br><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) &#123;</span><br><span class="line">        <span class="keyword">if</span>(l1 == NULL) <span class="keyword">return</span> l2<span class="comment">;</span></span><br><span class="line">        <span class="keyword">if</span>(l2 == NULL) <span class="keyword">return</span> l1<span class="comment">;</span></span><br><span class="line">        ListNode *dummy = new ListNode(<span class="number">-1</span>)<span class="comment">;</span></span><br><span class="line">        ListNode *p = dummy<span class="comment">;</span></span><br><span class="line">        <span class="keyword">while</span>(l1 != NULL &amp;&amp; l2 != NULL) &#123;</span><br><span class="line">            <span class="keyword">if</span>(l1-&gt;val &gt; l2-&gt;val) &#123;</span><br><span class="line">                p-&gt;<span class="keyword">next</span> = l2<span class="comment">;</span></span><br><span class="line">                l2 = l2-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">            &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                p-&gt;<span class="keyword">next</span> = l1<span class="comment">;</span></span><br><span class="line">                l1 = l1-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">            p = p-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(l1 != NULL) &#123;</span><br><span class="line">            p-&gt;<span class="keyword">next</span> = l1<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(l2 != NULL) &#123;</span><br><span class="line">            p-&gt;<span class="keyword">next</span> = l2<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dummy-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -123,7 +124,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2016/04/06/LeetCode-Letter-Combinations-of-a-Phone-Number/" data-title="LeetCode Letter Combinations of a Phone Number | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2015/12/09/LeetCode-Merge-Two-Sorted-Lists/" data-title="LeetCode Merge Two Sorted Lists | Urey on the way" data-tsina="1758475283" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -136,11 +137,19 @@
 	
 <nav class="article-nav clearfix">
  
+ <div class="prev" >
+ <a href="/2016/02/27/2016-02-27-shi-shi-ri-zhi-shou-ji-cha-xun-fen-xi-xi-tong-flume-plus-elasticsearch-plus-kibana/" title="实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)">
+  <strong>上一篇：</strong><br/>
+  <span>
+  实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)</span>
+</a>
+</div>
+
 
 <div class="next">
-<a href="/2016/04/06/LeetCode-3Sum-Closest/"  title="LeetCode 3Sum Closest">
+<a href="/2015/12/08/LeetCode-Valid-Parentheses/"  title="LeetCode Valid Parentheses">
  <strong>下一篇：</strong><br/> 
- <span>LeetCode 3Sum Closest
+ <span>LeetCode Valid Parentheses
 </span>
 </a>
 </div>
@@ -149,7 +158,7 @@
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2016/04/06/LeetCode-Letter-Combinations-of-a-Phone-Number/" data-title="LeetCode Letter Combinations of a Phone Number" data-url="http://qiaowei.xyz/2016/04/06/LeetCode-Letter-Combinations-of-a-Phone-Number/"></div>
+	<div class="ds-thread" data-thread-key="2015/12/09/LeetCode-Merge-Two-Sorted-Lists/" data-title="LeetCode Merge Two Sorted Lists" data-url="http://qiaowei.xyz/2015/12/09/LeetCode-Merge-Two-Sorted-Lists/"></div>
 </section>
 
 

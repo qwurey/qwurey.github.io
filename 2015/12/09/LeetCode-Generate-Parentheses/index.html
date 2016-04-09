@@ -4,23 +4,23 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>LeetCode Valid Parentheses | Urey on the way</title>
+    <title>LeetCode Generate Parentheses | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="String Stack">
+    <meta name="description" content="DFS">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LeetCode Valid Parentheses">
-<meta property="og:url" content="http://qiaowei.xyz/2015/12/08/LeetCode-Valid-Parentheses/index.html">
+<meta property="og:title" content="LeetCode Generate Parentheses">
+<meta property="og:url" content="http://qiaowei.xyz/2015/12/09/LeetCode-Generate-Parentheses/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="String Stack">
-<meta property="og:updated_time" content="2016-04-08T00:11:46.000Z">
+<meta property="og:description" content="DFS">
+<meta property="og:updated_time" content="2016-04-09T09:37:35.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LeetCode Valid Parentheses">
-<meta name="twitter:description" content="String Stack">
+<meta name="twitter:title" content="LeetCode Generate Parentheses">
+<meta name="twitter:description" content="DFS">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -79,14 +79,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/12/08/LeetCode-Valid-Parentheses/" title="LeetCode Valid Parentheses" itemprop="url">LeetCode Valid Parentheses</a>
+      <a href="/2015/12/09/LeetCode-Generate-Parentheses/" title="LeetCode Generate Parentheses" itemprop="url">LeetCode Generate Parentheses</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2015-12-08T00:10:10.000Z" itemprop="datePublished"> 发表于 2015-12-08</time>
+    <time datetime="2015-12-09T09:36:19.000Z" itemprop="datePublished"> 发表于 2015-12-09</time>
     
   </p>
 </header>
@@ -99,9 +99,9 @@
 		
 		</div>
 		
-		<p>String Stack<br><a id="more"></a></p>
-<p>时间复杂度：O(N)，空间复杂度：O(N)</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> Solution &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isValid</span><span class="params">(<span class="built_in">string</span> s)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">stack</span>&lt;<span class="keyword">char</span>&gt; ps;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; s.size(); ++i) &#123;</span><br><span class="line">            <span class="keyword">if</span>(s[i] == <span class="string">'('</span> || s[i] == <span class="string">'&#123;'</span> || s[i] == <span class="string">'['</span>) &#123;</span><br><span class="line">                ps.push(s[i]);</span><br><span class="line">            &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">if</span>(ps.empty()) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">                <span class="keyword">char</span> top_v = ps.top();</span><br><span class="line">                <span class="keyword">if</span>((s[i] == <span class="string">')'</span> &amp;&amp; top_v == <span class="string">'('</span>) || (s[i] == <span class="string">'&#125;'</span> &amp;&amp; top_v == <span class="string">'&#123;'</span>) || (s[i] == <span class="string">']'</span> &amp;&amp; top_v == <span class="string">'['</span>)) &#123;</span><br><span class="line">                    ps.pop();</span><br><span class="line">                &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(!ps.empty()) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+		<p>DFS</p>
+<a id="more"></a>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> Solution &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">dfs</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; &amp;res, <span class="built_in">string</span> v, <span class="keyword">int</span> n, <span class="keyword">int</span> left, <span class="keyword">int</span> right)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(n == left) &#123;</span><br><span class="line">            v.append(n - right, <span class="string">')'</span>);</span><br><span class="line">            res.push_back(v);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        dfs(res, v + <span class="string">'('</span>, n, left + <span class="number">1</span>, right);</span><br><span class="line">        <span class="keyword">if</span>(left &gt; right) dfs(res, v + <span class="string">')'</span>, n, left, right + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; generateParenthesis(<span class="keyword">int</span> n) &#123;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; res;</span><br><span class="line">        <span class="keyword">if</span>(n &gt; <span class="number">0</span>) dfs(res, <span class="string">""</span>, n, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -124,7 +124,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2015/12/08/LeetCode-Valid-Parentheses/" data-title="LeetCode Valid Parentheses | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2015/12/09/LeetCode-Generate-Parentheses/" data-title="LeetCode Generate Parentheses | Urey on the way" data-tsina="1758475283" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -138,18 +138,18 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2015/12/09/LeetCode-Merge-Two-Sorted-Lists/" title="LeetCode Merge Two Sorted Lists">
+ <a href="/2016/02/27/2016-02-27-shi-shi-ri-zhi-shou-ji-cha-xun-fen-xi-xi-tong-flume-plus-elasticsearch-plus-kibana/" title="实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)">
   <strong>上一篇：</strong><br/>
   <span>
-  LeetCode Merge Two Sorted Lists</span>
+  实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)</span>
 </a>
 </div>
 
 
 <div class="next">
-<a href="/2015/12/08/LeetCode-Remove-Nth-Node-From-End-of-List/"  title="LeetCode Remove Nth Node From End of List">
+<a href="/2015/12/09/LeetCode-Merge-Two-Sorted-Lists/"  title="LeetCode Merge Two Sorted Lists">
  <strong>下一篇：</strong><br/> 
- <span>LeetCode Remove Nth Node From End of List
+ <span>LeetCode Merge Two Sorted Lists
 </span>
 </a>
 </div>
@@ -158,7 +158,7 @@
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2015/12/08/LeetCode-Valid-Parentheses/" data-title="LeetCode Valid Parentheses" data-url="http://qiaowei.xyz/2015/12/08/LeetCode-Valid-Parentheses/"></div>
+	<div class="ds-thread" data-thread-key="2015/12/09/LeetCode-Generate-Parentheses/" data-title="LeetCode Generate Parentheses" data-url="http://qiaowei.xyz/2015/12/09/LeetCode-Generate-Parentheses/"></div>
 </section>
 
 

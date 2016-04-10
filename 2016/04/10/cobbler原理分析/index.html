@@ -4,41 +4,23 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>LeetCode Palindrome Number | Urey on the way</title>
+    <title>cobbler原理分析 | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="tips
-负数直接判断不是回文
-左右依次比较
-去除两边数字的方法：1234# x:待去除的数字，比如：121# d:对应121为100，12321位10000 x = x % d / 10
-
-
-123456789101112131415161718class Solution &amp;#123;  public:      bool isPalindrome(int x) &amp;#123;">
+    <meta name="description" content="Cobbler通过将设置和管理一个安装服务器所涉及的任务集中在一起，从而简化了系统配置。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LeetCode Palindrome Number">
-<meta property="og:url" content="http://qiaowei.xyz/2016/03/13/LeetCode-Palindrome-Number/index.html">
+<meta property="og:title" content="cobbler原理分析">
+<meta property="og:url" content="http://qiaowei.xyz/2016/04/10/cobbler原理分析/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="tips
-负数直接判断不是回文
-左右依次比较
-去除两边数字的方法：1234# x:待去除的数字，比如：121# d:对应121为100，12321位10000 x = x % d / 10
-
-
-123456789101112131415161718class Solution &amp;#123;  public:      bool isPalindrome(int x) &amp;#123;">
-<meta property="og:updated_time" content="2016-03-13T12:24:52.000Z">
+<meta property="og:description" content="Cobbler通过将设置和管理一个安装服务器所涉及的任务集中在一起，从而简化了系统配置。">
+<meta property="og:updated_time" content="2016-04-10T02:13:48.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LeetCode Palindrome Number">
-<meta name="twitter:description" content="tips
-负数直接判断不是回文
-左右依次比较
-去除两边数字的方法：1234# x:待去除的数字，比如：121# d:对应121为100，12321位10000 x = x % d / 10
-
-
-123456789101112131415161718class Solution &amp;#123;  public:      bool isPalindrome(int x) &amp;#123;">
+<meta name="twitter:title" content="cobbler原理分析">
+<meta name="twitter:description" content="Cobbler通过将设置和管理一个安装服务器所涉及的任务集中在一起，从而简化了系统配置。">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -97,14 +79,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/03/13/LeetCode-Palindrome-Number/" title="LeetCode Palindrome Number" itemprop="url">LeetCode Palindrome Number</a>
+      <a href="/2016/04/10/cobbler原理分析/" title="cobbler原理分析" itemprop="url">cobbler原理分析</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2016-03-13T09:46:37.000Z" itemprop="datePublished"> 发表于 2016-03-13</time>
+    <time datetime="2016-04-10T02:13:08.000Z" itemprop="datePublished"> 发表于 2016-04-10</time>
     
   </p>
 </header>
@@ -113,17 +95,45 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、Cobbler简介"><span class="toc-number">1.</span> <span class="toc-text">一、Cobbler简介</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、相关服务介绍"><span class="toc-number">2.</span> <span class="toc-text">二、相关服务介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#2-1-DHCP："><span class="toc-number">2.0.1.</span> <span class="toc-text">2.1 DHCP：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-2-TFTP："><span class="toc-number">2.0.2.</span> <span class="toc-text">2.2 TFTP：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-3-PXE："><span class="toc-number">2.0.3.</span> <span class="toc-text">2.3 PXE：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、交互过程分析"><span class="toc-number">3.</span> <span class="toc-text">三、交互过程分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#四、Cobbler相关"><span class="toc-number">4.</span> <span class="toc-text">四、Cobbler相关</span></a></li></ol>
 		
 		</div>
 		
-		<h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a><strong>tips</strong></h4><ol>
-<li>负数直接判断不是回文</li>
-<li>左右依次比较</li>
-<li>去除两边数字的方法：<figure class="highlight cos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># <span class="keyword">x</span>:待去除的数字，比如：<span class="number">121</span></span><br><span class="line"># <span class="keyword">d</span>:对应<span class="number">121</span>为<span class="number">100</span>，<span class="number">12321</span>位<span class="number">10000</span> </span><br><span class="line"></span><br><span class="line"><span class="keyword">x</span> = <span class="keyword">x</span> % <span class="keyword">d</span> / <span class="number">10</span></span><br></pre></td></tr></table></figure>
-</li>
+		<p>Cobbler通过将设置和管理一个安装服务器所涉及的任务集中在一起，从而简化了系统配置。</p>
+<a id="more"></a>
+<h4 id="一、Cobbler简介"><a href="#一、Cobbler简介" class="headerlink" title="一、Cobbler简介"></a>一、Cobbler简介</h4><p>Cobbler通过将设置和管理一个安装服务器所涉及的任务集中在一起，从而简化了系统配置。相当于Cobbler封装了DHCP、TFTP、XINTED等服务，结合了PXE、kickstart等安装方法，可以实现自动化安装操作系统，并且可以同时提供多种版本，以实现在线安装不同版本的系统。</p>
+<h4 id="二、相关服务介绍"><a href="#二、相关服务介绍" class="headerlink" title="二、相关服务介绍"></a>二、相关服务介绍</h4><h6 id="2-1-DHCP："><a href="#2-1-DHCP：" class="headerlink" title="2.1 DHCP："></a>2.1 DHCP：</h6><p>DHCP（Dynamic Host Configuration Protocol，动态主机配置协议）是一个局域网的网络协议，<strong>使用UDP协议工作</strong>， 主要有两个用途：给内部网络或网络服务供应商自动分配IP地址，给用户或者内部网络管理员作为对所有计算机作中央管理的手段。DHCP有3个端口，其中<strong>UDP67和UDP68为正常的DHCP服务端口，分别作为DHCP Server和DHCP Client的服务端口</strong>；546号端口用于DHCPv6 Client，而不用于DHCPv4，是为DHCP failover服务，这是需要特别开启的服务，DHCP failover是用来做“双机热备”的。</p>
+<h6 id="2-2-TFTP："><a href="#2-2-TFTP：" class="headerlink" title="2.2 TFTP："></a>2.2 TFTP：</h6><p>TFTP是一种比较特殊的文件传输协议。相对于FTP和目前经常使用的SFTP，TFTP是基于TCP/IP协议簇，用于进行简单文件传输，提供简单、低开销的传输服务。TFTP的端口设置为69。<br>相对于常见的FTP，TFTP有两个比较好的优势：</p>
+<ol>
+<li><strong>TFTP基于UDP协议</strong>，如果环境中没有TCP协议，是比较合适的；</li>
+<li>TFTP执行和代码占用内存量比较小；</li>
 </ol>
-<figure class="highlight cos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> Solution &#123;  </span><br><span class="line">public:  </span><br><span class="line">    bool isPalindrome(int <span class="keyword">x</span>) &#123;  </span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">x</span> &lt; <span class="number">0</span>) <span class="keyword">return</span> false<span class="comment">;  </span></span><br><span class="line">        int <span class="keyword">d</span> = <span class="number">1</span><span class="comment">;  </span></span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">x</span>/<span class="keyword">d</span> &gt;= <span class="number">10</span>) <span class="keyword">d</span> *= <span class="number">10</span><span class="comment">;  </span></span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">x</span> &gt; <span class="number">0</span>) &#123;  </span><br><span class="line">            int left = <span class="keyword">x</span> / <span class="keyword">d</span><span class="comment">;  </span></span><br><span class="line">            int right = <span class="keyword">x</span> % <span class="number">10</span><span class="comment">;  </span></span><br><span class="line">            <span class="keyword">if</span>(left != right) &#123;  </span><br><span class="line">                <span class="keyword">return</span> false<span class="comment">;  </span></span><br><span class="line">            &#125;  </span><br><span class="line">            <span class="keyword">x</span> = <span class="keyword">x</span> % <span class="keyword">d</span> / <span class="number">10</span><span class="comment">;  </span></span><br><span class="line">            <span class="keyword">d</span> = <span class="keyword">d</span> / <span class="number">100</span><span class="comment">;  </span></span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="keyword">return</span> true<span class="comment">;  </span></span><br><span class="line">    &#125;  </span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<p>默认情况下，Linux内部是安装了tftp服务器包的。但是默认是不启动的。</p>
+<h6 id="2-3-PXE："><a href="#2-3-PXE：" class="headerlink" title="2.3 PXE："></a>2.3 PXE：</h6><p>预启动执行环境（Preboot eXecution Environment，PXE，也被称为预执行环境)提供了一种使用网络接口（Network Interface）启动计算机的机制。这种机制让计算机的启动可以不依赖本地数据存储设备（如硬盘）或本地已安装的操作系统。</p>
+<p>PXE当初是作为Intel的有线管理体系的一部分，Intel 和 Systemsoft于1999年9月20日公布其规格(版本2.1)[1]。通过使用像网际协议(IP)、用户数据报协议(UDP)、动态主机设定协定(DHCP)、小型文件传输协议(TFTP)等几种网络协议和全局唯一标识符(GUID)、通用网络驱动接口(UNDI)、通用唯一识别码(UUID)的概念并通过对客户机(通过PXE自检的电脑)固件扩展预设的API来实现目的。</p>
+<h4 id="三、交互过程分析"><a href="#三、交互过程分析" class="headerlink" title="三、交互过程分析"></a>三、交互过程分析</h4><p>cobbler server与裸机（PXE client）交互过程分析：</p>
+<ol>
+<li>裸机配置了从网络启动后，开机后会广播包请求DHCP服务器（cobbler server）发送其分配好的一个IP</li>
+<li>DHCP服务器（cobbler server）收到请求后发送responese，包括其ip地址</li>
+<li>裸机拿到ip后再向cobbler server发送请求OS引导文件的请求</li>
+<li>cobbler server告诉裸机OS引导文件的名字和TFTP server的ip和port</li>
+<li>裸机通过上面告知的TFTP server地址和port通信，下载引导文件</li>
+<li>裸机执行执行该引导文件，确定加载信息，选择要安装的os，期间会再向cobbler server请求kickstart文件和os image</li>
+<li>cobbler server发送请求的kickstart和os iamge</li>
+<li>裸机加载kickstart文件</li>
+<li>裸机接收os image，安装该os image</li>
+</ol>
+<p>之后，裸机就不“裸”了，有了自己的os和dhcp分配给其的ip。</p>
+<p>可以通过查看cobbler server所在机器的dhcp服务的相关文件，来查看分配出去的ip和对应的mac地址：<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /var/<span class="class"><span class="keyword">lib</span>/<span class="title">dhcpd</span>/<span class="title">dhcpd</span>.<span class="title">leases</span></span></span><br></pre></td></tr></table></figure></p>
+<h4 id="四、Cobbler相关"><a href="#四、Cobbler相关" class="headerlink" title="四、Cobbler相关"></a>四、Cobbler相关</h4><p>Cobbler使用Python开发，目前实验使用的版本是Cobbler 2.6.11 Released by Jörgen on January 23, 2016</p>
+<p>Reference：</p>
+<ol>
+<li><a href="https://zh.wikipedia.org/wiki/%E9%A2%84%E5%90%AF%E5%8A%A8%E6%89%A7%E8%A1%8C%E7%8E%AF%E5%A2%83" target="_blank" rel="external">https://zh.wikipedia.org/wiki/%E9%A2%84%E5%90%AF%E5%8A%A8%E6%89%A7%E8%A1%8C%E7%8E%AF%E5%A2%83</a></li>
+<li><a href="https://zh.wikipedia.org/wiki/%E5%8A%A8%E6%80%81%E4%B8%BB%E6%9C%BA%E8%AE%BE%E7%BD%AE%E5%8D%8F%E8%AE%AE" target="_blank" rel="external">https://zh.wikipedia.org/wiki/%E5%8A%A8%E6%80%81%E4%B8%BB%E6%9C%BA%E8%AE%BE%E7%BD%AE%E5%8D%8F%E8%AE%AE</a></li>
+<li><a href="https://zh.wikipedia.org/wiki/%E5%B0%8F%E5%9E%8B%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE" target="_blank" rel="external">https://zh.wikipedia.org/wiki/%E5%B0%8F%E5%9E%8B%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE</a></li>
+<li><a href="http://cobbler.github.io/" target="_blank" rel="external">http://cobbler.github.io/</a></li>
+<li><a href="http://www.361way.com/cobbler-principle/4328.html" target="_blank" rel="external">http://www.361way.com/cobbler-principle/4328.html</a></li>
+</ol>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -131,13 +141,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
+  <span></span> <a href="/tags/cobbler/">cobbler</a>
   </div>
 
 </div>
@@ -146,7 +156,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2016/03/13/LeetCode-Palindrome-Number/" data-title="LeetCode Palindrome Number | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2016/04/10/cobbler原理分析/" data-title="cobbler原理分析 | Urey on the way" data-tsina="1758475283" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -159,19 +169,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2016/03/13/LeetCode-Regular-Expression-Matching/" title="LeetCode Regular Expression Matching">
-  <strong>上一篇：</strong><br/>
-  <span>
-  LeetCode Regular Expression Matching</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2016/03/13/LeetCode-String-to-Integer/"  title="LeetCode String to Integer">
+<a href="/2016/04/10/cobbler快速批量安装OS/"  title="cobbler快速批量安装OS">
  <strong>下一篇：</strong><br/> 
- <span>LeetCode String to Integer
+ <span>cobbler快速批量安装OS
 </span>
 </a>
 </div>
@@ -180,7 +182,7 @@
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2016/03/13/LeetCode-Palindrome-Number/" data-title="LeetCode Palindrome Number" data-url="http://qiaowei.xyz/2016/03/13/LeetCode-Palindrome-Number/"></div>
+	<div class="ds-thread" data-thread-key="2016/04/10/cobbler原理分析/" data-title="cobbler原理分析" data-url="http://qiaowei.xyz/2016/04/10/cobbler原理分析/"></div>
 </section>
 
 
@@ -190,7 +192,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、Cobbler简介"><span class="toc-number">1.</span> <span class="toc-text">一、Cobbler简介</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、相关服务介绍"><span class="toc-number">2.</span> <span class="toc-text">二、相关服务介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#2-1-DHCP："><span class="toc-number">2.0.1.</span> <span class="toc-text">2.1 DHCP：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-2-TFTP："><span class="toc-number">2.0.2.</span> <span class="toc-text">2.2 TFTP：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-3-PXE："><span class="toc-number">2.0.3.</span> <span class="toc-text">2.3 PXE：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、交互过程分析"><span class="toc-number">3.</span> <span class="toc-text">三、交互过程分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#四、Cobbler相关"><span class="toc-number">4.</span> <span class="toc-text">四、Cobbler相关</span></a></li></ol>
  
   </div>
 

@@ -1,0 +1,600 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>cobbler快速批量安装OS | Urey on the way</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="urey">
+    
+
+    
+    <meta name="description" content="通过cobbler快速部署centos6.5mini的详细指导，且提供了一键部署cobbler的脚本以供参考。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cobbler快速批量安装OS">
+<meta property="og:url" content="http://qiaowei.xyz/2016/04/10/cobbler快速批量安装OS/index.html">
+<meta property="og:site_name" content="Urey on the way">
+<meta property="og:description" content="通过cobbler快速部署centos6.5mini的详细指导，且提供了一键部署cobbler的脚本以供参考。">
+<meta property="og:updated_time" content="2016-04-10T02:12:04.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="cobbler快速批量安装OS">
+<meta name="twitter:description" content="通过cobbler快速部署centos6.5mini的详细指导，且提供了一键部署cobbler的脚本以供参考。">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Urey on the way" title="Urey on the way"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Urey on the way">Urey on the way</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" autocomplete="off" name="q" maxlength="20" placeholder="搜索" />
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/10/cobbler快速批量安装OS/" title="cobbler快速批量安装OS" itemprop="url">cobbler快速批量安装OS</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-10T02:10:40.000Z" itemprop="datePublished"> 发表于 2016-04-10</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、禁用SELinux和Firewall："><span class="toc-number">1.</span> <span class="toc-text">一、禁用SELinux和Firewall：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、下载并安装epel的repo，安装相关的包："><span class="toc-number">2.</span> <span class="toc-text">二、下载并安装epel的repo，安装相关的包：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、设置服务开机自启动，开启服务："><span class="toc-number">3.</span> <span class="toc-text">三、设置服务开机自启动，开启服务：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#四、修改cobbler以及其依赖服务的相关设置："><span class="toc-number">4.</span> <span class="toc-text">四、修改cobbler以及其依赖服务的相关设置：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#五、修改cobbler的配置文件："><span class="toc-number">5.</span> <span class="toc-text">五、修改cobbler的配置文件：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#六、修改root默认密码：这里密码也设为root"><span class="toc-number">6.</span> <span class="toc-text">六、修改root默认密码：这里密码也设为root</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#七、修改cobbler的dhcp模版：注意这些需要根据自己的网络环境进行设置"><span class="toc-number">7.</span> <span class="toc-text">七、修改cobbler的dhcp模版：注意这些需要根据自己的网络环境进行设置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#八、编辑自定义的kickstart文件："><span class="toc-number">8.</span> <span class="toc-text">八、编辑自定义的kickstart文件：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#九、启动cobbler："><span class="toc-number">9.</span> <span class="toc-text">九、启动cobbler：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#十、导入OS镜像："><span class="toc-number">10.</span> <span class="toc-text">十、导入OS镜像：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#十一、再次同步修改："><span class="toc-number">11.</span> <span class="toc-text">十一、再次同步修改：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#十二、OK，下面可以查看是否配置成功："><span class="toc-number">12.</span> <span class="toc-text">十二、OK，下面可以查看是否配置成功：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Reference："><span class="toc-number">13.</span> <span class="toc-text">Reference：</span></a></li></ol>
+		
+		</div>
+		
+		<p>通过cobbler快速部署centos6.5mini的详细指导，且提供了一键部署cobbler的脚本以供参考。</p>
+<a id="more"></a>
+<p>实验环境：<br>cobbler server所在机器的OS版本：CentOs6.5-x86_64 mini<br>快速安装的OS版本：CentOs6.5-x86_64 mini</p>
+<h4 id="一、禁用SELinux和Firewall："><a href="#一、禁用SELinux和Firewall：" class="headerlink" title="一、禁用SELinux和Firewall："></a>一、禁用SELinux和Firewall：</h4><figure class="highlight vbnet"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">setenforce <span class="number">0</span></span><br><span class="line">sed -i <span class="comment">'/^SELINUX=/ s/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">chkconfig iptables <span class="keyword">off</span></span><br><span class="line">chkconfig ip6tables <span class="keyword">off</span></span><br><span class="line">service iptables <span class="keyword">stop</span></span><br><span class="line">service ip6tables <span class="keyword">stop</span></span><br></pre></td></tr></table></figure>
+<h4 id="二、下载并安装epel的repo，安装相关的包："><a href="#二、下载并安装epel的repo，安装相关的包：" class="headerlink" title="二、下载并安装epel的repo，安装相关的包："></a>二、下载并安装epel的repo，安装相关的包：</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rpm -Uvh http://mirrors.ustc.edu.cn/fedora/epel/6/x86_64/epel-<span class="keyword">release</span><span class="number">-6</span><span class="number">-8.</span>noarch.rpm</span><br><span class="line"></span><br><span class="line">yum -y <span class="keyword">install</span> cobbler tftp-<span class="keyword">server</span> xinetd dhcp httpd rsync pykickstart debmirror python-ctypes cman ru bind</span><br></pre></td></tr></table></figure>
+<h4 id="三、设置服务开机自启动，开启服务："><a href="#三、设置服务开机自启动，开启服务：" class="headerlink" title="三、设置服务开机自启动，开启服务："></a>三、设置服务开机自启动，开启服务：</h4><figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">chkconfig httpd <span class="keyword">on</span></span><br><span class="line">chkconfig dhcpd <span class="keyword">on</span></span><br><span class="line">chkconfig xinetd <span class="keyword">on</span></span><br><span class="line">chkconfig cobblerd <span class="keyword">on</span></span><br><span class="line">service httpd <span class="built_in">start</span></span><br></pre></td></tr></table></figure>
+<h4 id="四、修改cobbler以及其依赖服务的相关设置："><a href="#四、修改cobbler以及其依赖服务的相关设置：" class="headerlink" title="四、修改cobbler以及其依赖服务的相关设置："></a>四、修改cobbler以及其依赖服务的相关设置：</h4><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 修改/etc/xinetd.d/tftp</span></span><br><span class="line"><span class="attribute">vi</span> /etc/xinetd.d/tftp</span><br><span class="line"></span><br><span class="line">将disable=<span class="literal">yes</span>改为disable=<span class="literal">no</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改/etc/xinetd.d/rsync</span></span><br><span class="line">vi /etc/xinetd.d/rsync</span><br><span class="line"></span><br><span class="line">将disable=<span class="literal">yes</span>改为disable=<span class="literal">no</span></span><br></pre></td></tr></table></figure>
+<h4 id="五、修改cobbler的配置文件："><a href="#五、修改cobbler的配置文件：" class="headerlink" title="五、修改cobbler的配置文件："></a>五、修改cobbler的配置文件：</h4><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># 修改/etc/cobbler/settings</span></span><br><span class="line">vi <span class="meta-keyword">/etc/</span>cobbler/settings</span><br><span class="line"><span class="symbol"></span><br><span class="line">server:</span> cobbler server所在的ip  </span><br><span class="line"><span class="symbol">next_server:</span> cobbler server所在的ip </span><br><span class="line"><span class="symbol">pxe_just_once:</span> <span class="number">1</span>  </span><br><span class="line"><span class="symbol">manage_rsync:</span> <span class="number">1</span>  </span><br><span class="line"><span class="symbol">manage_dhcp:</span> <span class="number">1</span> </span><br><span class="line">manage_dns：<span class="number">1</span> </span><br><span class="line">restart_dhcp：<span class="number">1</span> </span><br><span class="line">restart_dns：<span class="number">1</span></span><br></pre></td></tr></table></figure>
+<h4 id="六、修改root默认密码：这里密码也设为root"><a href="#六、修改root默认密码：这里密码也设为root" class="headerlink" title="六、修改root默认密码：这里密码也设为root"></a>六、修改root默认密码：这里密码也设为root</h4><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vi <span class="meta-keyword">/etc/</span>cobbler/settings</span><br><span class="line"></span><br><span class="line">openssl passwd <span class="number">-1</span> <span class="string">"root"</span></span><br><span class="line">将产生的字符串写入<span class="meta-keyword">/etc/</span>cobbler/settings的default_password_crypted中</span><br></pre></td></tr></table></figure>
+<h4 id="七、修改cobbler的dhcp模版：注意这些需要根据自己的网络环境进行设置"><a href="#七、修改cobbler的dhcp模版：注意这些需要根据自己的网络环境进行设置" class="headerlink" title="七、修改cobbler的dhcp模版：注意这些需要根据自己的网络环境进行设置"></a>七、修改cobbler的dhcp模版：注意这些需要根据自己的网络环境进行设置</h4><figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/cobbler/dhcp.template</span><br><span class="line"></span><br><span class="line">subnet <span class="number">192.168.37.0</span> netmask <span class="number">255.255.255.0</span> &#123;  </span><br><span class="line">     option routers             cobbler server所在的ip<span class="comment">;  </span></span><br><span class="line">     option domain-name-servers cobbler server所在的ip<span class="comment">;  </span></span><br><span class="line">     option subnet-mask         <span class="number">255.255.255.0</span><span class="comment">;  </span></span><br><span class="line">     #range dynamic-bootp        <span class="number">192.168.37.200</span> <span class="number">192.168.145.240</span><span class="comment">;  </span></span><br><span class="line">     default-lease-time         <span class="number">21600</span><span class="comment">;  </span></span><br><span class="line">     max-lease-time             <span class="number">43200</span><span class="comment">;  </span></span><br><span class="line">     next-server                $next_server<span class="comment">;  </span></span><br><span class="line">     filename           "/pxelinux.<span class="number">0</span>"<span class="comment">;  </span></span><br><span class="line">     host test &#123; # 为指定机器指定ip地址   </span><br><span class="line">         hardware ethernet <span class="number">08</span>:<span class="number">00</span>:<span class="number">27</span>:<span class="number">2</span>C:<span class="number">30</span>:<span class="number">8</span>C<span class="comment">;     </span></span><br><span class="line">         fixed-address <span class="number">192.168.145.155</span><span class="comment">;  </span></span><br><span class="line">     &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="八、编辑自定义的kickstart文件："><a href="#八、编辑自定义的kickstart文件：" class="headerlink" title="八、编辑自定义的kickstart文件："></a>八、编辑自定义的kickstart文件：</h4><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cp /var/<span class="class"><span class="keyword">lib</span>/<span class="title">cobbler</span>/<span class="title">kickstarts</span>/<span class="title">sample_end</span>.<span class="title">ks</span> ./<span class="title">centos6</span>.5-<span class="title">x86_64</span>.<span class="title">ks</span></span></span><br><span class="line">vi ./centos6.<span class="number">5</span>-x86_64.ks</span><br><span class="line"></span><br><span class="line">修改root密码，时区等等操作，如果初次安装，可以使用默认的ks文件，不用管这个步骤</span><br></pre></td></tr></table></figure>
+<h4 id="九、启动cobbler："><a href="#九、启动cobbler：" class="headerlink" title="九、启动cobbler："></a>九、启动cobbler：</h4><figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">service cobblerd restart</span><br><span class="line">cobbler get-loaders  </span><br><span class="line">cobbler<span class="built_in"> check</span><br><span class="line"></span>cobbler sync</span><br></pre></td></tr></table></figure>
+<p>依次检查上面check出现的问题，如果有不满足的，依次修改直到满足，有些如果已经设置，但还是提醒，可以不管，比如selinux已经设置了setenforce 0，但还是提醒，这是因为没有重启，不用管这个。</p>
+<h4 id="十、导入OS镜像："><a href="#十、导入OS镜像：" class="headerlink" title="十、导入OS镜像："></a>十、导入OS镜像：</h4><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir <span class="regexp">/mnt/</span>centos_iso</span><br><span class="line">mount -o loop .<span class="regexp">/iso/</span>CentOS-<span class="number">6.5</span>-x86_64-minimal.iso <span class="regexp">/mnt/</span>centos_iso</span><br><span class="line">cobbler <span class="keyword">import</span> --arch=x86_64 --path=<span class="regexp">/mnt/</span>centos_iso --name=CentOS-<span class="number">6.5</span></span><br></pre></td></tr></table></figure>
+<h4 id="十一、再次同步修改："><a href="#十一、再次同步修改：" class="headerlink" title="十一、再次同步修改："></a>十一、再次同步修改：</h4><figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cobbler <span class="keyword">sync</span></span><br></pre></td></tr></table></figure>
+<h4 id="十二、OK，下面可以查看是否配置成功："><a href="#十二、OK，下面可以查看是否配置成功：" class="headerlink" title="十二、OK，下面可以查看是否配置成功："></a>十二、OK，下面可以查看是否配置成功：</h4><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cobbler <span class="keyword">report</span></span><br><span class="line">cobbler distro <span class="keyword">list</span></span><br><span class="line">cobbler profile <span class="keyword">list</span></span><br></pre></td></tr></table></figure>
+<p>此时，可以新建虚拟机配置从网络启动，然后选择我们的cobbler上传的os镜像，就可以安装了。</p>
+<p>cobbler自带了强大的命令，可以自由的配置很多功能，详细可以参见官网。</p>
+<p>另，我写了个一键部署cobbler的脚本，之后会上传到github上，可以参考：<br><a href="http://" target="_blank" rel="external">http://</a></p>
+<h4 id="Reference："><a href="#Reference：" class="headerlink" title="Reference："></a>Reference：</h4><ol>
+<li><a href="https://github.com/cobbler/cobbler" target="_blank" rel="external">https://github.com/cobbler/cobbler</a></li>
+<li><a href="https://cobbler.github.io/" target="_blank" rel="external">https://cobbler.github.io/</a> </li>
+</ol>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux/">linux</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/linux/">linux</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://qiaowei.xyz/2016/04/10/cobbler快速批量安装OS/" data-title="cobbler快速批量安装OS | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2016/04/06/LeetCode-Letter-Combinations-of-a-Phone-Number/"  title="LeetCode Letter Combinations of a Phone Number">
+ <strong>下一篇：</strong><br/> 
+ <span>LeetCode Letter Combinations of a Phone Number
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2016/04/10/cobbler快速批量安装OS/" data-title="cobbler快速批量安装OS" data-url="http://qiaowei.xyz/2016/04/10/cobbler快速批量安装OS/"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、禁用SELinux和Firewall："><span class="toc-number">1.</span> <span class="toc-text">一、禁用SELinux和Firewall：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、下载并安装epel的repo，安装相关的包："><span class="toc-number">2.</span> <span class="toc-text">二、下载并安装epel的repo，安装相关的包：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、设置服务开机自启动，开启服务："><span class="toc-number">3.</span> <span class="toc-text">三、设置服务开机自启动，开启服务：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#四、修改cobbler以及其依赖服务的相关设置："><span class="toc-number">4.</span> <span class="toc-text">四、修改cobbler以及其依赖服务的相关设置：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#五、修改cobbler的配置文件："><span class="toc-number">5.</span> <span class="toc-text">五、修改cobbler的配置文件：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#六、修改root默认密码：这里密码也设为root"><span class="toc-number">6.</span> <span class="toc-text">六、修改root默认密码：这里密码也设为root</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#七、修改cobbler的dhcp模版：注意这些需要根据自己的网络环境进行设置"><span class="toc-number">7.</span> <span class="toc-text">七、修改cobbler的dhcp模版：注意这些需要根据自己的网络环境进行设置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#八、编辑自定义的kickstart文件："><span class="toc-number">8.</span> <span class="toc-text">八、编辑自定义的kickstart文件：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#九、启动cobbler："><span class="toc-number">9.</span> <span class="toc-text">九、启动cobbler：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#十、导入OS镜像："><span class="toc-number">10.</span> <span class="toc-text">十、导入OS镜像：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#十一、再次同步修改："><span class="toc-number">11.</span> <span class="toc-text">十一、再次同步修改：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#十二、OK，下面可以查看是否配置成功："><span class="toc-number">12.</span> <span class="toc-text">十二、OK，下面可以查看是否配置成功：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Reference："><span class="toc-number">13.</span> <span class="toc-text">Reference：</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="github-card">
+<p class="asidetitle">Github 名片</p>
+<div class="github-card" data-github="qwurey" data-width="220" data-height="119" data-theme="medium">
+<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
+</div>
+  </div>
+
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/ambari/" title="ambari">ambari<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/flume/" title="flume">flume<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/leetcode/" title="leetcode">leetcode<sup>17</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/life/" title="life">life<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/osx/" title="osx">osx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pg/" title="pg">pg<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pgxl/" title="pgxl">pgxl<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/python/" title="python">python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/regex/" title="regex">regex<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tool/" title="tool">tool<sup>3</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/REST-API/" style="font-size: 10px;">REST API</a> <a href="/tags/ambari/" style="font-size: 13.33px;">ambari</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/flume/" style="font-size: 16.67px;">flume</a> <a href="/tags/leetcode/" style="font-size: 20px;">leetcode</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/pg/" style="font-size: 10px;">pg</a> <a href="/tags/pgxl/" style="font-size: 16.67px;">pgxl</a> <a href="/tags/postgres-xl/" style="font-size: 16.67px;">postgres-xl</a> <a href="/tags/puppet/" style="font-size: 10px;">puppet</a> <a href="/tags/python/" style="font-size: 13.33px;">python</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/tips/" style="font-size: 16.67px;">tips</a>
+    </div>
+  </div>
+
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=1758475283&verifier=ec858d3c&dpc=1"></iframe>
+</div>
+
+
+
+  <!-- 多说最新评论 start -->
+<p class="asidetitle">最新评论</p>
+    <div class="ds-recent-comments" data-num-items="5" data-show-avatars="0" data-show-time="1" data-show-title="1" data-show-admin="0" data-excerpt-length="70"></div>
+    <!-- 多说最新评论 end -->
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:"urey"};
+    (function() {
+            var ds = document.createElement('script');
+                    ds.type = 'text/javascript';ds.async = true;
+                            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                                    ds.charset = 'UTF-8';
+                                            (document.getElementsByTagName('head')[0] 
+                                                     || document.getElementsByTagName('body')[0]).appendChild(ds);
+                                                })();
+    </script>
+    <!-- 多说公共JS代码 end -->
+
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://blog.csdn.net/yeruby" target="_blank" title="在路上的学习者">在路上的学习者</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://macshuo.com/" target="_blank" title="MacTalk-池建强的随想录">MacTalk-池建强的随想录</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://www.liaoxuefeng.com/" target="_blank" title="廖雪峰的官方网站">廖雪峰的官方网站</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Urey. <br/>
+			Welcome to contact me ^_^</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/1758475283" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/qwurey" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		<a href="https://www.linkedin.com/in/qwurey" target="_blank" class="icon-linkedin" title="linkedin"></a>
+		
+		
+		
+		<a href="http://www.zhihu.com/people/urey" target="_blank" class="icon-zhihu" title="知乎"></a>
+		
+		
+		
+		<a href="mailto:qiaowei@pku.edu.cn" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="/about" target="_blank" title="urey">urey</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+        getSize();
+        if (myWidth >= 1024) {
+          c.click();
+        }
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"urey"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256263437'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1256263437' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

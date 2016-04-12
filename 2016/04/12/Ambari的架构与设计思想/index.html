@@ -4,23 +4,47 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>LeetCode Generate Parentheses | Urey on the way</title>
+    <title>Ambari的架构与设计思想 | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="DFS">
+    <meta name="description" content="Ambari的架构通过三张图来说明：
+第一张架构图告诉我们：Ambari是Hortonworks贡献给社区的、完全开源的、Hadoop生态的集群管理、监控、部署的工具：
+
+第二张架构图告诉我们：
+
+对外，Ambari提供ambari web，rest api，ambari shell三大方式操作机群；
+ambari将集群的配置、各个服务的配置等信息存在ambari server端的DB中(比如可">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LeetCode Generate Parentheses">
-<meta property="og:url" content="http://qiaowei.xyz/2015/12/09/LeetCode-Generate-Parentheses/index.html">
+<meta property="og:title" content="Ambari的架构与设计思想">
+<meta property="og:url" content="http://qiaowei.xyz/2016/04/12/Ambari的架构与设计思想/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="DFS">
-<meta property="og:updated_time" content="2016-04-09T09:37:35.000Z">
+<meta property="og:description" content="Ambari的架构通过三张图来说明：
+第一张架构图告诉我们：Ambari是Hortonworks贡献给社区的、完全开源的、Hadoop生态的集群管理、监控、部署的工具：
+
+第二张架构图告诉我们：
+
+对外，Ambari提供ambari web，rest api，ambari shell三大方式操作机群；
+ambari将集群的配置、各个服务的配置等信息存在ambari server端的DB中(比如可">
+<meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/ambari_arch1.png">
+<meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/ambari_arch2.png">
+<meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/ambari-arch3.png">
+<meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/ambari-concepts.png">
+<meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/ambari-stageplan.png">
+<meta property="og:updated_time" content="2016-04-12T14:11:45.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LeetCode Generate Parentheses">
-<meta name="twitter:description" content="DFS">
+<meta name="twitter:title" content="Ambari的架构与设计思想">
+<meta name="twitter:description" content="Ambari的架构通过三张图来说明：
+第一张架构图告诉我们：Ambari是Hortonworks贡献给社区的、完全开源的、Hadoop生态的集群管理、监控、部署的工具：
+
+第二张架构图告诉我们：
+
+对外，Ambari提供ambari web，rest api，ambari shell三大方式操作机群；
+ambari将集群的配置、各个服务的配置等信息存在ambari server端的DB中(比如可">
+<meta name="twitter:image" content="http://7xlhna.com1.z0.glb.clouddn.com/ambari_arch1.png">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -79,14 +103,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/12/09/LeetCode-Generate-Parentheses/" title="LeetCode Generate Parentheses" itemprop="url">LeetCode Generate Parentheses</a>
+      <a href="/2016/04/12/Ambari的架构与设计思想/" title="Ambari的架构与设计思想" itemprop="url">Ambari的架构与设计思想</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2015-12-09T09:36:19.000Z" itemprop="datePublished"> 发表于 2015-12-09</time>
+    <time datetime="2016-04-12T02:31:11.000Z" itemprop="datePublished"> 发表于 2016-04-12</time>
     
   </p>
 </header>
@@ -95,13 +119,55 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#Ambari的架构"><span class="toc-number">1.</span> <span class="toc-text">Ambari的架构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Ambari的设计思想"><span class="toc-number">2.</span> <span class="toc-text">Ambari的设计思想</span></a></li></ol>
 		
 		</div>
 		
-		<p>DFS</p>
-<a id="more"></a>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> Solution &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">dfs</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; &amp;res, <span class="built_in">string</span> v, <span class="keyword">int</span> n, <span class="keyword">int</span> left, <span class="keyword">int</span> right)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(n == left) &#123;</span><br><span class="line">            v.append(n - right, <span class="string">')'</span>);</span><br><span class="line">            res.push_back(v);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        dfs(res, v + <span class="string">'('</span>, n, left + <span class="number">1</span>, right);</span><br><span class="line">        <span class="keyword">if</span>(left &gt; right) dfs(res, v + <span class="string">')'</span>, n, left, right + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; generateParenthesis(<span class="keyword">int</span> n) &#123;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; res;</span><br><span class="line">        <span class="keyword">if</span>(n &gt; <span class="number">0</span>) dfs(res, <span class="string">""</span>, n, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+		<a id="more"></a>
+<h4 id="Ambari的架构"><a href="#Ambari的架构" class="headerlink" title="Ambari的架构"></a><strong>Ambari的架构</strong></h4><p>通过三张图来说明：</p>
+<p>第一张架构图告诉我们：Ambari是Hortonworks贡献给社区的、完全开源的、Hadoop生态的集群管理、监控、部署的工具：</p>
+<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/ambari_arch1.png" width="600" height="330" style="display:block;margin:auto"></p>
+<p><br><br>第二张架构图告诉我们：</p>
+<ol>
+<li>对外，Ambari提供ambari web，rest api，ambari shell三大方式操作机群；</li>
+<li>ambari将集群的配置、各个服务的配置等信息存在ambari server端的DB中(比如可以是postgresql)；</li>
+<li>ambari server与ambari agent的交流走RPC，即agent向server报告心跳，server将command通过response发回给agent，agent本地执行命令，比如：agent端执行相应的python脚本；</li>
+<li>ambari有自己的一套监控、告警、镜像服务，以可插拔的形式供上层服务调用；</li>
+</ol>
+<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/ambari_arch2.png" width="600" height="350" style="display:block;margin:auto"></p>
+<p><br><br>第三张架构图是第二张图的简化：</p>
+<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/ambari-arch3.png" width="600" height="350" style="display:block;margin:auto"></p>
+<h4 id="Ambari的设计思想"><a href="#Ambari的设计思想" class="headerlink" title="Ambari的设计思想"></a><strong>Ambari的设计思想</strong></h4><p>Ambari最重要的一块就是将各个Hadoop生态圈的组件抽象成一个个服务，Ambari Stack可以看成一个服务集合，比如，Ambari就使用了Hortonworks的Hortonworks Data Platform（HDP）来做为提供服务的服务栈。</p>
+<p>这里简单介绍一下HDP：</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">它是一款基于Apache Hadoop的是开源数据平台，提供大数据云存储，大数据处理和分析等服务。该平台是专门用来应对多来源和多格式的数据，并使其处理起来能变成简单、更有成本效益。</span><br><span class="line"></span><br><span class="line">HDP还提供了一个开放，稳定和高度可扩展的平台，使得更容易地集成Apache Hadoop的数据流业务与现有的数据架构。该平台包括各种的Apache Hadoop项目以及Hadoop分布式文件系统（HDFS）、MapReduce、Pig、Hive、HBase、Zookeeper和其他各种组件，使Hadoop的平台更易于管理，更加具有开放性以及可扩展性。</span><br><span class="line"></span><br><span class="line">与其对应的有<span class="keyword">Cloudera的CDH（Cloudera’s </span><span class="keyword">Distribution </span>Including Apache Hadoop），都是商业公司将开源的Hadoop拿来优化、改进、二次开发后再推出去，通过咨询等方式盈利。</span><br></pre></td></tr></table></figure>
+<p>好，回到Ambari的话题。Ambari Stack下面就对应了一个又一个Ambari Service，比如HDFS，那HDFS包含有不同的组件（Datanode，NameNode），这时Ambari又对其进行了抽象：</p>
+<p>一个Service由多个ServiceComponent构成，一个ServiceComponent由多个ServiceComponentHost构成：</p>
+<ol>
+<li>Service: HDFS, YARN, HBase, etc</li>
+<li>ServiceComponent: HDFS.NameNode, YARN.ResourceManager, HBase.RegionServer, etc</li>
+<li>ServiceComponentHost: HDFS.NameNode.HostA, YARN.ResourceManager.HostB, etc</li>
+</ol>
+<p>对应上面的三种<strong>资源</strong>，有三种操作：</p>
+<ol>
+<li>Operation: Service层面的操作(Install/Start/Stop/Config)，一个Operation可以作用于一个或多个Service。</li>
+<li>Stage: ServicesComponent层面的操作，根据不同ServicesComponent操作间的依赖关系，一个Operation的所有Task可能被划分成多个Stage，一个Stage内的多个Task相互没有依赖，可以并行执行。</li>
+<li>Task: ServiceComponentHost层面的操作，为了完成一个Operation，需要为不同的机器分配一系列的Task去执行。</li>
+</ol>
+<p>需要特别说明的是操作的执行顺序：</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 不同的Stage只能顺序执行。后面的Stage只有在前面Stage执行成功后才会下发给Agent。如果前面Stage失败，后面的Stage将取消。</span><br><span class="line"><span class="number">2.</span> 同一个Stage内的多个<span class="built_in">Task</span>可以并行执行，可以同时下发给Agent。如果某个<span class="built_in">Task</span>失败，其他的已下发且正执行的<span class="built_in">Task</span>将被取消。</span><br><span class="line"><span class="number">3.</span> 分配给同一个机器的不同<span class="built_in">Task</span>只会顺序执行。</span><br></pre></td></tr></table></figure>
+<p>下图描述了这三种资源与操作的对应关系：</p>
+<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/ambari-concepts.png" width="600" height="150" style="display:block;margin:auto"></p>
+<p>上述的三个操作抽象是定义态的描述，它们分别对应一个执行态的抽象：</p>
+<ol>
+<li>StagePlan: 执行态的Operation，是一个Stage DAG。</li>
+<li>Action: 执行态的Stage，由多个Command构成。</li>
+<li>Command: 执行态的Task，下发给具体的机器执行。主要有以下几种： </li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">（1）、ExecuteCommand: 对服务组件执行<span class="keyword">INSTALL</span>/<span class="keyword">START</span>/<span class="keyword">STOP</span>等操作。</span><br><span class="line">（<span class="number">2</span>）、StatusCommand: 对服务组件执行死活检查（由<span class="keyword">Server</span>定期下发）。</span><br><span class="line">（<span class="number">3</span>）、CancelCommand: 取消其他已经下发的Task（当Stage中的某个Task失败时）。</span><br><span class="line">（<span class="number">4</span>）、RegistrationCommand: 要求<span class="keyword">Agent</span>向<span class="keyword">Server</span>重新注册（当发现<span class="keyword">Server</span>维护的心跳序号与<span class="keyword">Agent</span>上报的不一致时）。</span><br></pre></td></tr></table></figure>
+<p>下图通过一个具体实例（启动HDFS和YARN服务），展示了其Stage DAG的构建逻辑：</p>
+<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/ambari-stageplan.png" width="400" height="350" style="display:block;margin:auto"></p>
+<p>那么如何构建一个Stage DAG？</p>
+<p>见下一篇文章。</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -109,13 +175,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
+  <a class="article-category-link" href="/categories/ambari/">ambari</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
+  <span></span> <a href="/tags/ambari/">ambari</a>
   </div>
 
 </div>
@@ -124,7 +190,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2015/12/09/LeetCode-Generate-Parentheses/" data-title="LeetCode Generate Parentheses | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2016/04/12/Ambari的架构与设计思想/" data-title="Ambari的架构与设计思想 | Urey on the way" data-tsina="1758475283" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -137,19 +203,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2016/02/27/2016-02-27-shi-shi-ri-zhi-shou-ji-cha-xun-fen-xi-xi-tong-flume-plus-elasticsearch-plus-kibana/" title="实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)">
-  <strong>上一篇：</strong><br/>
-  <span>
-  实时日志收集-查询-分析系统(Flume+ElasticSearch+Kibana)</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/12/09/LeetCode-Merge-Two-Sorted-Lists/"  title="LeetCode Merge Two Sorted Lists">
+<a href="/2016/04/10/cobbler原理分析/"  title="cobbler原理分析">
  <strong>下一篇：</strong><br/> 
- <span>LeetCode Merge Two Sorted Lists
+ <span>cobbler原理分析
 </span>
 </a>
 </div>
@@ -158,7 +216,7 @@
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2015/12/09/LeetCode-Generate-Parentheses/" data-title="LeetCode Generate Parentheses" data-url="http://qiaowei.xyz/2015/12/09/LeetCode-Generate-Parentheses/"></div>
+	<div class="ds-thread" data-thread-key="2016/04/12/Ambari的架构与设计思想/" data-title="Ambari的架构与设计思想" data-url="http://qiaowei.xyz/2016/04/12/Ambari的架构与设计思想/"></div>
 </section>
 
 
@@ -168,7 +226,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#Ambari的架构"><span class="toc-number">1.</span> <span class="toc-text">Ambari的架构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Ambari的设计思想"><span class="toc-number">2.</span> <span class="toc-text">Ambari的设计思想</span></a></li></ol>
  
   </div>
 

@@ -1,0 +1,608 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Ambari的DAG是如何做的 | Urey on the way</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="urey">
+    
+
+    
+    <meta name="description" content="我认为Ambari最有趣的地方之一是如何计算DAG(Directed acyclic graph的简写，有向无环图)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ambari的DAG是如何做的">
+<meta property="og:url" content="http://qiaowei.xyz/2016/04/13/Ambari的DAG是如何做的/index.html">
+<meta property="og:site_name" content="Urey on the way">
+<meta property="og:description" content="我认为Ambari最有趣的地方之一是如何计算DAG(Directed acyclic graph的简写，有向无环图)">
+<meta property="og:updated_time" content="2016-04-12T14:14:23.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ambari的DAG是如何做的">
+<meta name="twitter:description" content="我认为Ambari最有趣的地方之一是如何计算DAG(Directed acyclic graph的简写，有向无环图)">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Urey on the way" title="Urey on the way"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Urey on the way">Urey on the way</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" autocomplete="off" name="q" maxlength="20" placeholder="搜索" />
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/13/Ambari的DAG是如何做的/" title="Ambari的DAG是如何做的" itemprop="url">Ambari的DAG是如何做的</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-13T14:13:14.000Z" itemprop="datePublished"> 发表于 2016-04-13</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			
+		
+		</div>
+		
+		<p>我认为Ambari最有趣的地方之一是如何计算DAG(Directed acyclic graph的简写，有向无环图)</p>
+<a id="more"></a>
+<p>先简要概括一下Ambari是如何确定执行流程的：</p>
+<p><strong>ambari server会根据集群的配置信息，建立一个DAG，根据这个DAG，划分Stage，Stage间有执行顺序，必须按着顺序来，根据Stage，生成Command，将Command下发给ambari agent执行，第一个Stage的所有Command全部执行成功，才会执行第二个Stage，依次类推。</strong></p>
+<p><br><br>当然，有很多细节需要补充，我们先认识几个类，按理解的重要性排序：</p>
+<p>第一个类：RoleGraphNode，它可以看成DAG的一个点<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RoleGraphNode</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">RoleGraphNode</span><span class="params">(Role role, RoleCommand command)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.role = role;</span><br><span class="line">    <span class="keyword">this</span>.command = command;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">private</span> Role role;</span><br><span class="line">  <span class="keyword">private</span> RoleCommand command;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span> inDegree = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">private</span> List&lt;String&gt; hosts = <span class="keyword">new</span> ArrayList&lt;String&gt;();</span><br><span class="line">  <span class="keyword">private</span> Map&lt;String, RoleGraphNode&gt; edges = <span class="keyword">new</span> TreeMap&lt;String, RoleGraphNode&gt;();</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">addHost</span><span class="params">(String host)</span> </span>&#123;</span><br><span class="line">    hosts.add(host);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">addEdge</span><span class="params">(RoleGraphNode rgn)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (edges.containsKey(rgn.getRole().toString())) &#123;</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    edges.put(rgn.getRole().toString(), rgn);</span><br><span class="line">    rgn.incrementInDegree();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">incrementInDegree</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    inDegree ++;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Role <span class="title">getRole</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> role;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> RoleCommand <span class="title">getCommand</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> command;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> List&lt;String&gt; <span class="title">getHosts</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> hosts;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getInDegree</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> inDegree;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="function">Collection&lt;RoleGraphNode&gt; <span class="title">getEdges</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> edges.values();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">decrementInDegree</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    inDegree --;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    StringBuilder builder = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">    builder.append(<span class="string">"("</span>+role+<span class="string">", "</span>+command +<span class="string">", "</span>+inDegree+<span class="string">")"</span>);</span><br><span class="line">    <span class="keyword">return</span> builder.toString();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>一个DAG的节点有两部分构成，Role和RoleCommand，<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">(1) Role: Role defines the components that are available to Ambari. 说白了，就是component。</span><br><span class="line">(2) RoleCommand：一个枚举类，包含：<span class="keyword">INSTALL</span>,<span class="keyword">UNINSTALL</span>,<span class="keyword">START</span>,<span class="keyword">STOP</span>,<span class="keyword">EXECUTE</span>,<span class="keyword">ABORT</span>,<span class="keyword">UPGRADE</span>,SERVICE_CHECK,</span><br><span class="line">  <span class="comment">/**</span><br><span class="line">   * Represents any custom command</span><br><span class="line">   */</span></span><br><span class="line">  CUSTOM_COMMAND,</span><br><span class="line"></span><br><span class="line">  <span class="comment">/**</span><br><span class="line">   * Represents any action</span><br><span class="line">   */</span></span><br><span class="line">  ACTIONEXECUTE</span><br></pre></td></tr></table></figure></p>
+<p>前面提到，Stage需要按顺序执行，那DAG如何确定顺序呢？</p>
+<p>数据结构课都有上过，既然是一个有向无环图，那么先找到所有入度为0的nodes，这些nodes可以被划分在第一个Stage中，然后去掉这些nodes，以这些nodes为起点的边的终点的nodes的入度要-1，再找到所有入度为0的nodes，那么这些nodes可以被划分为第二个Stage，依次类推，就可以确定有多少个Stage和各个Stage的执行顺序。</p>
+<p>在代码中是如何体现的呢？</p>
+<p>每个RoleGraphNode都可以表示为一个(role, command, inDegree)三元组，比如(datanode, install, 0)；<br>每个RoleGraphNode都有该节点的边的信息（Map<string, rolegraphnode=""> edges），来表示该节点连着哪些其他的RoleGraphNode；<br>每个RoleGraphNode都有自己的入度值；<br>每个RoleGraphNode还记录着有哪些host”有”这个node；</string,></p>
+<p>第二个类：RoleCommandOrder，它可以理解成是如何生成DAG的graph的规则:<br><figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">This <span class="built_in">class</span> <span class="keyword">is</span> used <span class="keyword">to</span> establish <span class="keyword">the</span> order <span class="keyword">between</span> two roles.</span><br></pre></td></tr></table></figure></p>
+<p>判定规则函数实现如下：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Returns the dependency order. -1 =&gt; rgn1 before rgn2, 0 =&gt; they can be</span><br><span class="line"> * parallel 1 =&gt; rgn2 before rgn1</span><br><span class="line"> * </span><br><span class="line"> * @param rgn1 roleGraphNode1</span><br><span class="line"> * @param rgn2 roleGraphNode2</span><br><span class="line"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">order</span>(<span class="params">RoleGraphNode rgn1, RoleGraphNode rgn2</span>) </span>&#123;</span><br><span class="line">  RoleCommandPair rcp1 = <span class="keyword">new</span> RoleCommandPair(rgn1.getRole(),</span><br><span class="line">      rgn1.getCommand());</span><br><span class="line">  RoleCommandPair rcp2 = <span class="keyword">new</span> RoleCommandPair(rgn2.getRole(),</span><br><span class="line">      rgn2.getCommand());</span><br><span class="line">  <span class="keyword">if</span> ((<span class="keyword">this</span>.dependencies.<span class="keyword">get</span>(rcp1) != <span class="keyword">null</span>)</span><br><span class="line">      &amp;&amp; (<span class="keyword">this</span>.dependencies.<span class="keyword">get</span>(rcp1).contains(rcp2))) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  &#125; <span class="function"><span class="keyword">else</span> <span class="title">if</span> (<span class="params">(<span class="keyword">this</span>.dependencies.<span class="keyword">get</span>(rcp2</span>) !</span>= <span class="keyword">null</span>)</span><br><span class="line">      &amp;&amp; (<span class="keyword">this</span>.dependencies.<span class="keyword">get</span>(rcp2).contains(rcp1))) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  &#125; <span class="function"><span class="keyword">else</span> <span class="title">if</span> (<span class="params">!rgn2.getCommand(</span>).<span class="title">equals</span>(<span class="params">rgn1.getCommand(</span>))) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> compareCommands(rgn1, rgn2);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>给定两个node：node1和node2</p>
+<ol>
+<li>如果node1 -&gt; node2，则返回-1；</li>
+<li>如果node1和node2不存在先后关系，则返回0；</li>
+<li>反之，如果node2 -&gt; node1，则返回1；</li>
+</ol>
+<p>谁先谁后是根据command的类型决定：<br>INSTALL -&gt; START -&gt; EXECUTE -&gt; SERVICE_CHECK -&gt; STOP<br><figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">private <span class="keyword">int</span> compareCommands(RoleGraphNode rgn1, RoleGraphNode rgn2) &#123;</span><br><span class="line">  <span class="comment">// <span class="doctag">TODO:</span> add proper order comparison support for RoleCommand.ACTIONEXECUTE</span></span><br><span class="line"></span><br><span class="line">  RoleCommand rc1 = rgn1.getCommand()<span class="comment">;</span></span><br><span class="line">  RoleCommand rc2 = rgn2.getCommand()<span class="comment">;</span></span><br><span class="line">  <span class="keyword">if</span> (rc1.equals(rc2)) &#123;</span><br><span class="line">    <span class="comment">//If its coming here means roles have no dependencies.</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span><span class="comment">;</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (independentCommands.contains(rc1) &amp;&amp; independentCommands.contains(rc2)) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span><span class="comment">;</span></span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">if</span> (rc1.equals(RoleCommand.INSTALL)) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span><span class="comment">;</span></span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (rc2.equals(RoleCommand.INSTALL)) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span><span class="comment">;</span></span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (rc1.equals(RoleCommand.START) || rc1.equals(RoleCommand.EXECUTE)</span><br><span class="line">          || rc1.equals(RoleCommand.SERVICE_CHECK)) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span><span class="comment">;</span></span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (rc2.equals(RoleCommand.START) || rc2.equals(RoleCommand.EXECUTE)</span><br><span class="line">          || rc2.equals(RoleCommand.SERVICE_CHECK)) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span><span class="comment">;</span></span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (rc1.equals(RoleCommand.<span class="keyword">STOP</span>)) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span><span class="comment">;</span></span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (rc2.equals(RoleCommand.<span class="keyword">STOP</span>)) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span><span class="comment">;</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span><span class="comment">;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>这里要明确的是：</strong><br>除了上面的规则，还有一类规则信息是config，比如有role_command_order.json这个配置文件给定的规则，这类规则通常规定了不同component之间的顺序关系，可以是一个service间的不同component，比如：<br><figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"HIVE_SERVER-START"</span>: [</span><br><span class="line">  <span class="string">"HIVE_METADATA_DATABASE-START"</span></span><br><span class="line">],</span><br></pre></td></tr></table></figure></p>
+<p>也可以是不同service间的不同component，比如：<br><figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"KAFKA_MANAGER-START"</span>: [</span><br><span class="line">  <span class="string">"ZOOKEEPER_SERVER-START"</span></span><br><span class="line">],</span><br></pre></td></tr></table></figure></p>
+<p>再比如有service的metainfo.xml这个配置文件给定的规则，规定了service间的依赖关系：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">requiredServices</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">service</span>&gt;</span>YARN<span class="tag">&lt;/<span class="name">service</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">service</span>&gt;</span>HIVE<span class="tag">&lt;/<span class="name">service</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">service</span>&gt;</span>HDFS<span class="tag">&lt;/<span class="name">service</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">requiredServices</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>第三个类：RoleGraph，通过给定的nodes来划分Stage，提供了如下方法：<br><figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">1</span>) <span class="keyword">public</span> <span class="literal">void</span> build(Stage stage)</span><br><span class="line">给定一个Stage，建立一个DAG</span><br><span class="line"></span><br><span class="line">(<span class="number">2</span>) <span class="keyword">public</span> <span class="built_in">List</span>&lt;Stage&gt; getStages()</span><br><span class="line">给定nodes，建立Stages</span><br><span class="line"></span><br><span class="line">(<span class="number">3</span>) <span class="keyword">private</span> synchronized <span class="literal">void</span> removeZeroInDegreeNode(<span class="built_in">String</span> role)</span><br><span class="line">去除入度为<span class="number">0</span>的node</span><br><span class="line"></span><br><span class="line">(<span class="number">4</span>) <span class="keyword">private</span> Stage getStageFromGraphNodes(Stage origStage,</span><br><span class="line">      <span class="built_in">List</span>&lt;RoleGraphNode&gt; stageGraphNodes)</span><br><span class="line">给定一个Stage，和一些nodes，重建一个新的Stage</span><br><span class="line"></span><br><span class="line">(<span class="number">5</span>) <span class="keyword">public</span> <span class="built_in">String</span> stringifyGraph()</span><br><span class="line">字符串表示DAG</span><br></pre></td></tr></table></figure></p>
+<p><strong>这里要明确的是：</strong>有两种DAG</p>
+<ol>
+<li>Stage间的DAG：根据nodes建立Stage DAG，即不同Stage的DAG；</li>
+<li>Stage内部的DAG：根据给定Stage内部的nodes建立Task DAG，即不同Command的DAG；</li>
+</ol>
+<p>下面需要介绍调用关系，这些类是如何串起来和它们是如何被其它类调用的。<br>等待更新…</p>
+<p>下一节希望可以介绍Ambari的调度…</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/ambari/">ambari</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/ambari/">ambari</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://qiaowei.xyz/2016/04/13/Ambari的DAG是如何做的/" data-title="Ambari的DAG是如何做的 | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2016/04/12/Ambari的架构与设计思想/"  title="Ambari的架构与设计思想">
+ <strong>下一篇：</strong><br/> 
+ <span>Ambari的架构与设计思想
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2016/04/13/Ambari的DAG是如何做的/" data-title="Ambari的DAG是如何做的" data-url="http://qiaowei.xyz/2016/04/13/Ambari的DAG是如何做的/"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ 
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="github-card">
+<p class="asidetitle">Github 名片</p>
+<div class="github-card" data-github="qwurey" data-width="220" data-height="119" data-theme="medium">
+<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
+</div>
+  </div>
+
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/ambari/" title="ambari">ambari<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/flume/" title="flume">flume<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/leetcode/" title="leetcode">leetcode<sup>17</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/life/" title="life">life<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/osx/" title="osx">osx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pg/" title="pg">pg<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pgxl/" title="pgxl">pgxl<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/python/" title="python">python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/regex/" title="regex">regex<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tool/" title="tool">tool<sup>3</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/REST-API/" style="font-size: 10px;">REST API</a> <a href="/tags/ambari/" style="font-size: 17.5px;">ambari</a> <a href="/tags/cobbler/" style="font-size: 12.5px;">cobbler</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/flume/" style="font-size: 15px;">flume</a> <a href="/tags/leetcode/" style="font-size: 20px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/pg/" style="font-size: 10px;">pg</a> <a href="/tags/pgxl/" style="font-size: 15px;">pgxl</a> <a href="/tags/postgres-xl/" style="font-size: 15px;">postgres-xl</a> <a href="/tags/puppet/" style="font-size: 10px;">puppet</a> <a href="/tags/python/" style="font-size: 12.5px;">python</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/tips/" style="font-size: 15px;">tips</a>
+    </div>
+  </div>
+
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=1758475283&verifier=ec858d3c&dpc=1"></iframe>
+</div>
+
+
+
+  <!-- 多说最新评论 start -->
+<p class="asidetitle">最新评论</p>
+    <div class="ds-recent-comments" data-num-items="5" data-show-avatars="0" data-show-time="1" data-show-title="1" data-show-admin="0" data-excerpt-length="70"></div>
+    <!-- 多说最新评论 end -->
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:"urey"};
+    (function() {
+            var ds = document.createElement('script');
+                    ds.type = 'text/javascript';ds.async = true;
+                            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                                    ds.charset = 'UTF-8';
+                                            (document.getElementsByTagName('head')[0] 
+                                                     || document.getElementsByTagName('body')[0]).appendChild(ds);
+                                                })();
+    </script>
+    <!-- 多说公共JS代码 end -->
+
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://blog.csdn.net/yeruby" target="_blank" title="在路上的学习者">在路上的学习者</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://macshuo.com/" target="_blank" title="MacTalk-池建强的随想录">MacTalk-池建强的随想录</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://www.liaoxuefeng.com/" target="_blank" title="廖雪峰的官方网站">廖雪峰的官方网站</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Urey. <br/>
+			Welcome to contact me ^_^</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/1758475283" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/qwurey" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		<a href="https://www.linkedin.com/in/qwurey" target="_blank" class="icon-linkedin" title="linkedin"></a>
+		
+		
+		
+		<a href="http://www.zhihu.com/people/urey" target="_blank" class="icon-zhihu" title="知乎"></a>
+		
+		
+		
+		<a href="mailto:qiaowei@pku.edu.cn" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="/about" target="_blank" title="urey">urey</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+        getSize();
+        if (myWidth >= 1024) {
+          c.click();
+        }
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"urey"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256263437'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1256263437' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

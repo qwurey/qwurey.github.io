@@ -11,39 +11,21 @@
     
 
     
-    <meta name="description" content="Ambari的架构通过三张图来说明：
-第一张架构图告诉我们：Ambari是Hortonworks贡献给社区的、完全开源的、Hadoop生态的集群管理、监控、部署的工具：
-
-第二张架构图告诉我们：
-
-对外，Ambari提供ambari web，rest api，ambari shell三大方式操作机群；
-ambari将集群的配置、各个服务的配置等信息存在ambari server端的DB中(比如可">
+    <meta name="description" content="Ambari包罗了大部分Hadoop生态系统的组件，说明它的抽象层次、设计思想值得我们去研究学习。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Ambari的架构与设计思想">
 <meta property="og:url" content="http://qiaowei.xyz/2016/04/12/Ambari的架构与设计思想/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="Ambari的架构通过三张图来说明：
-第一张架构图告诉我们：Ambari是Hortonworks贡献给社区的、完全开源的、Hadoop生态的集群管理、监控、部署的工具：
-
-第二张架构图告诉我们：
-
-对外，Ambari提供ambari web，rest api，ambari shell三大方式操作机群；
-ambari将集群的配置、各个服务的配置等信息存在ambari server端的DB中(比如可">
+<meta property="og:description" content="Ambari包罗了大部分Hadoop生态系统的组件，说明它的抽象层次、设计思想值得我们去研究学习。">
 <meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/ambari_arch1.png">
 <meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/ambari_arch2.png">
 <meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/ambari-arch3.png">
 <meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/ambari-concepts.png">
 <meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/ambari-stageplan.png">
-<meta property="og:updated_time" content="2016-04-12T14:11:45.000Z">
+<meta property="og:updated_time" content="2016-04-12T14:24:04.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Ambari的架构与设计思想">
-<meta name="twitter:description" content="Ambari的架构通过三张图来说明：
-第一张架构图告诉我们：Ambari是Hortonworks贡献给社区的、完全开源的、Hadoop生态的集群管理、监控、部署的工具：
-
-第二张架构图告诉我们：
-
-对外，Ambari提供ambari web，rest api，ambari shell三大方式操作机群；
-ambari将集群的配置、各个服务的配置等信息存在ambari server端的DB中(比如可">
+<meta name="twitter:description" content="Ambari包罗了大部分Hadoop生态系统的组件，说明它的抽象层次、设计思想值得我们去研究学习。">
 <meta name="twitter:image" content="http://7xlhna.com1.z0.glb.clouddn.com/ambari_arch1.png">
 
     
@@ -123,7 +105,8 @@ ambari将集群的配置、各个服务的配置等信息存在ambari server端�
 		
 		</div>
 		
-		<a id="more"></a>
+		<p>Ambari包罗了大部分Hadoop生态系统的组件，说明它的抽象层次、设计思想值得我们去研究学习。</p>
+<a id="more"></a>
 <h4 id="Ambari的架构"><a href="#Ambari的架构" class="headerlink" title="Ambari的架构"></a><strong>Ambari的架构</strong></h4><p>通过三张图来说明：</p>
 <p>第一张架构图告诉我们：Ambari是Hortonworks贡献给社区的、完全开源的、Hadoop生态的集群管理、监控、部署的工具：</p>
 <p><img src="http://7xlhna.com1.z0.glb.clouddn.com/ambari_arch1.png" width="600" height="330" style="display:block;margin:auto"></p>

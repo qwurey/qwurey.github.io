@@ -1,0 +1,627 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Flume启动过程分析 | Urey on the way</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="urey">
+    
+
+    
+    <meta name="description" content="对Flume-NG的agent启动过程进行详细的分析。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flume启动过程分析">
+<meta property="og:url" content="http://qiaowei.xyz/2016/04/16/Flume启动过程分析/index.html">
+<meta property="og:site_name" content="Urey on the way">
+<meta property="og:description" content="对Flume-NG的agent启动过程进行详细的分析。">
+<meta property="og:updated_time" content="2016-04-16T05:53:38.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Flume启动过程分析">
+<meta name="twitter:description" content="对Flume-NG的agent启动过程进行详细的分析。">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Urey on the way" title="Urey on the way"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Urey on the way">Urey on the way</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" autocomplete="off" name="q" maxlength="20" placeholder="搜索" />
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/04/16/Flume启动过程分析/" title="Flume启动过程分析" itemprop="url">Flume启动过程分析</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
+		
+  <p class="article-time">
+    <time datetime="2016-04-16T02:27:30.000Z" itemprop="datePublished"> 发表于 2016-04-16</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#启动过程"><span class="toc-number">1.</span> <span class="toc-text">启动过程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#LifecycleAware接口"><span class="toc-number">1.0.1.</span> <span class="toc-text">LifecycleAware接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#EventBus事件监听和发布订阅模式"><span class="toc-number">1.0.2.</span> <span class="toc-text">EventBus事件监听和发布订阅模式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Application的start前与后"><span class="toc-number">1.0.3.</span> <span class="toc-text">Application的start前与后</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#start前："><span class="toc-number">1.0.3.1.</span> <span class="toc-text">start前：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#start后：application-start"><span class="toc-number">1.0.3.2.</span> <span class="toc-text">start后：application.start();</span></a></li></ol></li></ol></li></ol></li></ol>
+		
+		</div>
+		
+		<p>对Flume-NG的agent启动过程进行详细的分析。<br><a id="more"></a></p>
+<h2 id="启动过程"><a href="#启动过程" class="headerlink" title="启动过程"></a><strong>启动过程</strong></h2><p>flume的main函数在Application.java中，在flume-ng的shell启动脚本中会用java来起flume：</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$EXEC $JAVA_HOME/bin/java $JAVA_OPTS $FLUME_JAVA_OPTS <span class="string">"$&#123;arr_java_props[@]&#125;"</span> -cp <span class="string">"$FLUME_CLASSPATH"</span> -Djava.library.path=$FLUME_JAVA_LIBRARY_PATH <span class="string">"$FLUME_APPLICATION_CLASS"</span> $*</span><br></pre></td></tr></table></figure>
+<p>在main函数中，会检查一系列参数，最重要的是<code>no-reload-conf</code>，根据reload的不同，判断是否动态加载配置文件，然后start：</p>
+<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">List&lt;LifecycleAware&gt; components = Lists.newArrayList()<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (reload) &#123;</span><br><span class="line">          EventBus eventBus = new EventBus(agentName + <span class="string">"-event-bus"</span>)<span class="comment">;</span></span><br><span class="line">          PollingPropertiesFileConfigurationProvider configurationProvider =</span><br><span class="line">            new PollingPropertiesFileConfigurationProvider(</span><br><span class="line">              agentName, configurationFile, eventBus, <span class="number">30</span>)<span class="comment">;</span></span><br><span class="line">          components.add(configurationProvider)<span class="comment">;</span></span><br><span class="line">          application = new Application(components)<span class="comment">;</span></span><br><span class="line">          eventBus.register(application)<span class="comment">;</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          PropertiesFileConfigurationProvider configurationProvider =</span><br><span class="line">            new PropertiesFileConfigurationProvider(</span><br><span class="line">              agentName, configurationFile)<span class="comment">;</span></span><br><span class="line">          application = new Application()<span class="comment">;</span></span><br><span class="line">          application.handleConfigurationEvent(configurationProvider</span><br><span class="line">            .getConfiguration())<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        application.start()<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<p>这里面有很多需要讲解的：</p>
+<h4 id="LifecycleAware接口"><a href="#LifecycleAware接口" class="headerlink" title="LifecycleAware接口"></a><strong>LifecycleAware接口</strong></h4><p>实现这个接口的类是有定义好的一系列状态转化的生命周期的：</p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@InterfaceAudience.Public</span></span><br><span class="line"><span class="meta">@InterfaceStability.Stable</span></span><br><span class="line">public interface LifecycleAware &#123;</span><br><span class="line"></span><br><span class="line">  /<span class="keyword">*</span><span class="keyword">*</span></span><br><span class="line">   <span class="keyword">*</span> <span class="variable">&lt;p&gt;</span></span><br><span class="line">   <span class="keyword">*</span> Starts a service or component.</span><br><span class="line">   <span class="keyword">*</span> <span class="variable">&lt;/p&gt;</span></span><br><span class="line">   <span class="keyword">*</span> <span class="variable">&lt;p&gt;</span></span><br><span class="line">   <span class="keyword">*</span> Implementations should determine the result of any start logic and effect</span><br><span class="line">   <span class="keyword">*</span> the return value of &#123;<span class="meta">@link</span> <span class="comment">#getLifecycleState()&#125; accordingly.</span></span><br><span class="line">   <span class="keyword">*</span> <span class="variable">&lt;/p&gt;</span></span><br><span class="line">   <span class="keyword">*</span></span><br><span class="line">   <span class="keyword">*</span> <span class="meta">@throws</span> LifecycleException</span><br><span class="line">   <span class="keyword">*</span> <span class="meta">@throws</span> InterruptedException</span><br><span class="line">   <span class="keyword">*</span>/</span><br><span class="line">  public void start();</span><br><span class="line"></span><br><span class="line">  /<span class="keyword">*</span><span class="keyword">*</span></span><br><span class="line">   <span class="keyword">*</span> <span class="variable">&lt;p&gt;</span></span><br><span class="line">   <span class="keyword">*</span> Stops a service or component.</span><br><span class="line">   <span class="keyword">*</span> <span class="variable">&lt;/p&gt;</span></span><br><span class="line">   <span class="keyword">*</span> <span class="variable">&lt;p&gt;</span></span><br><span class="line">   <span class="keyword">*</span> Implementations should determine the result of any stop logic and effect</span><br><span class="line">   <span class="keyword">*</span> the return value of &#123;<span class="meta">@link</span> <span class="comment">#getLifecycleState()&#125; accordingly.</span></span><br><span class="line">   <span class="keyword">*</span> <span class="variable">&lt;/p&gt;</span></span><br><span class="line">   <span class="keyword">*</span></span><br><span class="line">   <span class="keyword">*</span> <span class="meta">@throws</span> LifecycleException</span><br><span class="line">   <span class="keyword">*</span> <span class="meta">@throws</span> InterruptedException</span><br><span class="line">   <span class="keyword">*</span>/</span><br><span class="line">  public void stop();</span><br><span class="line"></span><br><span class="line">  /<span class="keyword">*</span><span class="keyword">*</span></span><br><span class="line">   <span class="keyword">*</span> <span class="variable">&lt;p&gt;</span></span><br><span class="line">   <span class="keyword">*</span> Return the current state of the service or component.</span><br><span class="line">   <span class="keyword">*</span> <span class="variable">&lt;/p&gt;</span></span><br><span class="line">   <span class="keyword">*</span>/</span><br><span class="line">  public LifecycleState getLifecycleState();</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>比如给的样例：</p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">*</span> Example usage</span><br><span class="line"><span class="keyword">*</span> <span class="variable">&lt;/p&gt;</span></span><br><span class="line"><span class="keyword">*</span> <span class="variable">&lt;code&gt;</span></span><br><span class="line"><span class="keyword">*</span>  public class MyService implements LifecycleAware &#123;</span><br><span class="line"><span class="keyword">*</span></span><br><span class="line"><span class="keyword">*</span>    private LifecycleState lifecycleState;</span><br><span class="line"><span class="keyword">*</span></span><br><span class="line"><span class="keyword">*</span>    public MyService() &#123;</span><br><span class="line"><span class="keyword">*</span>      lifecycleState = LifecycleState.IDLE;</span><br><span class="line"><span class="keyword">*</span>    &#125;</span><br><span class="line"><span class="keyword">*</span></span><br><span class="line"><span class="keyword">*</span>    <span class="meta">@Override</span></span><br><span class="line"><span class="keyword">*</span>    public void start(Context context) throws LifecycleException,</span><br><span class="line"><span class="keyword">*</span>      InterruptedException &#123;</span><br><span class="line"><span class="keyword">*</span></span><br><span class="line"><span class="keyword">*</span>      ...your code does something.</span><br><span class="line"><span class="keyword">*</span></span><br><span class="line"><span class="keyword">*</span>      lifecycleState = LifecycleState.START;</span><br><span class="line"><span class="keyword">*</span>    &#125;</span><br><span class="line"><span class="keyword">*</span></span><br><span class="line"><span class="keyword">*</span>    <span class="meta">@Override</span></span><br><span class="line"><span class="keyword">*</span>    public void stop(Context context) throws LifecycleException,</span><br><span class="line"><span class="keyword">*</span>      InterruptedException &#123;</span><br><span class="line"><span class="keyword">*</span></span><br><span class="line"><span class="keyword">*</span>      try &#123;</span><br><span class="line"><span class="keyword">*</span>        ...you stop services here.</span><br><span class="line"><span class="keyword">*</span>      &#125; catch (SomethingException) &#123;</span><br><span class="line"><span class="keyword">*</span>        lifecycleState = LifecycleState.ERROR;</span><br><span class="line"><span class="keyword">*</span>      &#125;</span><br><span class="line"><span class="keyword">*</span></span><br><span class="line"><span class="keyword">*</span>      lifecycleState = LifecycleState.STOP;</span><br><span class="line"><span class="keyword">*</span>    &#125;</span><br><span class="line"><span class="keyword">*</span></span><br><span class="line"><span class="keyword">*</span>    <span class="meta">@Override</span></span><br><span class="line"><span class="keyword">*</span>    public LifecycleState getLifecycleState() &#123;</span><br><span class="line"><span class="keyword">*</span>      return lifecycleState;</span><br><span class="line"><span class="keyword">*</span>    &#125;</span><br><span class="line"><span class="keyword">*</span></span><br><span class="line"><span class="keyword">*</span>  &#125;</span><br><span class="line"><span class="keyword">*</span> <span class="variable">&lt;/code&gt;</span></span><br><span class="line"><span class="keyword">*</span>/</span><br></pre></td></tr></table></figure>
+<p>每一个flume node，每一个flume component(source, channel, sink)都实现了这个接口。</p>
+<h4 id="EventBus事件监听和发布订阅模式"><a href="#EventBus事件监听和发布订阅模式" class="headerlink" title="EventBus事件监听和发布订阅模式"></a><strong>EventBus事件监听和发布订阅模式</strong></h4><p>回到上面，再往前判断是否设置了<code>no-reload-conf</code>，如果设置了，会新建一个<code>EventBus</code>，它是Guava(Google写的java库)的事件处理机制，是设计模式中的观察者模式（生产/消费者编程模型）的优雅实现。</p>
+<p>使用Guava之后, 如果要订阅消息, 就不用再继承指定的接口, 只需要在指定的方法上加上@Subscribe注解即可。</p>
+<p>我们看flume是如何用的：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PollingPropertiesFileConfigurationProvider configurationProvider =</span><br><span class="line">            new PollingPropertiesFileConfigurationProvider(</span><br><span class="line">              <span class="name">agentName</span>, configurationFile, eventBus, <span class="number">30</span>)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<p>将eventBus传给<code>PollingPropertiesFileConfigurationProvider</code>，一方面它继承了<code>PropertiesFileConfigurationProvider</code>类，说明它是配置文件的提供者，另一方面，它实现了<code>LifecycleAware</code>接口，说明它是有生命周期的。</p>
+<p>那么它在生命周期做了什么？</p>
+<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public void start() &#123;</span><br><span class="line">  LOGGER.info(<span class="string">"Configuration provider starting"</span>)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">  Preconditions.checkState(file != null,</span><br><span class="line">      <span class="string">"The parameter file must not be null"</span>)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">  executorService = Executors.newSingleThreadScheduledExecutor(</span><br><span class="line">          new ThreadFactoryBuilder().setNameFormat(<span class="string">"conf-file-poller-%d"</span>)</span><br><span class="line">              .build())<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">  FileWatcherRunnable fileWatcherRunnable =</span><br><span class="line">      new FileWatcherRunnable(file, counterGroup)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">  executorService.scheduleWithFixedDelay(fileWatcherRunnable, <span class="number">0</span>, interval,</span><br><span class="line">      TimeUnit.SECONDS)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">  lifecycleState = LifecycleState.START<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">  LOGGER.debug(<span class="string">"Configuration provider started"</span>)<span class="comment">;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line">public void <span class="keyword">stop</span>() &#123;</span><br><span class="line">  LOGGER.info(<span class="string">"Configuration provider stopping"</span>)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">  executorService.shutdown()<span class="comment">;</span></span><br><span class="line">  try&#123;</span><br><span class="line">    <span class="keyword">while</span>(!executorService.awaitTermination(<span class="number">500</span>, TimeUnit.MILLISECONDS)) &#123;</span><br><span class="line">      LOGGER.debug(<span class="string">"Waiting for file watcher to terminate"</span>)<span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125; catch (InterruptedException e) &#123;</span><br><span class="line">    LOGGER.debug(<span class="string">"Interrupted while waiting for file watcher to terminate"</span>)<span class="comment">;</span></span><br><span class="line">    Thread.currentThread().interrupt()<span class="comment">;</span></span><br><span class="line">  &#125;</span><br><span class="line">  lifecycleState = LifecycleState.<span class="keyword">STOP</span><span class="comment">;</span></span><br><span class="line">  LOGGER.debug(<span class="string">"Configuration provider stopped"</span>)<span class="comment">;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到，在start时候，它起了一个周期调用线程<code>executorService</code>，这个周期调用线程又回每隔30s调用<code>fileWatcherRunnable</code>这个配置文件监控线程，在<code>FileWatcherRunnable</code>这里面，会去监听flume配置文件的变化，如果修改时间发生变化，<code>eventBus</code>会说我感兴趣的事件发生了！即<code>eventBus.post(getConfiguration())</code></p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  LOGGER.debug(<span class="string">"Checking file:&#123;&#125; for changes"</span>, file);</span><br><span class="line"></span><br><span class="line">  counterGroup.incrementAndGet(<span class="string">"file.checks"</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">long</span> lastModified = file.lastModified();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (lastModified &gt; lastChange) &#123;</span><br><span class="line">    LOGGER.info(<span class="string">"Reloading configuration file:&#123;&#125;"</span>, file);</span><br><span class="line"></span><br><span class="line">    counterGroup.incrementAndGet(<span class="string">"file.loads"</span>);</span><br><span class="line"></span><br><span class="line">    lastChange = lastModified;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      eventBus.post(getConfiguration());</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">      LOGGER.<span class="keyword">error</span>(<span class="string">"Failed to load configuration data. Exception follows."</span>,</span><br><span class="line">          e);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (NoClassDefFoundError e) &#123;</span><br><span class="line">      LOGGER.<span class="keyword">error</span>(<span class="string">"Failed to start agent because dependencies were not "</span> +</span><br><span class="line">          <span class="string">"found in classpath. Error follows."</span>, e);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Throwable t) &#123;</span><br><span class="line">      <span class="comment">// caught because the caller does not handle or log Throwables</span></span><br><span class="line">      LOGGER.<span class="keyword">error</span>(<span class="string">"Unhandled error"</span>, t);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>之后对该事件感兴趣的listener就会进行事件处理，这里flume本身的Application对配置文件的变化感兴趣：</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">eventBus.<span class="keyword">register</span>(application);</span><br><span class="line"><span class="meta"># 相当于 </span></span><br><span class="line">eventBus.<span class="keyword">register</span>(listener);</span><br></pre></td></tr></table></figure>
+<p>在application中，用注解<code>@Subscribe</code>标明的方法就告诉了我们，事件发生后，如何处理：</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Subscribe</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="function"><span class="keyword">void</span> <span class="title">handleConfigurationEvent</span><span class="params">(MaterializedConfiguration conf)</span> </span>&#123;</span><br><span class="line">  stopAllComponents();</span><br><span class="line">  startAllComponents(conf);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>到这里为止，讲清楚了如果启动flume时候配置了<code>no-reload-con</code>参数，flume就会动态加载配置文件，默认每30秒检查一次配置文件，如果有修改，会重启所有的components；如果没有配置该参数，则只会启动一次。</p>
+<h4 id="Application的start前与后"><a href="#Application的start前与后" class="headerlink" title="Application的start前与后"></a><strong>Application的start前与后</strong></h4><h5 id="start前："><a href="#start前：" class="headerlink" title="start前："></a><strong>start前：</strong></h5><figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">components</span>.add(configurationProvider);</span><br><span class="line">application = <span class="built_in">new</span> Application(<span class="built_in">components</span>);</span><br></pre></td></tr></table></figure>
+<p>将监听文件变化的类作为一个component</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Application</span><span class="params">(List&lt;LifecycleAware&gt; components)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.components = components;</span><br><span class="line">  supervisor = <span class="keyword">new</span> LifecycleSupervisor();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后这里出现了另一个重要的类<code>LifecycleSupervisor</code>：</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public LifecycleSupervisor() &#123;</span><br><span class="line">  lifecycleState = LifecycleState.IDLE<span class="comment">;</span></span><br><span class="line">  supervisedProcesses = new HashMap&lt;LifecycleAware, Supervisoree&gt;()<span class="comment">;</span></span><br><span class="line">  monitorFutures = new HashMap&lt;LifecycleAware, <span class="keyword">ScheduledFuture&lt;?&gt;&gt;();</span><br><span class="line"></span>  monitorService = new <span class="keyword">ScheduledThreadPoolExecutor(10,</span><br><span class="line"></span>      new ThreadFactoryBuilder().setNameFormat(</span><br><span class="line">          <span class="string">"lifecycleSupervisor-"</span> + Thread.currentThread().getId() + <span class="string">"-%d"</span>)</span><br><span class="line">          .<span class="keyword">build());</span><br><span class="line"></span>  monitorService.setMaximumPoolSize(<span class="number">20</span>)<span class="comment">;</span></span><br><span class="line">  monitorService.setKeepAliveTime(<span class="number">30</span>, TimeUnit.SECONDS)<span class="comment">;</span></span><br><span class="line">  purger = new Purger()<span class="comment">;</span></span><br><span class="line">  needToPurge = false<span class="comment">;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到，它构建了一个定期执行任务的线程池，大小是10</p>
+<h5 id="start后：application-start"><a href="#start后：application-start" class="headerlink" title="start后：application.start();"></a><strong>start后：<code>application.start();</code></strong></h5><p>对每一个component使用<code>SupervisorPolicy.AlwaysRestartPolicy</code>的策略，有监督的执行：</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="function"><span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(LifecycleAware component : components) &#123;</span><br><span class="line">      supervisor.supervise(component,</span><br><span class="line">          <span class="keyword">new</span> SupervisorPolicy.AlwaysRestartPolicy(), LifecycleState.START);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>再看<code>supervisor.supervise()</code>方法的主要流程：</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Supervisoree process = new Supervisoree()<span class="comment">;</span></span><br><span class="line">    process.status = new Status()<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">    process.policy = policy<span class="comment">;</span></span><br><span class="line">    process.status.desiredState = desiredState<span class="comment">;</span></span><br><span class="line">    process.status.error = false<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">    MonitorRunnable monitorRunnable = new MonitorRunnable()<span class="comment">;</span></span><br><span class="line">    monitorRunnable.lifecycleAware = lifecycleAware<span class="comment">;</span></span><br><span class="line">    monitorRunnable.supervisoree = process<span class="comment">;</span></span><br><span class="line">    monitorRunnable.monitorService = monitorService<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">    supervisedProcesses.put(lifecycleAware, process)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">ScheduledFuture&lt;?&gt; </span>future = monitorService.<span class="keyword">scheduleWithFixedDelay(</span><br><span class="line"></span>        monitorRunnable, <span class="number">0</span>, <span class="number">3</span>, TimeUnit.SECONDS)<span class="comment">;</span></span><br><span class="line">    monitorFutures.put(lifecycleAware, future)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<p>对每一个component会通过线程池<code>ScheduledThreadPoolExecutor monitorService</code>起一个<code>MonitorRunnable</code>线程执行，在<code>monitorRunnable</code>中的<code>run()</code>方法中，是每一个component的执行逻辑，根据<code>desiredState</code>的不同，选择不同的状态执行方法去执行，比如：</p>
+<ol>
+<li>PollingPropertiesFileConfigurationProvider有对应监控配置文件的start、stop逻辑；</li>
+<li>ExecSource有对应的source的start、stop执行逻辑；</li>
+<li>MemoryChannel有对应channel的start、stop逻辑；</li>
+<li>ElasticSearchSink有对应sink的start、stop逻辑；</li>
+</ol>
+<p>等等…</p>
+<p>那每个<code>component</code>，也就是每个<code>monitorRunnable</code>隔多长时间会执行一次呢？</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ScheduledFuture&lt;?&gt; </span>future = monitorService.<span class="keyword">scheduleWithFixedDelay(</span><br><span class="line"></span>    monitorRunnable, <span class="number">0</span>, <span class="number">3</span>, TimeUnit.SECONDS)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<p>可以看出，这里设定的执行线程计划是：初始0s延迟，每次任务完成后延迟3s再执行一次任务，比如，ExecSource每次从数据源取数据，取完后回来隔3s再去取一次。</p>
+<p>在application.start()后，还有一个钩子方法：</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> Application appReference = application;</span><br><span class="line">      Runtime.getRuntime().addShutdownHook(<span class="keyword">new</span> Thread(<span class="string">"agent-shutdown-hook"</span>) &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">          appReference.stop();</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br></pre></td></tr></table></figure>
+<p>它主要在agent停止后用来执行内存清理、对象销毁等操作。</p>
+<p>好了，以上就是对flume agent启动过程的详细分析。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/flume/">flume</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/flume/">flume</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://qiaowei.xyz/2016/04/16/Flume启动过程分析/" data-title="Flume启动过程分析 | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2016/04/13/Ambari的DAG是如何做的/"  title="Ambari的DAG是如何做的">
+ <strong>下一篇：</strong><br/> 
+ <span>Ambari的DAG是如何做的
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2016/04/16/Flume启动过程分析/" data-title="Flume启动过程分析" data-url="http://qiaowei.xyz/2016/04/16/Flume启动过程分析/"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#启动过程"><span class="toc-number">1.</span> <span class="toc-text">启动过程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#LifecycleAware接口"><span class="toc-number">1.0.1.</span> <span class="toc-text">LifecycleAware接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#EventBus事件监听和发布订阅模式"><span class="toc-number">1.0.2.</span> <span class="toc-text">EventBus事件监听和发布订阅模式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Application的start前与后"><span class="toc-number">1.0.3.</span> <span class="toc-text">Application的start前与后</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#start前："><span class="toc-number">1.0.3.1.</span> <span class="toc-text">start前：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#start后：application-start"><span class="toc-number">1.0.3.2.</span> <span class="toc-text">start后：application.start();</span></a></li></ol></li></ol></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="github-card">
+<p class="asidetitle">Github 名片</p>
+<div class="github-card" data-github="qwurey" data-width="220" data-height="119" data-theme="medium">
+<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
+</div>
+  </div>
+
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/ambari/" title="ambari">ambari<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/flume/" title="flume">flume<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/leetcode/" title="leetcode">leetcode<sup>17</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/life/" title="life">life<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/osx/" title="osx">osx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pg/" title="pg">pg<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pgxl/" title="pgxl">pgxl<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/python/" title="python">python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/regex/" title="regex">regex<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tool/" title="tool">tool<sup>3</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/REST-API/" style="font-size: 10px;">REST API</a> <a href="/tags/ambari/" style="font-size: 17.5px;">ambari</a> <a href="/tags/cobbler/" style="font-size: 12.5px;">cobbler</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/flume/" style="font-size: 17.5px;">flume</a> <a href="/tags/leetcode/" style="font-size: 20px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/pg/" style="font-size: 10px;">pg</a> <a href="/tags/pgxl/" style="font-size: 15px;">pgxl</a> <a href="/tags/postgres-xl/" style="font-size: 15px;">postgres-xl</a> <a href="/tags/puppet/" style="font-size: 10px;">puppet</a> <a href="/tags/python/" style="font-size: 12.5px;">python</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/tips/" style="font-size: 15px;">tips</a>
+    </div>
+  </div>
+
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=1758475283&verifier=ec858d3c&dpc=1"></iframe>
+</div>
+
+
+
+  <!-- 多说最新评论 start -->
+<p class="asidetitle">最新评论</p>
+    <div class="ds-recent-comments" data-num-items="5" data-show-avatars="0" data-show-time="1" data-show-title="1" data-show-admin="0" data-excerpt-length="70"></div>
+    <!-- 多说最新评论 end -->
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:"urey"};
+    (function() {
+            var ds = document.createElement('script');
+                    ds.type = 'text/javascript';ds.async = true;
+                            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                                    ds.charset = 'UTF-8';
+                                            (document.getElementsByTagName('head')[0] 
+                                                     || document.getElementsByTagName('body')[0]).appendChild(ds);
+                                                })();
+    </script>
+    <!-- 多说公共JS代码 end -->
+
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://blog.csdn.net/yeruby" target="_blank" title="在路上的学习者">在路上的学习者</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://macshuo.com/" target="_blank" title="MacTalk-池建强的随想录">MacTalk-池建强的随想录</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://www.liaoxuefeng.com/" target="_blank" title="廖雪峰的官方网站">廖雪峰的官方网站</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Urey. <br/>
+			Welcome to contact me ^_^</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/1758475283" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/qwurey" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		<a href="https://www.linkedin.com/in/qwurey" target="_blank" class="icon-linkedin" title="linkedin"></a>
+		
+		
+		
+		<a href="http://www.zhihu.com/people/urey" target="_blank" class="icon-zhihu" title="知乎"></a>
+		
+		
+		
+		<a href="mailto:qiaowei@pku.edu.cn" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="/about" target="_blank" title="urey">urey</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+        getSize();
+        if (myWidth >= 1024) {
+          c.click();
+        }
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"urey"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256263437'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1256263437' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

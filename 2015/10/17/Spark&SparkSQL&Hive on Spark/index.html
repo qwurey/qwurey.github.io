@@ -1,0 +1,701 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>SparkSQL与Hive on Spark的比较 | Urey on the way</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="urey">
+    
+
+    
+    <meta name="description" content="简要介绍了SparkSQL与Hive on Spark的区别与联系">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SparkSQL与Hive on Spark的比较">
+<meta property="og:url" content="http://qiaowei.xyz/2015/10/17/Spark&SparkSQL&Hive on Spark/index.html">
+<meta property="og:site_name" content="Urey on the way">
+<meta property="og:description" content="简要介绍了SparkSQL与Hive on Spark的区别与联系">
+<meta property="og:image" content="http://qiaowei.xyz/file:///Users/urey/Pictures/spark cluster.png">
+<meta property="og:image" content="http://qiaowei.xyz/file:///Users/urey/Pictures/spark_sql_architecture.png">
+<meta property="og:updated_time" content="2016-05-10T14:11:17.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SparkSQL与Hive on Spark的比较">
+<meta name="twitter:description" content="简要介绍了SparkSQL与Hive on Spark的区别与联系">
+<meta name="twitter:image" content="http://qiaowei.xyz/file:///Users/urey/Pictures/spark cluster.png">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Urey on the way" title="Urey on the way"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Urey on the way">Urey on the way</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" autocomplete="off" name="q" maxlength="20" placeholder="搜索" />
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/10/17/Spark&SparkSQL&Hive on Spark/" title="SparkSQL与Hive on Spark的比较" itemprop="url">SparkSQL与Hive on Spark的比较</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
+		
+  <p class="article-time">
+    <time datetime="2015-10-17T14:15:38.000Z" itemprop="datePublished"> 发表于 2015-10-17</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、关于Spark"><span class="toc-number">1.</span> <span class="toc-text">一、关于Spark</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#简介"><span class="toc-number">1.1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#架构"><span class="toc-number">1.2.</span> <span class="toc-text">架构</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Spark特点"><span class="toc-number">1.3.</span> <span class="toc-text">Spark特点</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#部署模型："><span class="toc-number">1.4.</span> <span class="toc-text">部署模型：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#IDE选择"><span class="toc-number">1.5.</span> <span class="toc-text">IDE选择</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#测试"><span class="toc-number">1.6.</span> <span class="toc-text">测试</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#总结"><span class="toc-number">1.7.</span> <span class="toc-text">总结</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、关于Spark-SQL"><span class="toc-number"></span> <span class="toc-text">二、关于Spark SQL</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#简介-1"><span class="toc-number">0.1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#架构-1"><span class="toc-number">0.2.</span> <span class="toc-text">架构</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Spark-SQL的两个组件"><span class="toc-number">0.3.</span> <span class="toc-text">Spark SQL的两个组件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#使用示例"><span class="toc-number">0.4.</span> <span class="toc-text">使用示例</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#小结"><span class="toc-number">1.</span> <span class="toc-text">小结</span></a></li></ol>
+		
+		</div>
+		
+		<p>简要介绍了SparkSQL与Hive on Spark的区别与联系</p>
+<a id="more"></a>
+<h4 id="一、关于Spark"><a href="#一、关于Spark" class="headerlink" title="一、关于Spark"></a><strong>一、关于Spark</strong></h4><h5 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h5><p>在Hadoop的整个生态系统中，Spark和MapReduce在同一个层级，即主要解决分布式计算框架的问题。</p>
+<h5 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h5><p>Spark的架构如下图所示，主要包含四大组件：Driver、Master、Worker和Executor。</p>
+<p><img src="file:///Users/urey/Pictures/spark cluster.png" width="400" height="220" alt="spark cluster" align="center"></p>
+<h5 id="Spark特点"><a href="#Spark特点" class="headerlink" title="Spark特点"></a>Spark特点</h5><ul>
+<li><p>Spark可以部署在YARN上。</p>
+</li>
+<li><p>Spark原生支持对HDFS文件系统的访问。</p>
+</li>
+<li><p>使用Scala语言编写</p>
+</li>
+</ul>
+<h5 id="部署模型："><a href="#部署模型：" class="headerlink" title="部署模型："></a>部署模型：</h5><ol>
+<li><p>单机模型：主要用来开发测试。特点：Driver、Master、Worker和Executor都运行在同一个JVM进程之中。</p>
+</li>
+<li><p>伪集群模型：主要用来开发测试。特点：Master、Worker都运行在同一个JVM进程之中；Master、Worker和Executor都运行于同一台机器，无法跨机器运行；</p>
+</li>
+</ol>
+<ol>
+<li><p>独立集群（又叫做原生集群模式）：在集群规模不是非常大的情况下，可用于生产环境。特点：Master、Worker和Executor都运行于独立的JVM进程。</p>
+</li>
+<li><p>YARN集群：YARN生态中的ApplicationMaster角色使用Apache开发好的Spark ApplicationMaster代替，每一个YARN生态中的NodeManager角色相当于一个Spark生态中的Worker角色，由NodeManger负责Executor的启动。</p>
+</li>
+<li><p>Mesos集群：暂无详细调研。</p>
+</li>
+</ol>
+<h5 id="IDE选择"><a href="#IDE选择" class="headerlink" title="IDE选择"></a>IDE选择</h5><p>编写Spark应用程序或者配置Spark源码环境最好使用的IDE是IntelliJ Idea，因为它对Scala插件的支持非常好。当然Eclipse，Emacs，Sublime都可以作为IDE。</p>
+<h5 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h5><p>经过测试，在宿主系统为CentOS6.5上（3个节点），hadoop2.7.1 + hive1.2.1(pg为元数据库) + sqoop + flume1.6.0 + spark1.5.0可以部署。</p>
+<h5 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h5><p>Spark网上的资料现在很多，现在也比较成熟。</p>
+<p><br></p>
+<h3 id="二、关于Spark-SQL"><a href="#二、关于Spark-SQL" class="headerlink" title="二、关于Spark SQL"></a><strong>二、关于Spark SQL</strong></h3><h5 id="简介-1"><a href="#简介-1" class="headerlink" title="简介"></a>简介</h5><p>它主要用于结构化数据处理和对Spark数据执行类SQL的查询。通过Spark SQL，可以针对不同格式的数据执行ETL操作（如JSON，Parquet，数据库）然后完成特定的查询操作。一般来说，Spark每支持一种新的应用开发，都会引入一个新的Context及相应的RDD，对于SQL这一特性来说，引入的就是SQLContext和SchemaRDD。注意：在Spark1.3之后，SchemaRDD已经更名为DataFrame，但它本质就类似一个RDD，因为可以将DataFrame无缝的转换成一个RDD。</p>
+<h5 id="架构-1"><a href="#架构-1" class="headerlink" title="架构"></a>架构</h5><p>Spark要很好的支持SQL，要完成解析(parser)、优化(optimizer)、执行(execution)三大过程。</p>
+<p><img src="file:///Users/urey/Pictures/spark_sql_architecture.png" width="500" height="300" alt="spark cluster" align="center"></p>
+<p><br><br>处理顺序大致如下：</p>
+<ol>
+<li><p>SQlParser生成LogicPlan Tree；</p>
+</li>
+<li><p>Analyzer和Optimizer将各种Rule作用于LogicalPlan Tree；</p>
+</li>
+<li><p>最终优化生成的LogicalPlan生成SparkRDD；</p>
+</li>
+<li><p>最后将生成的RDD交由Spark执行；</p>
+</li>
+</ol>
+<h5 id="Spark-SQL的两个组件"><a href="#Spark-SQL的两个组件" class="headerlink" title="Spark SQL的两个组件"></a>Spark SQL的两个组件</h5><ol>
+<li><p>SQLContext：Spark SQL提供SQLContext封装Spark中的所有关系型功能。可以用之前的示例中的现有SparkContext创建SQLContext。</p>
+</li>
+<li><p>DataFrame：DataFrame是一个分布式的，按照命名列的形式组织的数据集合。DataFrame基于R语言中的data frame概念，与关系型数据库中的数据库表类似。通过调用将DataFrame的内容作为行RDD（RDD of Rows）返回的rdd方法，可以将DataFrame转换成RDD。可以通过如下数据源创建DataFrame：已有的RDD、结构化数据文件、JSON数据集、Hive表、外部数据库。</p>
+</li>
+</ol>
+<h5 id="使用示例"><a href="#使用示例" class="headerlink" title="使用示例"></a>使用示例</h5><p>编写简单的scala程序，从文本文件中加载用户数据并从数据集中创建一个DataFrame对象。然后运行DataFrame函数，执行特定的数据选择查询。</p>
+<p>文本文件customers.txt中的内容如下：</p>
+<pre><code>Tom,12
+Mike,13
+Tony,34
+Lili,8
+David,21
+Nike,18
+Bush,29
+Candy,42
+
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">编写<span class="keyword">Scala</span>代码：</span><br></pre></td></tr></table></figure>
+
+import org.apache.spark._
+
+object Hello {
+
+    // 创建一个表示用户的自定义类
+    case class Person(name: String, age: Int)
+
+      def main(args: Array[String]) {
+
+        val conf = new SparkConf().setAppName(&quot;SparkSQL Demo&quot;)
+        val sc = new SparkContext(conf)
+
+        // 首先用已有的Spark Context对象创建SQLContext对象
+        val sqlContext = new org.apache.spark.sql.SQLContext(sc)
+
+        // 导入语句，可以隐式地将RDD转化成DataFrame
+        import sqlContext.implicits._
+
+        // 用数据集文本文件创建一个Person对象的DataFrame
+        val people = sc.textFile(&quot;/Users/urey/data/input2.txt&quot;).map(_.split(&quot;,&quot;)).map(p =&gt; Person(p(0), p(1).trim.toInt)).toDF()
+
+        // 将DataFrame注册为一个表
+        people.registerTempTable(&quot;people&quot;)
+
+        // SQL查询
+        val teenagers = sqlContext.sql(&quot;SELECT name, age FROM people WHERE age &gt;= 13 AND age &lt;= 19&quot;)
+
+        // 输出查询结果，按照顺序访问结果行的各个列。
+        teenagers.map(t =&gt; &quot;Name: &quot; + t(0)).collect().foreach(println)
+
+        sc.stop()
+  }
+}
+
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">如上所示，Spark SQL提供了十分友好的SQL接口，可以与来自多种不同数据源的数据进行交互，而且所采用的语法也是团队熟知的SQL查询语法。这对于非技术类的项目成员，如数据分析师以及数据库管理员来说，非常实用。</span><br><span class="line"><span class="comment">##### 总结</span></span><br><span class="line"></span><br><span class="line">我们了解到Apache Spark SQL如何用熟知的SQL查询语法提供与Spark数据交互的SQL接口。Spark SQL是一个功能强大的库，组织中的非技术团队成员，如业务分析师和数据分析师，都可以用Spark SQL执行数据分析。&lt;br&gt;<span class="comment">#### **三、关于Hive on Spark**</span></span><br><span class="line"><span class="comment">##### 背景</span></span><br><span class="line">Hive <span class="keyword">on</span> Spark是由Cloudera发起，由Intel、MapR等公司共同参与的开源项目，其目的是把Spark作为Hive的一个计算引擎，将Hive的查询作为Spark的任务提交到Spark集群上进行计算。通过该项目，可以提高Hive查询的性能，同时为已经部署了Hive或者Spark的用户提供了更加灵活的选择，从而进一步提高Hive和Spark的普及率。<span class="comment">##### 简介</span></span><br><span class="line">Hive <span class="keyword">on</span> Spark是从Hive <span class="keyword">on</span> MapReduce演进而来，Hive的整体解决方案很不错，但是从查询提交到结果返回需要相当长的时间，查询耗时太长，这个主要原因就是由于Hive原生是基于MapReduce的，那么如果我们不生成MapReduce Job，而是生成Spark Job，就可以充分利用Spark的快速执行能力来缩短HiveQL的响应时间。</span><br><span class="line">Hive <span class="keyword">on</span> Spark现在是Hive组件(从Hive1<span class="number">.1</span> release之后)的一部分。</span><br><span class="line"><span class="comment">##### 与SparkSQL的区别</span></span><br><span class="line"></span><br><span class="line">SparkSQL和Hive On Spark都是在Spark上实现SQL的解决方案。Spark早先有Shark项目用来实现SQL层，不过后来推翻重做了，就变成了SparkSQL。这是Spark官方Databricks的项目，Spark项目本身主推的SQL实现。Hive On Spark比SparkSQL稍晚。Hive原本是没有很好支持MapReduce之外的引擎的，而Hive On Tez项目让Hive得以支持和Spark近似的Planning结构（非MapReduce的DAG）。所以在此基础上，Cloudera主导启动了Hive On Spark。这个项目得到了IBM，Intel和MapR的支持（但是没有Databricks）。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">##### 使用示例</span></span><br><span class="line"></span><br><span class="line">大体与SparkSQL结构类似，只是SQL引擎不同。部分核心代码如下：</span><br></pre></td></tr></table></figure>
+
+    val hiveContext = new HiveContext(sc)
+    import hiveContext._
+    hql(&quot;CREATE TABLE IF NOT EXIST src(key INT, value STRING)&quot;)
+    hql(&quot;LOAD DATA LOCAL PATH &apos;/Users/urey/data/input2.txt&apos; INTO TABLE src&quot;)
+    hql(&quot;FROM src SELECT key, value&quot;).collect().foreach(println)
+</code></pre><h4 id="小结"><a href="#小结" class="headerlink" title="小结"></a><strong>小结</strong></h4><p>结构上Hive On Spark和SparkSQL都是一个翻译层，把一个SQL翻译成分布式可执行的Spark程序。比如一个SQL：</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">SELECT</span> item_<span class="keyword">type</span>, sum(price)</span><br><span class="line"><span class="type">FROM</span> item</span><br><span class="line"><span class="type">GROUP</span> item_<span class="keyword">type</span>;</span><br></pre></td></tr></table></figure>
+<p>上面这个SQL脚本交给Hive或者类似的SQL引擎，它会“告诉”计算引擎做如下两个步骤：读取item表，抽出item_type,price这两个字段；对price计算初始的SUM（其实就是每个单独的price作为自己的SUM）因为GROUP BY说需要根据item_type分组，所以设定shuffle的key为item_type从第一组节点分组后分发给聚合节点，让相同的item_type汇总到同一个聚合节点，然后这些节点把每个组的Partial Sum再加在一起，就得到了最后结果。不管是Hive还是SparkSQL大致上都是做了上面这样的工作。</p>
+<p>需要理解的是，Hive和SparkSQL都不负责计算，它们只是告诉Spark，你需要这样算那样算，但是本身并不直接参与计算。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/spark/">spark</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/spark/">spark</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://qiaowei.xyz/2015/10/17/Spark&SparkSQL&Hive on Spark/" data-title="SparkSQL与Hive on Spark的比较 | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/10/26/2015-10-26-bug-no-such-file-or-directory-jekyll/" title="BUG:No Such File or Directory - Jekyll">
+  <strong>上一篇：</strong><br/>
+  <span>
+  BUG:No Such File or Directory - Jekyll</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/10/09/2015-10-09-pgxlde-jdbcfang-wen/"  title="PGXL的JDBC访问">
+ <strong>下一篇：</strong><br/> 
+ <span>PGXL的JDBC访问
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2015/10/17/Spark&SparkSQL&Hive on Spark/" data-title="SparkSQL与Hive on Spark的比较" data-url="http://qiaowei.xyz/2015/10/17/Spark&SparkSQL&Hive on Spark/"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、关于Spark"><span class="toc-number">1.</span> <span class="toc-text">一、关于Spark</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#简介"><span class="toc-number">1.1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#架构"><span class="toc-number">1.2.</span> <span class="toc-text">架构</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Spark特点"><span class="toc-number">1.3.</span> <span class="toc-text">Spark特点</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#部署模型："><span class="toc-number">1.4.</span> <span class="toc-text">部署模型：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#IDE选择"><span class="toc-number">1.5.</span> <span class="toc-text">IDE选择</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#测试"><span class="toc-number">1.6.</span> <span class="toc-text">测试</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#总结"><span class="toc-number">1.7.</span> <span class="toc-text">总结</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、关于Spark-SQL"><span class="toc-number"></span> <span class="toc-text">二、关于Spark SQL</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#简介-1"><span class="toc-number">0.1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#架构-1"><span class="toc-number">0.2.</span> <span class="toc-text">架构</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Spark-SQL的两个组件"><span class="toc-number">0.3.</span> <span class="toc-text">Spark SQL的两个组件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#使用示例"><span class="toc-number">0.4.</span> <span class="toc-text">使用示例</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#小结"><span class="toc-number">1.</span> <span class="toc-text">小结</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="github-card">
+<p class="asidetitle">Github 名片</p>
+<div class="github-card" data-github="qwurey" data-width="220" data-height="119" data-theme="medium">
+<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
+</div>
+  </div>
+
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/ambari/" title="ambari">ambari<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/flume/" title="flume">flume<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/leetcode/" title="leetcode">leetcode<sup>17</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/life/" title="life">life<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/osx/" title="osx">osx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pg/" title="pg">pg<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pgxl/" title="pgxl">pgxl<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/python/" title="python">python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/regex/" title="regex">regex<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/spark/" title="spark">spark<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tool/" title="tool">tool<sup>3</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/REST-API/" style="font-size: 10px;">REST API</a> <a href="/tags/ambari/" style="font-size: 16px;">ambari</a> <a href="/tags/cobbler/" style="font-size: 12px;">cobbler</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/flume/" style="font-size: 18px;">flume</a> <a href="/tags/leetcode/" style="font-size: 20px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/pg/" style="font-size: 10px;">pg</a> <a href="/tags/pgxl/" style="font-size: 14px;">pgxl</a> <a href="/tags/postgres-xl/" style="font-size: 14px;">postgres-xl</a> <a href="/tags/puppet/" style="font-size: 10px;">puppet</a> <a href="/tags/python/" style="font-size: 12px;">python</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/spark/" style="font-size: 10px;">spark</a> <a href="/tags/tips/" style="font-size: 14px;">tips</a>
+    </div>
+  </div>
+
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=1758475283&verifier=ec858d3c&dpc=1"></iframe>
+</div>
+
+
+
+  <!-- 多说最新评论 start -->
+<p class="asidetitle">最新评论</p>
+    <div class="ds-recent-comments" data-num-items="5" data-show-avatars="0" data-show-time="1" data-show-title="1" data-show-admin="0" data-excerpt-length="70"></div>
+    <!-- 多说最新评论 end -->
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:"urey"};
+    (function() {
+            var ds = document.createElement('script');
+                    ds.type = 'text/javascript';ds.async = true;
+                            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                                    ds.charset = 'UTF-8';
+                                            (document.getElementsByTagName('head')[0] 
+                                                     || document.getElementsByTagName('body')[0]).appendChild(ds);
+                                                })();
+    </script>
+    <!-- 多说公共JS代码 end -->
+
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://blog.csdn.net/yeruby" target="_blank" title="在路上的学习者">在路上的学习者</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://macshuo.com/" target="_blank" title="MacTalk-池建强的随想录">MacTalk-池建强的随想录</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://www.liaoxuefeng.com/" target="_blank" title="廖雪峰的官方网站">廖雪峰的官方网站</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Urey. <br/>
+			Welcome to contact me ^_^</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/1758475283" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/qwurey" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		<a href="https://www.linkedin.com/in/qwurey" target="_blank" class="icon-linkedin" title="linkedin"></a>
+		
+		
+		
+		<a href="http://www.zhihu.com/people/urey" target="_blank" class="icon-zhihu" title="知乎"></a>
+		
+		
+		
+		<a href="mailto:qiaowei@pku.edu.cn" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="/about" target="_blank" title="urey">urey</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+        getSize();
+        if (myWidth >= 1024) {
+          c.click();
+        }
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"urey"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256263437'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1256263437' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

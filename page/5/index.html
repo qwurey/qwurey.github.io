@@ -4,23 +4,22 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>LeetCode Letter Combinations of a Phone Number | Urey on the way</title>
+    <title>Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="DFS">
-<meta property="og:type" content="article">
-<meta property="og:title" content="LeetCode Letter Combinations of a Phone Number">
-<meta property="og:url" content="http://qiaowei.xyz/2016/04/06/LeetCode-Letter-Combinations-of-a-Phone-Number/index.html">
+    <meta name="description">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Urey on the way">
+<meta property="og:url" content="http://qiaowei.xyz/page/5/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="DFS">
-<meta property="og:updated_time" content="2016-04-06T14:51:39.000Z">
+<meta property="og:description">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LeetCode Letter Combinations of a Phone Number">
-<meta name="twitter:description" content="DFS">
+<meta name="twitter:title" content="Urey on the way">
+<meta name="twitter:description">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -73,103 +72,36 @@
 </div>
     </header>
     <div id="container">
-      <div id="main" class="post" itemscope itemprop="blogPost">
+      <div id="main">
+
   
-	<article itemprop="articleBody"> 
-		<header class="article-info clearfix">
-  <h1 itemprop="name">
+<section class="post" itemscope itemprop="blogitem">
+  
+    <a href="/2015/08/31/2015-08-31-ban-jia-la/" title="搬家啦" itemprop="url">
+  
+    <h1 itemprop="name">搬家啦</h1>
     
-      <a href="/2016/04/06/LeetCode-Letter-Combinations-of-a-Phone-Number/" title="LeetCode Letter Combinations of a Phone Number" itemprop="url">LeetCode Letter Combinations of a Phone Number</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
-		
-  <p class="article-time">
-    <time datetime="2016-04-06T00:28:20.000Z" itemprop="datePublished"> 发表于 2016-04-06</time>
+     
+           <p itemprop="description" >以前一直把博客的家安在CSDN上(http://blog.csdn.net/yeruby)，它记录了我从大一开始，一直到研一生活结束的点点滴滴，这也是我一直不断前进的动力，但就像一直住在别人家里一样，有点别扭。
+　　因此赶在2015年的8月末，我决定将博客迁移到github上，并</p>
+        
     
-  </p>
-</header>
-	<div class="article-content">
-		
-		<div id="toc" class="toc-article">
-			<strong class="toc-title">文章目录</strong>
-		
-			
-		
-		</div>
-		
-		<p>DFS<br><a id="more"></a></p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    vector&lt;<span class="keyword">string</span>&gt; mapping = &#123;<span class="string">"abc"</span>, <span class="string">"def"</span>, <span class="string">"ghi"</span>, <span class="string">"jkl"</span>, <span class="string">"mno"</span>, <span class="string">"pqrs"</span>, <span class="string">"tuv"</span>, <span class="string">"wxyz"</span>&#125;;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">vector&lt;<span class="keyword">string</span>&gt; <span class="title">letterCombinations</span>(<span class="params"><span class="keyword">string</span> digits</span>) </span>&#123;</span><br><span class="line">        vector&lt;<span class="keyword">string</span>&gt; res;</span><br><span class="line">        <span class="keyword">if</span>(digits.size() == <span class="number">0</span>) <span class="keyword">return</span> res;</span><br><span class="line">        <span class="keyword">int</span> index = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">string</span> <span class="keyword">value</span> = <span class="string">""</span>;</span><br><span class="line">        dfs(index, digits, res, <span class="keyword">value</span>);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">dfs</span>(<span class="params"><span class="keyword">int</span> index, <span class="keyword">string</span> digits, vector&lt;<span class="keyword">string</span>&gt;&amp; res, <span class="keyword">string</span>&amp; <span class="keyword">value</span></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(index == digits.size()) &#123;</span><br><span class="line">            res.push_back(<span class="keyword">value</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; mapping[digits[index] - <span class="string">'2'</span>].size(); ++i) &#123;</span><br><span class="line">            <span class="keyword">value</span>.push_back(mapping[digits[index] - <span class="string">'2'</span>][i]);</span><br><span class="line">            dfs(index + <span class="number">1</span>, digits, res, <span class="keyword">value</span>);</span><br><span class="line">            <span class="keyword">value</span>.pop_back();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-  
-	</div>
-		<footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
-  </div>
-
-</div>
-
-
-
-	<div class="article-share" id="share">
-	
-	  <div data-url="http://qiaowei.xyz/2016/04/06/LeetCode-Letter-Combinations-of-a-Phone-Number/" data-title="LeetCode Letter Combinations of a Phone Number | Urey on the way" data-tsina="1758475283" class="share clearfix">
-	  </div>
-	
-	</div>
-
-
-</footer>
-
-   	       
-	</article>
-	
-<nav class="article-nav clearfix">
- 
- <div class="prev" >
- <a href="/2016/04/10/cobbler快速批量安装OS/" title="cobbler快速批量安装OS">
-  <strong>上一篇：</strong><br/>
-  <span>
-  cobbler快速批量安装OS</span>
-</a>
-</div>
-
-
-<div class="next">
-<a href="/2016/04/06/LeetCode-3Sum-Closest/"  title="LeetCode 3Sum Closest">
- <strong>下一篇：</strong><br/> 
- <span>LeetCode 3Sum Closest
-</span>
-</a>
-</div>
-
-</nav>
-
-	
-<section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2016/04/06/LeetCode-Letter-Combinations-of-a-Phone-Number/" data-title="LeetCode Letter Combinations of a Phone Number" data-url="http://qiaowei.xyz/2016/04/06/LeetCode-Letter-Combinations-of-a-Phone-Number/"></div>
+    <time datetime="2015-08-31T09:15:31.000Z" itemprop="datePublished">2015-08-31</time>
+  </a>
 </section>
 
 
-</div>  
-      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
-  <div id="toc" class="toc-aside">
-  <strong class="toc-title">文章目录</strong>
- 
- 
- 
-  </div>
+
+
+
+
+  <nav id="page-nav" class="clearfix unexpand">
+    <a class="extend prev" rel="prev" href="/page/4/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span>
+  </nav>
+
+</div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
 <div id="asidepart">
 <div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
@@ -385,11 +317,6 @@ $(document).ready(function(){
     o.css("top",Math.max(80,260-$(this).scrollTop()));
   });
   
-        getSize();
-        if (myWidth >= 1024) {
-          c.click();
-        }
-  
   $(window).resize(function(){
     getSize(); 
     if (myWidth >= 1024) {
@@ -398,103 +325,14 @@ $(document).ready(function(){
       m.removeClass('moveMain');
       a.css('display', 'block').removeClass('fadeOut');
       o.css('display', 'none');
-      
-      $('#toc.toc-aside').css('display', 'none');
         
     }
   });
 });
 </script>
 
-<script type="text/javascript">
-$(document).ready(function(){ 
-  var ai = $('.article-content>iframe'),
-      ae = $('.article-content>embed'),
-      t  = $('#toc'),
-      ta = $('#toc.toc-aside'),
-      o  = $('.openaside'),
-      c  = $('.closeaside');
-  if(ai.length>0){
-    ai.wrap('<div class="video-container" />');
-  };
-  if(ae.length>0){
-   ae.wrap('<div class="video-container" />');
-  };
-  c.click(function(){
-    ta.css('display', 'block').addClass('fadeIn');
-  });
-  o.click(function(){
-    ta.css('display', 'none');
-  });
-  $(window).scroll(function(){
-    ta.css("top",Math.max(140,320-$(this).scrollTop()));
-  });
-});
-</script>
 
 
-<script type="text/javascript">
-$(document).ready(function(){ 
-  var $this = $('.share'),
-      url = $this.attr('data-url'),
-      encodedUrl = encodeURIComponent(url),
-      title = $this.attr('data-title'),
-      tsina = $this.attr('data-tsina'),
-      description = $this.attr('description');
-  var html = [
-  '<div class="hoverqrcode clearfix"></div>',
-  '<a class="overlay" id="qrcode"></a>',
-  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
-  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
-  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
-  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
-  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
-  '<span title="Share to"></span>'
-  ].join('');
-  $this.append(html);
-
-  $('.hoverqrcode').hide();
-
-  var myWidth = 0;
-  function updatehoverqrcode(){
-    if( typeof( window.innerWidth ) == 'number' ) {
-      myWidth = window.innerWidth;
-    } else if( document.documentElement && document.documentElement.clientWidth) {
-      myWidth = document.documentElement.clientWidth;
-    };
-    var qrsize = myWidth > 1024 ? 200:100;
-    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
-    var p = $('.article-share-qrcode').position();
-    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
-                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
-                          .qrcode(options);
-  };
-  $(window).resize(function(){
-    $('.hoverqrcode').hide();
-  });
-  $('.article-share-qrcode').click(function(){
-    updatehoverqrcode();
-    $('.hoverqrcode').toggle();
-  });
-  $('.article-share-qrcode').hover(function(){}, function(){
-      $('.hoverqrcode').hide();
-  });
-});   
-</script>
-
-
-
-<script type="text/javascript">
-  var duoshuoQuery = {short_name:"urey"};
-  (function() {
-    var ds = document.createElement('script');
-    ds.type = 'text/javascript';ds.async = true;
-    ds.src = '//static.duoshuo.com/embed.js';
-    ds.charset = 'UTF-8';
-    (document.getElementsByTagName('head')[0] 
-    || document.getElementsByTagName('body')[0]).appendChild(ds);
-  })();
-</script> 
 
 
 
@@ -584,4 +422,4 @@ $(document).ready(function(){
 <!-- Tiny_search End -->
 
   </body>
-</html>
+ </html>

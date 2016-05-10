@@ -1,0 +1,606 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Flume event转化为ES的document过程分析 | Urey on the way</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="urey">
+    
+
+    
+    <meta name="description" content="使用更改后的MultiExecSource + MemoryChannel +　ElasticsearchSink 将flume收集到的日志信息发送到es集群中。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flume event转化为ES的document过程分析">
+<meta property="og:url" content="http://qiaowei.xyz/2016/05/10/Flume event转化为ES的document过程分析/index.html">
+<meta property="og:site_name" content="Urey on the way">
+<meta property="og:description" content="使用更改后的MultiExecSource + MemoryChannel +　ElasticsearchSink 将flume收集到的日志信息发送到es集群中。">
+<meta property="og:updated_time" content="2016-05-10T13:55:42.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Flume event转化为ES的document过程分析">
+<meta name="twitter:description" content="使用更改后的MultiExecSource + MemoryChannel +　ElasticsearchSink 将flume收集到的日志信息发送到es集群中。">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Urey on the way" title="Urey on the way"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Urey on the way">Urey on the way</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" autocomplete="off" name="q" maxlength="20" placeholder="搜索" />
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/05/10/Flume event转化为ES的document过程分析/" title="Flume event转化为ES的document过程分析" itemprop="url">Flume event转化为ES的document过程分析</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
+		
+  <p class="article-time">
+    <time datetime="2016-05-10T14:13:08.000Z" itemprop="datePublished"> 发表于 2016-05-10</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一条flume-event的构成"><span class="toc-number">1.</span> <span class="toc-text">一条flume event的构成</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#一条es-document的构成"><span class="toc-number">2.</span> <span class="toc-text">一条es document的构成</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#转化过程"><span class="toc-number">3.</span> <span class="toc-text">转化过程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#遇到的错误"><span class="toc-number">4.</span> <span class="toc-text">遇到的错误</span></a></li></ol>
+		
+		</div>
+		
+		<p>使用更改后的MultiExecSource + MemoryChannel +　ElasticsearchSink 将flume收集到的日志信息发送到es集群中。</p>
+<a id="more"></a>
+<h4 id="一条flume-event的构成"><a href="#一条flume-event的构成" class="headerlink" title="一条flume event的构成"></a><strong>一条flume event的构成</strong></h4><p><br></p>
+<p>一个flume event由 header + body 构成：</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Basic representation of a data object in Flume.</span><br><span class="line"> * Provides access to data as it flows through the system.</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">public</span> interface Event &#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/**</span><br><span class="line">   * Returns a map of name-value pairs describing the data stored in the body.</span><br><span class="line">   */</span></span><br><span class="line">  <span class="keyword">public</span> Map&lt;<span class="keyword">String</span>, <span class="keyword">String</span>&gt; getHeaders();</span><br><span class="line"></span><br><span class="line">  <span class="comment">/**</span><br><span class="line">   * Set the event headers</span><br><span class="line">   * @param headers Map of headers to replace the current headers.</span><br><span class="line">   */</span></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">void</span> setHeaders(Map&lt;<span class="keyword">String</span>, <span class="keyword">String</span>&gt; headers);</span><br><span class="line"></span><br><span class="line">  <span class="comment">/**</span><br><span class="line">   * Returns the raw byte array of the data contained in this event.</span><br><span class="line">   */</span></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">byte</span>[] getBody();</span><br><span class="line"></span><br><span class="line">  <span class="comment">/**</span><br><span class="line">   * Sets the raw byte array of the data contained in this event.</span><br><span class="line">   * @param body The data.</span><br><span class="line">   */</span></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">void</span> setBody(<span class="keyword">byte</span>[] body);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果使用Source使用ExecSource读取文件，那么默认body就是每一行的内容，headers可以通过interceptor来添加。</p>
+<p><br></p>
+<h4 id="一条es-document的构成"><a href="#一条es-document的构成" class="headerlink" title="一条es document的构成"></a><strong>一条es document的构成</strong></h4><p><br></p>
+<p>比如，使用ElasticsearchSink，往es里导入数据，es中的索引信息如下：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">[root@10 /data/home/ambari]<span class="comment">#   curl -XGET 'http://localhost:9200/log-2016-04-20/_mapping/log?pretty'             </span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">"log-2016-04-20"</span> : &#123;</span><br><span class="line">    <span class="string">"mappings"</span> : &#123;</span><br><span class="line">      <span class="string">"log"</span> : &#123;</span><br><span class="line">        <span class="string">"properties"</span> : &#123;</span><br><span class="line">          <span class="string">"@message"</span> : &#123;</span><br><span class="line">            <span class="string">"type"</span> : <span class="string">"string"</span></span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="string">"@timestamp"</span> : &#123;</span><br><span class="line">            <span class="string">"type"</span> : <span class="string">"date"</span>,</span><br><span class="line">            <span class="string">"format"</span> : <span class="string">"dateOptionalTime"</span></span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="string">"component"</span> : &#123;</span><br><span class="line">            <span class="string">"type"</span> : <span class="string">"string"</span></span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="string">"content"</span> : &#123;</span><br><span class="line">            <span class="string">"type"</span> : <span class="string">"string"</span></span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="string">"fileName"</span> : &#123;</span><br><span class="line">            <span class="string">"type"</span> : <span class="string">"string"</span></span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="string">"hostname"</span> : &#123;</span><br><span class="line">            <span class="string">"type"</span> : <span class="string">"string"</span></span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="string">"level"</span> : &#123;</span><br><span class="line">            <span class="string">"type"</span> : <span class="string">"string"</span></span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="string">"offset"</span> : &#123;</span><br><span class="line">            <span class="string">"type"</span> : <span class="string">"long"</span></span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="string">"service"</span> : &#123;</span><br><span class="line">            <span class="string">"type"</span> : <span class="string">"string"</span></span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="string">"timestamps"</span> : &#123;</span><br><span class="line">            <span class="string">"type"</span> : <span class="string">"string"</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里面，<code>@message</code>是flume event的<code>body</code>，其余的field是flume event的<code>headers</code>中的每一个header构建而来。</p>
+<p><br></p>
+<h4 id="转化过程"><a href="#转化过程" class="headerlink" title="转化过程"></a><strong>转化过程</strong></h4><p><br></p>
+<p>构建过程在<code>ElasticSearchLogStashEventSerializer.java</code>中可以找到：</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public XContentBuilder getContentBuilder(Event event) throws IOException &#123;</span><br><span class="line">  XContentBuilder <span class="keyword">builder </span>= <span class="keyword">jsonBuilder().startObject();</span><br><span class="line"></span>  appendBody(<span class="keyword">builder, </span>event)<span class="comment">;</span></span><br><span class="line">  appendHeaders(<span class="keyword">builder, </span>event)<span class="comment">;</span></span><br><span class="line">  return <span class="keyword">builder;</span><br><span class="line"></span>&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到，<code>appendBody</code>是把event的body加到es里的document中，<code>appendHeaders</code>是把event的headers加到es里的document中，默认一个flume event对应一个es document。</p>
+<p>source的配置如下（有6个interceptor，其中的一个interceptor又产生了3个header）：<br><figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># source1:hdfs_datanode_src ----------</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.<span class="built_in">type</span> = com.pku.flume.MultiLineExecSource</span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.command = tail -F /var/<span class="built_in">log</span>/hdfs/hdfs/hadoop-hdfs-datanode-<span class="number">192.168</span>.<span class="number">37.3</span>.<span class="built_in">log</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.channels = memoryChannel</span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.restart = <span class="literal">true</span></span><br><span class="line"><span class="meta"># interceptor</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors = i1 i2 i3 i4 i5 i6</span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i1.<span class="built_in">type</span> = host</span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i1.useIP = <span class="literal">true</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i1.hostHeader = hostname</span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i1.preserveExisting = <span class="literal">false</span></span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i2.<span class="built_in">type</span> = static</span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i2.key = service</span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i2.value = hdfs</span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i3.<span class="built_in">type</span> = static</span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i3.key = component</span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i3.value = datanode</span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i4.<span class="built_in">type</span> = timestamp</span><br><span class="line"></span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i5.<span class="built_in">type</span> = regex_extractor</span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i5.regex = ^(?:\\n)?(.+)\\s(INFO|ERROR|WARN|DEBUG|FATAL)\\s(.+)$</span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i5.serializers = s1 s2 s3</span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i5.serializers.s1.<span class="built_in">name</span> = timestamps</span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i5.serializers.s2.<span class="built_in">name</span> = level</span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i5.serializers.s3.<span class="built_in">name</span> = content</span><br><span class="line"></span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i6.<span class="built_in">type</span> = static</span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i6.key = fileName</span><br><span class="line"><span class="built_in">agent</span>.sources.hdfs_datanode_src.interceptors.i6.value = hadoop-hdfs-datanode-<span class="number">192.168</span>.<span class="number">37.3</span>.<span class="built_in">log</span></span><br></pre></td></tr></table></figure></p>
+<p>一个flume event转化为es的一个document的对应关系如下：</p>
+<p>flume body:<br><figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">body</span> -&gt; <span class="keyword">@message</span></span><br></pre></td></tr></table></figure></p>
+<p>flume headers:<br><figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">hostname<span class="function"><span class="params">(interceptor加入的)</span> -&gt;</span> hostname(类型string)</span><br><span class="line">service<span class="function"><span class="params">(interceptor加入的)</span> -&gt;</span> service(类型string)</span><br><span class="line">component<span class="function"><span class="params">(interceptor加入的)</span> -&gt;</span> component(类型string)</span><br><span class="line">timestamp<span class="function"><span class="params">(interceptor加入的)</span> -&gt;</span> @timestamp(类型date)</span><br><span class="line">timestamps<span class="function"><span class="params">(interceptor加入的)</span> -&gt;</span> timestamps(类型string)</span><br><span class="line">level<span class="function"><span class="params">(interceptor加入的)</span> -&gt;</span> level(类型string)</span><br><span class="line">content<span class="function"><span class="params">(interceptor加入的)</span> -&gt;</span> content(类型string)</span><br><span class="line">fileName<span class="function"><span class="params">(interceptor加入的)</span> -&gt;</span> fileName(类型string)</span><br><span class="line">offset<span class="function"><span class="params">(在MultiLineExecSource的run过程加入的)</span> -&gt;</span> offset(类型long)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h4 id="遇到的错误"><a href="#遇到的错误" class="headerlink" title="遇到的错误"></a><strong>遇到的错误</strong></h4><p><br></p>
+<p>实际测试过程中遇到过这样一类错误：</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">19</span> Apr <span class="number">2016</span> <span class="number">13</span>:<span class="number">33</span>:<span class="number">00</span>,<span class="number">734</span> ERROR [SinkRunner-PollingRunner-DefaultSinkProcessor] (<span class="keyword">org.apache.flume.SinkRunner$PollingRunner.run:160) </span> - Unable to deliver event. Exception follows.</span><br><span class="line"><span class="keyword">org.apache.flume.EventDeliveryException: </span>Failed to commit transaction. Transaction rolled <span class="keyword">back.</span><br><span class="line"></span>        <span class="built_in">at</span> <span class="keyword">org.apache.flume.sink.elasticsearch.ElasticSearchSink.process(ElasticSearchSink.java:227)</span><br><span class="line"></span>        <span class="built_in">at</span> <span class="keyword">org.apache.flume.sink.DefaultSinkProcessor.process(DefaultSinkProcessor.java:68)</span><br><span class="line"></span>        <span class="built_in">at</span> <span class="keyword">org.apache.flume.SinkRunner$PollingRunner.run(SinkRunner.java:147)</span><br><span class="line"></span>        <span class="built_in">at</span> <span class="keyword">java.lang.Thread.run(Thread.java:745)</span><br><span class="line"></span>Caused <span class="keyword">by: </span><span class="keyword">org.elasticsearch.common.jackson.core.JsonParseException: </span>Unrecognized token <span class="string">'Topic'</span>: was expecting (<span class="string">'true'</span>, <span class="string">'false'</span> <span class="keyword">or </span><span class="string">'null'</span>)</span><br><span class="line"> <span class="built_in">at</span> [Source: [<span class="keyword">B@6e1faec2; </span>line: <span class="number">1</span>, column: <span class="number">7</span>]</span><br><span class="line">        <span class="built_in">at</span> <span class="keyword">org.elasticsearch.common.jackson.core.JsonParser._constructError(JsonParser.java:1487)</span><br><span class="line"></span>        <span class="built_in">at</span> <span class="keyword">org.elasticsearch.common.jackson.core.base.ParserMinimalBase._reportError(ParserMinimalBase.java:518)</span><br><span class="line"></span>        <span class="built_in">at</span> <span class="keyword">org.elasticsearch.common.jackson.core.json.UTF8StreamJsonParser._reportInvalidToken(UTF8StreamJsonParser.java:3323)</span><br><span class="line"></span>        <span class="built_in">at</span> <span class="keyword">org.elasticsearch.common.jackson.core.json.UTF8StreamJsonParser._handleUnexpectedValue(UTF8StreamJsonParser.java:2482)</span><br><span class="line"></span>        <span class="built_in">at</span> <span class="keyword">org.elasticsearch.common.jackson.core.json.UTF8StreamJsonParser._nextTokenNotInObject(UTF8StreamJsonParser.java:801)</span><br><span class="line"></span>        <span class="built_in">at</span> <span class="keyword">org.elasticsearch.common.jackson.core.json.UTF8StreamJsonParser.nextToken(UTF8StreamJsonParser.java:697)</span><br><span class="line"></span>        <span class="built_in">at</span> <span class="keyword">org.elasticsearch.common.xcontent.json.JsonXContentParser.nextToken(JsonXContentParser.java:51)</span><br><span class="line"></span>        <span class="built_in">at</span> <span class="keyword">org.apache.flume.sink.elasticsearch.ContentBuilderUtil.addComplexField(ContentBuilderUtil.java:60)</span><br><span class="line"></span>        <span class="built_in">at</span> <span class="keyword">org.apache.flume.sink.elasticsearch.ContentBuilderUtil.appendField(ContentBuilderUtil.java:47)</span><br><span class="line"></span>        <span class="built_in">at</span> <span class="keyword">org.apache.flume.sink.elasticsearch.ElasticSearchLogStashEventSerializer.appendHeaders(ElasticSearchLogStashEventSerializer.java:162)</span><br><span class="line"></span>        <span class="built_in">at</span> <span class="keyword">org.apache.flume.sink.elasticsearch.ElasticSearchLogStashEventSerializer.getContentBuilder(ElasticSearchLogStashEventSerializer.java:92)</span><br><span class="line"></span>        <span class="built_in">at</span> <span class="keyword">org.apache.flume.sink.elasticsearch.ElasticSearchLogStashEventSerializer.getContentBuilder(ElasticSearchLogStashEventSerializer.java:76)</span><br><span class="line"></span>        <span class="built_in">at</span> <span class="keyword">org.apache.flume.sink.elasticsearch.client.ElasticSearchTransportClient.addEvent(ElasticSearchTransportClient.java:166)</span><br><span class="line"></span>        <span class="built_in">at</span> <span class="keyword">org.apache.flume.sink.elasticsearch.ElasticSearchSink.process(ElasticSearchSink.java:189)</span><br><span class="line"></span>        ... <span class="number">3</span> more</span><br></pre></td></tr></table></figure>
+<p>BUG出现的原因：sink出现没有被捕获，导致sink无法正常运行</p>
+<p>BUG会导致的问题：这样会导致sink一直不能消费channel中的event，channel中的event因此一直积压发不出去，导致内存占用过高，一直做GC。</p>
+<p>Flume社区有这个issue的解决办法：<br><a href="https://issues.apache.org/jira/browse/FLUME-2769" target="_blank" rel="external">https://issues.apache.org/jira/browse/FLUME-2769</a></p>
+<p>需要修改flume1.6.0源码，目前看来是flume的一个bug，修复办法：<br><a href="https://github.com/agentgt/flume/commit/09089257df239eeac942ef64b2d24c68efb5bec7" target="_blank" rel="external">https://github.com/agentgt/flume/commit/09089257df239eeac942ef64b2d24c68efb5bec7</a></p>
+<p>即出现异常时捕获该异常，强制结束该event的相应header转换为document的一个field的过程。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/flume/">flume</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/flume/">flume</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://qiaowei.xyz/2016/05/10/Flume event转化为ES的document过程分析/" data-title="Flume event转化为ES的document过程分析 | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2016/04/16/Flume启动过程分析/"  title="源码分析Flume启动过程">
+ <strong>下一篇：</strong><br/> 
+ <span>源码分析Flume启动过程
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2016/05/10/Flume event转化为ES的document过程分析/" data-title="Flume event转化为ES的document过程分析" data-url="http://qiaowei.xyz/2016/05/10/Flume event转化为ES的document过程分析/"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一条flume-event的构成"><span class="toc-number">1.</span> <span class="toc-text">一条flume event的构成</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#一条es-document的构成"><span class="toc-number">2.</span> <span class="toc-text">一条es document的构成</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#转化过程"><span class="toc-number">3.</span> <span class="toc-text">转化过程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#遇到的错误"><span class="toc-number">4.</span> <span class="toc-text">遇到的错误</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="github-card">
+<p class="asidetitle">Github 名片</p>
+<div class="github-card" data-github="qwurey" data-width="220" data-height="119" data-theme="medium">
+<script type="text/javascript" src="//cdn.jsdelivr.net/github-cards/latest/widget.js" ></script>
+</div>
+  </div>
+
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/ambari/" title="ambari">ambari<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/flume/" title="flume">flume<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/leetcode/" title="leetcode">leetcode<sup>17</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/life/" title="life">life<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/osx/" title="osx">osx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pg/" title="pg">pg<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/pgxl/" title="pgxl">pgxl<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/python/" title="python">python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/regex/" title="regex">regex<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tool/" title="tool">tool<sup>3</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/REST-API/" style="font-size: 10px;">REST API</a> <a href="/tags/ambari/" style="font-size: 16px;">ambari</a> <a href="/tags/cobbler/" style="font-size: 12px;">cobbler</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/flume/" style="font-size: 18px;">flume</a> <a href="/tags/leetcode/" style="font-size: 20px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/pg/" style="font-size: 10px;">pg</a> <a href="/tags/pgxl/" style="font-size: 14px;">pgxl</a> <a href="/tags/postgres-xl/" style="font-size: 14px;">postgres-xl</a> <a href="/tags/puppet/" style="font-size: 10px;">puppet</a> <a href="/tags/python/" style="font-size: 12px;">python</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/tips/" style="font-size: 14px;">tips</a>
+    </div>
+  </div>
+
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=1758475283&verifier=ec858d3c&dpc=1"></iframe>
+</div>
+
+
+
+  <!-- 多说最新评论 start -->
+<p class="asidetitle">最新评论</p>
+    <div class="ds-recent-comments" data-num-items="5" data-show-avatars="0" data-show-time="1" data-show-title="1" data-show-admin="0" data-excerpt-length="70"></div>
+    <!-- 多说最新评论 end -->
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:"urey"};
+    (function() {
+            var ds = document.createElement('script');
+                    ds.type = 'text/javascript';ds.async = true;
+                            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                                    ds.charset = 'UTF-8';
+                                            (document.getElementsByTagName('head')[0] 
+                                                     || document.getElementsByTagName('body')[0]).appendChild(ds);
+                                                })();
+    </script>
+    <!-- 多说公共JS代码 end -->
+
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://blog.csdn.net/yeruby" target="_blank" title="在路上的学习者">在路上的学习者</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://macshuo.com/" target="_blank" title="MacTalk-池建强的随想录">MacTalk-池建强的随想录</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://www.liaoxuefeng.com/" target="_blank" title="廖雪峰的官方网站">廖雪峰的官方网站</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Urey. <br/>
+			Welcome to contact me ^_^</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/1758475283" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/qwurey" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		<a href="https://www.linkedin.com/in/qwurey" target="_blank" class="icon-linkedin" title="linkedin"></a>
+		
+		
+		
+		<a href="http://www.zhihu.com/people/urey" target="_blank" class="icon-zhihu" title="知乎"></a>
+		
+		
+		
+		<a href="mailto:qiaowei@pku.edu.cn" target="_blank" class="icon-email" title="Email Me"></a>
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2016 
+		
+		<a href="/about" target="_blank" title="urey">urey</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+        getSize();
+        if (myWidth >= 1024) {
+          c.click();
+        }
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"urey"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256263437'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1256263437' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

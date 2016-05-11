@@ -4,35 +4,25 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Maven：mirror和repository区别 | Urey on the way</title>
+    <title>Java使用quartz实现作业调度 | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="一、repository用法使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。
-maven中的repo有两种类型：
-
-remote repository：相当于公共的仓库，大家都能访问到，一般可以用URL的形式访问
-local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:">
+    <meta name="description" content="在spring boot中使用quartz实现作业调度的功能，简单易用。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Maven：mirror和repository区别">
-<meta property="og:url" content="http://qiaowei.xyz/2016/03/11/Maven：mirror和repository区别/index.html">
+<meta property="og:title" content="Java使用quartz实现作业调度">
+<meta property="og:url" content="http://qiaowei.xyz/2016/05/11/Java使用quartz实现作业调度/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="一、repository用法使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。
-maven中的repo有两种类型：
-
-remote repository：相当于公共的仓库，大家都能访问到，一般可以用URL的形式访问
-local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:">
-<meta property="og:updated_time" content="2016-03-25T00:31:59.000Z">
+<meta property="og:description" content="在spring boot中使用quartz实现作业调度的功能，简单易用。">
+<meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/quartzCronExpression.png">
+<meta property="og:updated_time" content="2016-05-11T13:50:01.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Maven：mirror和repository区别">
-<meta name="twitter:description" content="一、repository用法使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。
-maven中的repo有两种类型：
-
-remote repository：相当于公共的仓库，大家都能访问到，一般可以用URL的形式访问
-local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:">
+<meta name="twitter:title" content="Java使用quartz实现作业调度">
+<meta name="twitter:description" content="在spring boot中使用quartz实现作业调度的功能，简单易用。">
+<meta name="twitter:image" content="http://7xlhna.com1.z0.glb.clouddn.com/quartzCronExpression.png">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -91,14 +81,14 @@ local repository：存放在本地磁盘的一个文件夹，例如，windows上
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/03/11/Maven：mirror和repository区别/" title="Maven：mirror和repository区别" itemprop="url">Maven：mirror和repository区别</a>
+      <a href="/2016/05/11/Java使用quartz实现作业调度/" title="Java使用quartz实现作业调度" itemprop="url">Java使用quartz实现作业调度</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2016-03-11T14:13:38.000Z" itemprop="datePublished"> 发表于 2016-03-11</time>
+    <time datetime="2016-05-11T15:31:11.000Z" itemprop="datePublished"> 发表于 2016-05-11</time>
     
   </p>
 </header>
@@ -107,32 +97,45 @@ local repository：存放在本地磁盘的一个文件夹，例如，windows上
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、repository用法"><span class="toc-number">1.</span> <span class="toc-text">一、repository用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、mirror用法"><span class="toc-number">2.</span> <span class="toc-text">二、mirror用法</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#什么是Quartz？"><span class="toc-number">1.</span> <span class="toc-text">什么是Quartz？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#在Spring-boot中如何使用Quartz？"><span class="toc-number">2.</span> <span class="toc-text">在Spring boot中如何使用Quartz？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#什么是cron表达式？"><span class="toc-number">3.</span> <span class="toc-text">什么是cron表达式？</span></a></li></ol>
 		
 		</div>
 		
-		<h3 id="一、repository用法"><a href="#一、repository用法" class="headerlink" title="一、repository用法"></a><strong>一、repository用法</strong></h3><p>使用maven管理的项目如果依赖其他的artifact，则需要从repo自动下载，repo的地址在maven的setting.xml中配置。</p>
-<p>maven中的repo有两种类型：</p>
+		<p>在spring boot中使用quartz实现作业调度的功能，简单易用。</p>
+<a id="more"></a>
+<h4 id="什么是Quartz？"><a href="#什么是Quartz？" class="headerlink" title="什么是Quartz？"></a>什么是Quartz？</h4><p>Quartz是Java领域最著名的、功能丰富的、开放源码的作业调度工具，几乎可以在所有的Java应用程序中集成——从小的单机应用到大的电子商务系统。 Quartz可以用来执行成百上千甚至数万的级别的、简单或者复杂的作业调度，一个Job可以执行任意的你所编程的任务。 Quartz调度包括许多企业级功能，如JTA事务和集群支持。</p>
+<p>Quartz的主要角色有：</p>
 <ol>
-<li>remote repository：相当于公共的仓库，大家都能访问到，一般可以用URL的形式访问</li>
-<li>local repository：存放在本地磁盘的一个文件夹，例如，windows上默认是C:\Users\｛用户名｝.m2\repository目录</li>
+<li>Job：被调度的任务，重写其中execute方法，每次调度时会执行该方法；</li>
+<li>JobDetail：一个Job的具体化，可以这么看，JobDetail = Job + JobData</li>
+<li>Scheduler：调度器</li>
+<li>SchedulerFactory：调度工厂</li>
+<li>各种ScheduleBuilder：CronScheduleBuilder（支持cron表达式的调度器）、CalendarIntervalScheduleBuilder（支持时间间隔的调度器）、SimpleScheduleBuilder（最简单的触发器，可以设置间隔，重复次数）</li>
+<li>Trigger：触发器，用于定义任务调度和时间规则，可以这么看，Trigger = ScheduleBuilder + Time</li>
 </ol>
-<p>自动下载原则：repository里存放的都是各种jar包和maven插件。当向仓库请求插件或依赖的时候，会先检查local repository，如果local repository有则直接返回，否则会向remote repository请求，并缓存到local repository。也可以把做的东西放到本地仓库，仅供本地使用；或上传到远程仓库，供大家使用。</p>
-<p>其中，remote repository主要有3种类型：</p>
-<ol>
-<li>中央仓库：<a href="http://repo1.maven.org/maven2/" target="_blank" rel="external">http://repo1.maven.org/maven2/</a> </li>
-<li>私服：内网自建的maven repository，其URL是一个内部网址 </li>
-<li>其他公共仓库：其他可以互联网公共访问maven repository，例如 jboss repository等</li>
-</ol>
-<p>一个repo的定义如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">repository</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">id</span>&gt;</span>central<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">url</span>&gt;</span>http://maven.oa.com/nexus/content/groups/public<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">releases</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">enabled</span>&gt;</span>true<span class="tag">&lt;/<span class="name">enabled</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">releases</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">snapshots</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">enabled</span>&gt;</span>false<span class="tag">&lt;/<span class="name">enabled</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">snapshots</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">repository</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<h3 id="二、mirror用法"><a href="#二、mirror用法" class="headerlink" title="二、mirror用法"></a><strong>二、mirror用法</strong></h3><p>mirror相当于一个拦截器，可以拦截去往指定remote repository id的请求，把请求里的remote repository url，重定向到mirror里配置的地址。</p>
-<p>那么为什么要这么用呢？</p>
-<p>配置两个Repository之间的镜像关系，一般是出于访问速度和下载速度考虑。<br>例如， 有一个项目，需要在公司和住所都编码，并在项目pom.xml配置了A Maven库。在公司，是电信网络，访问A库很快，所以maven管理依赖和插件都从A库下载；在住所，是网通网络，访问A库很慢，但是访问B库很快。这时，在住所的setting.xml里，只要配置一下<mirrors><mirror>….</mirror></mirrors>，让B库成为A库的mirror，即可不用更改项目pom.xml里对于A库的相关配置。</p>
-<p>但是需要注意的是，如果配置了A库的镜像B库，那么当B库不稳定、不可访问或者停止服务的时候，maven此时也不会去访问A库，因而无法下载所需的构件。</p>
-<p>配置方法：</p>
-<p>在<code>&lt;mirrorOf&gt;&lt;/mirrorOf&gt;</code> 放置repo id，当然，这是mirror最基本的用法。</p>
-<p>为了满足一些复杂的需求，Maven还支持更高级的镜像配置：</p>
-<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 匹配所有远程仓库，此时所有的请求都会发往镜像库</span></span><br><span class="line"><span class="variable">&lt;mirrorOf&gt;</span><span class="keyword">*</span><span class="variable">&lt;/mirrorOf&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 匹配仓库repo1和repo2，使用逗号分隔多个远程仓库</span></span><br><span class="line"><span class="variable">&lt;mirrorOf&gt;</span>repo1,repo2<span class="variable">&lt;/mirrorOf&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 匹配所有远程仓库，repo1除外，使用感叹号将仓库从匹配中排除</span></span><br><span class="line"><span class="variable">&lt;mirrorOf&gt;</span><span class="keyword">*</span>,!repo1<span class="variable">&lt;/miiroOf&gt;</span></span><br></pre></td></tr></table></figure>
+<p>每个JobDetail都可以被唯一标识且指定一个抽象的Job，每个Trigger也都可以被唯一标识，Scheduler将JobDetail和Trigger绑定在了一起，即当trigger发生时，会调用JobDetail对应的Job的execute方法。</p>
+<p>初始化一个调度器，需要JobDetail和Trigger：<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">scheduler</span><span class="selector-class">.scheduleJob</span>(<span class="selector-tag">jobDetail</span>, <span class="selector-tag">trigger</span>);</span><br><span class="line"><span class="selector-tag">scheduler</span><span class="selector-class">.start</span>();</span><br></pre></td></tr></table></figure></p>
+<p>初始化一个JobDetail：<br><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>.jobDetail = newJob(SnapshotPolicyJob.<span class="keyword">class</span>)</span><br><span class="line">		.withIdentity(snapshotPolicyEntity.getId() + <span class="string">"-snapshot"</span>, snapshotPolicyEntity.getService())</span><br><span class="line">		.usingJobData(<span class="string">"service"</span>, snapshotPolicyEntity.getService())</span><br><span class="line">		.usingJobData(<span class="string">"directory"</span>, getDirectoryPrefix(snapshotPolicyEntity.getProject()) + snapshotPolicyEntity.getDirectory())</span><br><span class="line">		.build();</span><br><span class="line"></span><br><span class="line"><span class="comment">//可以通过JobDetail给Job传参数，简单类型通过JobData传，复杂类型通过JobDataMap传：</span></span><br><span class="line">JobDataMap jobDataMap = <span class="keyword">this</span>.jobDetail.getJobDataMap();</span><br><span class="line">jobDataMap.<span class="built_in">put</span>(<span class="string">"snapshotPolicyEntity"</span>, snapshotPolicyEntity);</span><br><span class="line">jobDataMap.<span class="built_in">put</span>(<span class="string">"snapshotHistoryRepository"</span>, snapshotHistoryRepository);</span><br><span class="line">jobDataMap.<span class="built_in">put</span>(<span class="string">"snapshotPolicyRepository"</span>, snapshotPolicyRepository);</span><br><span class="line">jobDataMap.<span class="built_in">put</span>(<span class="string">"configuration"</span>, configuration);</span><br></pre></td></tr></table></figure></p>
+<p>每一个JobDetail对应了一个Job：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SnapshotPolicyJob</span> <span class="keyword">implements</span> <span class="title">Job</span></span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(JobExecutionContext context)</span> <span class="keyword">throws</span> JobExecutionException </span>&#123;</span><br><span class="line">		<span class="comment">// ...</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>初始化一个Trigger，需要调度规则：<br><figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>.trigger = newTrigger()</span><br><span class="line">	.withIdentity(snapshotPolicyEntity.getName(), snapshotPolicyEntity.getService())</span><br><span class="line">	.startAt(BackupUtils.now())</span><br><span class="line">	.withSchedule(cronBuilder)</span><br><span class="line">	.build();</span><br></pre></td></tr></table></figure></p>
+<p>初始化一个调度规则：<br><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">cronExp</span> = <span class="string">"0 "</span> + minute + <span class="string">" "</span> + hour + <span class="string">" "</span> + day + <span class="string">" * ?"</span>;</span><br><span class="line"><span class="attr">cronBuilder</span> = CronScheduleBuilder.cronSchedule(cronExp);</span><br></pre></td></tr></table></figure></p>
+<p>这样，调度流程就串了起来，在满足调度条件后，会执行调度任务的作业。</p>
+<p>默认情况下，调度信息是保留在内存中的，可以通过配置将调度信息持久化到数据库中。</p>
+<p><br></p>
+<h4 id="在Spring-boot中如何使用Quartz？"><a href="#在Spring-boot中如何使用Quartz？" class="headerlink" title="在Spring boot中如何使用Quartz？"></a>在Spring boot中如何使用Quartz？</h4><p>在pom.xml添加依赖：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.quartz-scheduler<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>quartz<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.2.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>之后就可以通过代码实现业务逻辑，这里需要注意的是：在Job内，不能使用spring的注入机制注入对象，必须通过JobDataMap的方式由JobDetail传给Job相应的复杂类型的对象。</p>
+<p><br></p>
+<h4 id="什么是cron表达式？"><a href="#什么是cron表达式？" class="headerlink" title="什么是cron表达式？"></a>什么是cron表达式？</h4><p>CronTrigger 能够提供比 SimpleTrigger 更有具体实际意义的调度方案，调度规则基于 Cron 表达式。</p>
+<p>Quartz的cron表达式的格式十分类似于 UNIX的cron表达式，但还是有少许明显的区别。区别之一就是 Quartz 的格式向下支持到秒级别的计划，而 UNIX cron 计划仅支持至分钟级。许多我们的触发计划要基于秒级递增的(例如，每45秒)。</p>
+<p>另一个与 UNIX的cron表达式的不同点是在表达式中支持域的数目。UNIX 给出五个域(分、时、日、月和周)，Quartz 提供七个域。如下图所示：</p>
+<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/quartzCronExpression.png" alt=""></p>
+<p>注意，从左到右依次是：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">秒	分	时	日	月	周	年</span><br></pre></td></tr></table></figure></p>
+<p>其中第七个域（年）可以省略为空，即这样两个cron表达式是等效的：<br><figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">六个域：0 3 <span class="keyword">*</span> <span class="keyword">*</span> <span class="keyword">*</span> ?</span><br><span class="line">七个域：0 3 <span class="keyword">*</span> <span class="keyword">*</span> <span class="keyword">*</span> ? <span class="keyword">*</span></span><br></pre></td></tr></table></figure></p>
+<p>应用案例：</p>
+<p>按月调度：每月1号8点10分调度<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">10</span> <span class="number">8</span> <span class="number">1</span> * ?</span><br></pre></td></tr></table></figure></p>
+<p>按周调度：每周一8点10分调度<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">10</span> <span class="number">8</span> * * <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p>按日调度：每日8点10分调度<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">10</span> <span class="number">8</span> * * ?</span><br></pre></td></tr></table></figure></p>
+<p>按小时调度：每小时的第10分调度<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">10</span> * * * ?</span><br></pre></td></tr></table></figure></p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -140,13 +143,13 @@ local repository：存放在本地磁盘的一个文件夹，例如，windows上
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/tool/">tool</a>
+  <a class="article-category-link" href="/categories/quartz/">quartz</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/maven/">maven</a>
+  <span></span> <a href="/tags/quartz/">quartz</a>
   </div>
 
 </div>
@@ -155,7 +158,7 @@ local repository：存放在本地磁盘的一个文件夹，例如，windows上
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2016/03/11/Maven：mirror和repository区别/" data-title="Maven：mirror和repository区别 | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2016/05/11/Java使用quartz实现作业调度/" data-title="Java使用quartz实现作业调度 | Urey on the way" data-tsina="1758475283" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -168,19 +171,11 @@ local repository：存放在本地磁盘的一个文件夹，例如，windows上
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2016/03/12/LeetCode-Two-Sum/" title="LeetCode Two Sum">
-  <strong>上一篇：</strong><br/>
-  <span>
-  LeetCode Two Sum</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2016/03/11/RPM打包规范/"  title="RPM打包规范">
+<a href="/2016/05/10/Flume event转化为ES的document过程分析/"  title="Flume event转化为ES的document过程分析">
  <strong>下一篇：</strong><br/> 
- <span>RPM打包规范
+ <span>Flume event转化为ES的document过程分析
 </span>
 </a>
 </div>
@@ -189,7 +184,7 @@ local repository：存放在本地磁盘的一个文件夹，例如，windows上
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2016/03/11/Maven：mirror和repository区别/" data-title="Maven：mirror和repository区别" data-url="http://qiaowei.xyz/2016/03/11/Maven：mirror和repository区别/"></div>
+	<div class="ds-thread" data-thread-key="2016/05/11/Java使用quartz实现作业调度/" data-title="Java使用quartz实现作业调度" data-url="http://qiaowei.xyz/2016/05/11/Java使用quartz实现作业调度/"></div>
 </section>
 
 
@@ -199,7 +194,7 @@ local repository：存放在本地磁盘的一个文件夹，例如，windows上
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、repository用法"><span class="toc-number">1.</span> <span class="toc-text">一、repository用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、mirror用法"><span class="toc-number">2.</span> <span class="toc-text">二、mirror用法</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#什么是Quartz？"><span class="toc-number">1.</span> <span class="toc-text">什么是Quartz？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#在Spring-boot中如何使用Quartz？"><span class="toc-number">2.</span> <span class="toc-text">在Spring boot中如何使用Quartz？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#什么是cron表达式？"><span class="toc-number">3.</span> <span class="toc-text">什么是cron表达式？</span></a></li></ol>
  
   </div>
 

@@ -18,7 +18,7 @@
 <meta property="og:site_name" content="Urey on the way">
 <meta property="og:description" content="在spring boot中使用quartz实现作业调度的功能，简单易用。">
 <meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/quartzCronExpression.png">
-<meta property="og:updated_time" content="2016-05-11T13:50:01.000Z">
+<meta property="og:updated_time" content="2016-05-11T13:52:46.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java使用quartz实现作业调度">
 <meta name="twitter:description" content="在spring boot中使用quartz实现作业调度的功能，简单易用。">
@@ -103,7 +103,8 @@
 		
 		<p>在spring boot中使用quartz实现作业调度的功能，简单易用。</p>
 <a id="more"></a>
-<h4 id="什么是Quartz？"><a href="#什么是Quartz？" class="headerlink" title="什么是Quartz？"></a>什么是Quartz？</h4><p>Quartz是Java领域最著名的、功能丰富的、开放源码的作业调度工具，几乎可以在所有的Java应用程序中集成——从小的单机应用到大的电子商务系统。 Quartz可以用来执行成百上千甚至数万的级别的、简单或者复杂的作业调度，一个Job可以执行任意的你所编程的任务。 Quartz调度包括许多企业级功能，如JTA事务和集群支持。</p>
+<p><br></p>
+<h4 id="什么是Quartz？"><a href="#什么是Quartz？" class="headerlink" title="什么是Quartz？"></a><strong>什么是Quartz？</strong></h4><p>Quartz是Java领域最著名的、功能丰富的、开放源码的作业调度工具，几乎可以在所有的Java应用程序中集成——从小的单机应用到大的电子商务系统。 Quartz可以用来执行成百上千甚至数万的级别的、简单或者复杂的作业调度，一个Job可以执行任意的你所编程的任务。 Quartz调度包括许多企业级功能，如JTA事务和集群支持。</p>
 <p>Quartz的主要角色有：</p>
 <ol>
 <li>Job：被调度的任务，重写其中execute方法，每次调度时会执行该方法；</li>
@@ -122,16 +123,16 @@
 <p>这样，调度流程就串了起来，在满足调度条件后，会执行调度任务的作业。</p>
 <p>默认情况下，调度信息是保留在内存中的，可以通过配置将调度信息持久化到数据库中。</p>
 <p><br></p>
-<h4 id="在Spring-boot中如何使用Quartz？"><a href="#在Spring-boot中如何使用Quartz？" class="headerlink" title="在Spring boot中如何使用Quartz？"></a>在Spring boot中如何使用Quartz？</h4><p>在pom.xml添加依赖：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.quartz-scheduler<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>quartz<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.2.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="在Spring-boot中如何使用Quartz？"><a href="#在Spring-boot中如何使用Quartz？" class="headerlink" title="在Spring boot中如何使用Quartz？"></a><strong>在Spring boot中如何使用Quartz？</strong></h4><p>在pom.xml添加依赖：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.quartz-scheduler<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>quartz<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.2.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
 <p>之后就可以通过代码实现业务逻辑，这里需要注意的是：在Job内，不能使用spring的注入机制注入对象，必须通过JobDataMap的方式由JobDetail传给Job相应的复杂类型的对象。</p>
 <p><br></p>
-<h4 id="什么是cron表达式？"><a href="#什么是cron表达式？" class="headerlink" title="什么是cron表达式？"></a>什么是cron表达式？</h4><p>CronTrigger 能够提供比 SimpleTrigger 更有具体实际意义的调度方案，调度规则基于 Cron 表达式。</p>
+<h4 id="什么是cron表达式？"><a href="#什么是cron表达式？" class="headerlink" title="什么是cron表达式？"></a><strong>什么是cron表达式？</strong></h4><p>CronTrigger 能够提供比 SimpleTrigger 更有具体实际意义的调度方案，调度规则基于 Cron 表达式。</p>
 <p>Quartz的cron表达式的格式十分类似于 UNIX的cron表达式，但还是有少许明显的区别。区别之一就是 Quartz 的格式向下支持到秒级别的计划，而 UNIX cron 计划仅支持至分钟级。许多我们的触发计划要基于秒级递增的(例如，每45秒)。</p>
 <p>另一个与 UNIX的cron表达式的不同点是在表达式中支持域的数目。UNIX 给出五个域(分、时、日、月和周)，Quartz 提供七个域。如下图所示：</p>
 <p><img src="http://7xlhna.com1.z0.glb.clouddn.com/quartzCronExpression.png" alt=""></p>
 <p>注意，从左到右依次是：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">秒	分	时	日	月	周	年</span><br></pre></td></tr></table></figure></p>
 <p>其中第七个域（年）可以省略为空，即这样两个cron表达式是等效的：<br><figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">六个域：0 3 <span class="keyword">*</span> <span class="keyword">*</span> <span class="keyword">*</span> ?</span><br><span class="line">七个域：0 3 <span class="keyword">*</span> <span class="keyword">*</span> <span class="keyword">*</span> ? <span class="keyword">*</span></span><br></pre></td></tr></table></figure></p>
-<p>应用案例：</p>
+<p>比如：</p>
 <p>按月调度：每月1号8点10分调度<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">10</span> <span class="number">8</span> <span class="number">1</span> * ?</span><br></pre></td></tr></table></figure></p>
 <p>按周调度：每周一8点10分调度<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">10</span> <span class="number">8</span> * * <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
 <p>按日调度：每日8点10分调度<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">10</span> <span class="number">8</span> * * ?</span><br></pre></td></tr></table></figure></p>

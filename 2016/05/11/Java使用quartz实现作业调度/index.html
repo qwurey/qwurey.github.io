@@ -18,7 +18,7 @@
 <meta property="og:site_name" content="Urey on the way">
 <meta property="og:description" content="在spring boot中使用quartz实现作业调度的功能，简单易用。">
 <meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/quartzCronExpression.png">
-<meta property="og:updated_time" content="2016-05-11T13:52:46.000Z">
+<meta property="og:updated_time" content="2016-05-12T13:50:12.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java使用quartz实现作业调度">
 <meta name="twitter:description" content="在spring boot中使用quartz实现作业调度的功能，简单易用。">
@@ -135,6 +135,7 @@
 <p>比如：</p>
 <p>按月调度：每月1号8点10分调度<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">10</span> <span class="number">8</span> <span class="number">1</span> * ?</span><br></pre></td></tr></table></figure></p>
 <p>按周调度：每周一8点10分调度<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">10</span> <span class="number">8</span> * * <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p>注意：1-7 对应 SUN-SAT，即1是周日，7是周六</p>
 <p>按日调度：每日8点10分调度<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">10</span> <span class="number">8</span> * * ?</span><br></pre></td></tr></table></figure></p>
 <p>按小时调度：每小时的第10分调度<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">10</span> * * * ?</span><br></pre></td></tr></table></figure></p>
   

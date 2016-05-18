@@ -4,23 +4,28 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>LeetCode Remove Nth Node From End of List | Urey on the way</title>
+    <title>手动和自动化部署MySQL CLuster过程 | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="List">
+    <meta name="description" content="在CentOS6.5上部署Mysql Cluster的过程以及通过Ambari自动化部署的过程
+MySQL Cluster版本：7.4.11">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LeetCode Remove Nth Node From End of List">
-<meta property="og:url" content="http://qiaowei.xyz/2015/12/08/LeetCode-Remove-Nth-Node-From-End-of-List/index.html">
+<meta property="og:title" content="手动和自动化部署MySQL CLuster过程">
+<meta property="og:url" content="http://qiaowei.xyz/2016/03/30/手动和自动化部署MySQL CLuster过程/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="List">
-<meta property="og:updated_time" content="2016-04-07T23:53:22.000Z">
+<meta property="og:description" content="在CentOS6.5上部署Mysql Cluster的过程以及通过Ambari自动化部署的过程
+MySQL Cluster版本：7.4.11">
+<meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/mysql-cluster-arch.png">
+<meta property="og:updated_time" content="2016-05-16T00:43:08.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LeetCode Remove Nth Node From End of List">
-<meta name="twitter:description" content="List">
+<meta name="twitter:title" content="手动和自动化部署MySQL CLuster过程">
+<meta name="twitter:description" content="在CentOS6.5上部署Mysql Cluster的过程以及通过Ambari自动化部署的过程
+MySQL Cluster版本：7.4.11">
+<meta name="twitter:image" content="http://7xlhna.com1.z0.glb.clouddn.com/mysql-cluster-arch.png">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -79,14 +84,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/12/08/LeetCode-Remove-Nth-Node-From-End-of-List/" title="LeetCode Remove Nth Node From End of List" itemprop="url">LeetCode Remove Nth Node From End of List</a>
+      <a href="/2016/03/30/手动和自动化部署MySQL CLuster过程/" title="手动和自动化部署MySQL CLuster过程" itemprop="url">手动和自动化部署MySQL CLuster过程</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2015-12-07T23:46:38.000Z" itemprop="datePublished"> 发表于 2015-12-08</time>
+    <time datetime="2016-03-30T13:37:50.000Z" itemprop="datePublished"> 发表于 2016-03-30</time>
     
   </p>
 </header>
@@ -95,13 +100,53 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips:</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、MYSQL-Cluster架构"><span class="toc-number">1.</span> <span class="toc-text">一、MYSQL Cluster架构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、部署过程"><span class="toc-number">2.</span> <span class="toc-text">二、部署过程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、通过Ambari自动化部署"><span class="toc-number">3.</span> <span class="toc-text">三、通过Ambari自动化部署</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Reference"><span class="toc-number">4.</span> <span class="toc-text">Reference</span></a></li></ol>
 		
 		</div>
 		
-		<p>List<br><a id="more"></a></p>
-<h4 id="tips"><a href="#tips" class="headerlink" title="tips:"></a>tips:</h4><p>增加头节点可以使结构更清晰，时间复杂度：O(N)，空间复杂度：O(1)</p>
-<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Definition for singly-linked list.</span><br><span class="line"> * struct ListNode &#123;</span><br><span class="line"> *     int val;</span><br><span class="line"> *     ListNode *next;</span><br><span class="line"> *     ListNode(int x) : val(x), next(NULL) &#123;&#125;</span><br><span class="line"> * &#125;;</span><br><span class="line"> */</span></span><br><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    ListNode* removeNthFromEnd(ListNode* head, <span class="keyword">int</span> n) &#123;</span><br><span class="line">        ListNode* dummy = new ListNode(<span class="number">0</span>)<span class="comment">;</span></span><br><span class="line">        dummy-&gt;<span class="keyword">next</span> = head<span class="comment">;</span></span><br><span class="line">        ListNode* fast = dummy<span class="comment">;</span></span><br><span class="line">        ListNode* normal = dummy<span class="comment">;</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span><span class="comment">; i &lt; n; ++i) &#123;</span></span><br><span class="line">            fast = fast-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span>(fast-&gt;<span class="keyword">next</span> != NULL) &#123;</span><br><span class="line">            fast = fast-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">            normal = normal-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        ListNode *tmp = normal-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">        normal-&gt;<span class="keyword">next</span> = normal-&gt;<span class="keyword">next</span>-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">        <span class="keyword">delete</span>(tmp)<span class="comment">;</span></span><br><span class="line">        <span class="keyword">return</span> dummy-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+		<p>在CentOS6.5上部署Mysql Cluster的过程以及通过Ambari自动化部署的过程</p>
+<p>MySQL Cluster版本：7.4.11</p>
+<a id="more"></a>
+<p><br></p>
+<h4 id="一、MYSQL-Cluster架构"><a href="#一、MYSQL-Cluster架构" class="headerlink" title="一、MYSQL Cluster架构"></a><strong>一、MYSQL Cluster架构</strong></h4><p>Mysql Cluster架构：</p>
+<ol>
+<li>MGM NODE：MASTER（1）</li>
+<li>NDB NODE：SLAVE（1+）</li>
+<li>SQL NODE：SLAVE（1+）</li>
+</ol>
+<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/mysql-cluster-arch.png" width="600" height="330" style="display:block;margin:auto"></p>
+<p><br></p>
+<h4 id="二、部署过程"><a href="#二、部署过程" class="headerlink" title="二、部署过程"></a><strong>二、部署过程</strong></h4><p><strong>节点规划：</strong></p>
+<ol>
+<li>master.hp: mgm node</li>
+<li>slave1.hp: ndb node, sql node</li>
+<li>slave2.hp: ndb node, sql node</li>
+</ol>
+<p>删除CentOS6.5自装的mysql-libs：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rpm -<span class="keyword">qa</span> | <span class="keyword">grep</span> mysql</span><br><span class="line">rpm -<span class="keyword">e</span> --nodeps mysql-libs-<span class="number">5.1</span>.<span class="number">71</span>-<span class="number">1</span>.el6.x86_64</span><br></pre></td></tr></table></figure>
+<p>在<a href="http://dev.mysql.com/downloads/cluster/" target="_blank" rel="external">http://dev.mysql.com/downloads/cluster/</a>下载对应的MySQL Cluster的rpm包：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">MySQL-Cluster-client-gpl-7</span><span class="selector-class">.4</span><span class="selector-class">.11-1</span><span class="selector-class">.el6</span><span class="selector-class">.x86_64</span><span class="selector-class">.rpm</span></span><br><span class="line"><span class="selector-tag">MySQL-Cluster-server-gpl-7</span><span class="selector-class">.4</span><span class="selector-class">.11-1</span><span class="selector-class">.el6</span><span class="selector-class">.x86_64</span><span class="selector-class">.rpm</span></span><br></pre></td></tr></table></figure>
+<p>部署mgm node：</p>
+<p>安装server的rpm包：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">yum</span> <span class="selector-tag">-y</span> <span class="selector-tag">install</span> <span class="selector-tag">MySQL-Cluster-server-gpl-7</span><span class="selector-class">.4</span><span class="selector-class">.11-1</span><span class="selector-class">.el6</span><span class="selector-class">.x86_64</span></span><br></pre></td></tr></table></figure>
+<p>创建配置目录：</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /var/<span class="class"><span class="keyword">lib</span>/<span class="title">mysql</span>-<span class="title">cluster</span></span></span><br></pre></td></tr></table></figure>
+<p>创建配置文件：</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /var/<span class="class"><span class="keyword">lib</span>/<span class="title">mysql</span>-<span class="title">cluster</span>/<span class="title">config</span>.<span class="title">ini</span></span></span><br></pre></td></tr></table></figure>
+<p>配置如下：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[ndbd default]</span></span><br><span class="line"><span class="comment"># Options affecting ndbd processes on all data nodes:</span></span><br><span class="line"><span class="attr">NoOfReplicas</span>=<span class="number">2</span>    # Number of replicas</span><br><span class="line"><span class="attr">DataMemory</span>=<span class="number">80</span>M    # How much memory to allocate for data storage</span><br><span class="line"><span class="attr">IndexMemory</span>=<span class="number">18</span>M   # How much memory to allocate for index storage</span><br><span class="line"><span class="comment"># For DataMemory and IndexMemory, we have used the</span></span><br><span class="line"><span class="comment"># default values. Since the "world" database takes up</span></span><br><span class="line"><span class="comment"># only about 500KB, this should be more than enough for</span></span><br><span class="line"><span class="comment"># this example Cluster setup.</span></span><br><span class="line"><span class="section"></span><br><span class="line">[tcp default]</span></span><br><span class="line"><span class="comment"># TCP/IP options:</span></span><br><span class="line"><span class="attr">portnumber</span>=<span class="number">2202</span>   # This the default; however, you can use any</span><br><span class="line"><span class="comment"># port that is free for all the hosts in the cluster</span></span><br><span class="line"><span class="comment"># <span class="doctag">Note:</span> It is recommended that you do not specify the port</span></span><br><span class="line"><span class="comment"># number at all and simply allow the default value to be used</span></span><br><span class="line"><span class="comment"># instead</span></span><br><span class="line"><span class="section"></span><br><span class="line">[ndb_mgmd]</span></span><br><span class="line"><span class="comment"># Management process options:</span></span><br><span class="line"><span class="attr">hostname</span>=master.hp         # Hostname or IP address of MGM node</span><br><span class="line"><span class="attr">datadir</span>=/var/lib/mysql-cluster  # Directory for MGM node log files</span><br><span class="line"></span><br><span class="line"><span class="comment"># one [ndbd] section per data node</span></span><br><span class="line"><span class="section">[ndbd]</span></span><br><span class="line"><span class="comment"># Options for data node</span></span><br><span class="line"><span class="attr">hostname</span>=slave1.hp         # Hostname or IP address</span><br><span class="line"><span class="attr">datadir</span>=/usr/local/mysql/data   # Directory for this data node<span class="string">'s data files</span><br><span class="line"></span><br><span class="line">[ndbd]</span><br><span class="line"># Options for data node</span><br><span class="line">hostname=slave2.hp         # Hostname or IP address</span><br><span class="line">datadir=/usr/local/mysql/data   # Directory for this data node'</span>s data files</span><br><span class="line"><span class="section"></span><br><span class="line">[mysqld]</span></span><br><span class="line"><span class="comment"># SQL node options:</span></span><br><span class="line"><span class="attr">hostname</span>=slave1.hp         # Hostname or IP address</span><br><span class="line"><span class="section"></span><br><span class="line">[mysqld]</span></span><br><span class="line"><span class="comment"># SQL node options:</span></span><br><span class="line"><span class="attr">hostname</span>=slave2.hp         # Hostname or IP address</span><br></pre></td></tr></table></figure>
+<p>首次启动mgm node：<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ndb_mgmd -f /var/<span class="class"><span class="keyword">lib</span>/<span class="title">mysql</span>-<span class="title">cluster</span>/<span class="title">config</span>.<span class="title">ini</span> --<span class="title">initial</span></span></span><br></pre></td></tr></table></figure></p>
+<p>注意如果是第二次启动就直接：</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ndb_mgmd -f /var/<span class="class"><span class="keyword">lib</span>/<span class="title">mysql</span>-<span class="title">cluster</span>/<span class="title">config</span>.<span class="title">ini</span></span></span><br></pre></td></tr></table></figure>
+<p>部署ndb node：</p>
+<p>部署sql node：</p>
+<p><br></p>
+<h4 id="三、通过Ambari自动化部署"><a href="#三、通过Ambari自动化部署" class="headerlink" title="三、通过Ambari自动化部署"></a><strong>三、通过Ambari自动化部署</strong></h4><p>将MySQL Cluster看成一个服务，通过Ambari自动化部署，需要注意的是，需要部署前的节点上没有事先安装过mysql相关的包，否则会发生冲突导致安装失败。</p>
+<p>代码已经上传到github，地址：</p>
+<p><a href="https://github.com/qwurey/ambari-mysql-cluster-plugin" target="_blank" rel="external">https://github.com/qwurey/ambari-mysql-cluster-plugin</a></p>
+<p>Ambari版本:2.1.2</p>
+<p><br></p>
+<h4 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a><strong>Reference</strong></h4><p><a href="https://flume.apache.org/FlumeDeveloperGuide.html" target="_blank" rel="external">https://flume.apache.org/FlumeDeveloperGuide.html</a></p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -109,13 +154,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
+  <a class="article-category-link" href="/categories/ambari/">ambari</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
+  <span></span> <a href="/tags/ambari/">ambari</a>
   </div>
 
 </div>
@@ -124,7 +169,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2015/12/08/LeetCode-Remove-Nth-Node-From-End-of-List/" data-title="LeetCode Remove Nth Node From End of List | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2016/03/30/手动和自动化部署MySQL CLuster过程/" data-title="手动和自动化部署MySQL CLuster过程 | Urey on the way" data-tsina="1758475283" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -138,18 +183,18 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2015/12/08/LeetCode-Valid-Parentheses/" title="LeetCode Valid Parentheses">
+ <a href="/2016/03/30/Flume开发特定组件/" title="Flume开发特定组件">
   <strong>上一篇：</strong><br/>
   <span>
-  LeetCode Valid Parentheses</span>
+  Flume开发特定组件</span>
 </a>
 </div>
 
 
 <div class="next">
-<a href="/2015/11/05/2015-11-05-puppetan-zhuang-yu-ji-ben-shi-yong/"  title="puppet安装与基本使用">
+<a href="/2016/03/26/Ambari删除服务的方法小结/"  title="Ambari删除服务的方法小结">
  <strong>下一篇：</strong><br/> 
- <span>puppet安装与基本使用
+ <span>Ambari删除服务的方法小结
 </span>
 </a>
 </div>
@@ -158,7 +203,7 @@
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2015/12/08/LeetCode-Remove-Nth-Node-From-End-of-List/" data-title="LeetCode Remove Nth Node From End of List" data-url="http://qiaowei.xyz/2015/12/08/LeetCode-Remove-Nth-Node-From-End-of-List/"></div>
+	<div class="ds-thread" data-thread-key="2016/03/30/手动和自动化部署MySQL CLuster过程/" data-title="手动和自动化部署MySQL CLuster过程" data-url="http://qiaowei.xyz/2016/03/30/手动和自动化部署MySQL CLuster过程/"></div>
 </section>
 
 
@@ -168,7 +213,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips:</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、MYSQL-Cluster架构"><span class="toc-number">1.</span> <span class="toc-text">一、MYSQL Cluster架构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、部署过程"><span class="toc-number">2.</span> <span class="toc-text">二、部署过程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、通过Ambari自动化部署"><span class="toc-number">3.</span> <span class="toc-text">三、通过Ambari自动化部署</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Reference"><span class="toc-number">4.</span> <span class="toc-text">Reference</span></a></li></ol>
  
   </div>
 

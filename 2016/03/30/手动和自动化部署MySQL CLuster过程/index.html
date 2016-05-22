@@ -20,7 +20,7 @@ MySQL Cluster版本：7.4.11">
 <meta property="og:description" content="在CentOS6.5上部署Mysql Cluster的过程以及通过Ambari自动化部署的过程
 MySQL Cluster版本：7.4.11">
 <meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/mysql-cluster-arch.png">
-<meta property="og:updated_time" content="2016-05-16T00:43:08.000Z">
+<meta property="og:updated_time" content="2016-05-22T13:48:40.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="手动和自动化部署MySQL CLuster过程">
 <meta name="twitter:description" content="在CentOS6.5上部署Mysql Cluster的过程以及通过Ambari自动化部署的过程
@@ -116,17 +116,18 @@ MySQL Cluster版本：7.4.11">
 </ol>
 <p><img src="http://7xlhna.com1.z0.glb.clouddn.com/mysql-cluster-arch.png" width="600" height="330" style="display:block;margin:auto"></p>
 <p><br></p>
-<h4 id="二、部署过程"><a href="#二、部署过程" class="headerlink" title="二、部署过程"></a><strong>二、部署过程</strong></h4><p><strong>节点规划：</strong></p>
+<h4 id="二、部署过程"><a href="#二、部署过程" class="headerlink" title="二、部署过程"></a><strong>二、部署过程</strong></h4><p><strong> 节点规划：</strong></p>
 <ol>
 <li>master.hp: mgm node</li>
 <li>slave1.hp: ndb node, sql node</li>
 <li>slave2.hp: ndb node, sql node</li>
 </ol>
-<p>删除CentOS6.5自装的mysql-libs：</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rpm -<span class="keyword">qa</span> | <span class="keyword">grep</span> mysql</span><br><span class="line">rpm -<span class="keyword">e</span> --nodeps mysql-libs-<span class="number">5.1</span>.<span class="number">71</span>-<span class="number">1</span>.el6.x86_64</span><br></pre></td></tr></table></figure>
 <p>在<a href="http://dev.mysql.com/downloads/cluster/" target="_blank" rel="external">http://dev.mysql.com/downloads/cluster/</a>下载对应的MySQL Cluster的rpm包：</p>
 <figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">MySQL-Cluster-client-gpl-7</span><span class="selector-class">.4</span><span class="selector-class">.11-1</span><span class="selector-class">.el6</span><span class="selector-class">.x86_64</span><span class="selector-class">.rpm</span></span><br><span class="line"><span class="selector-tag">MySQL-Cluster-server-gpl-7</span><span class="selector-class">.4</span><span class="selector-class">.11-1</span><span class="selector-class">.el6</span><span class="selector-class">.x86_64</span><span class="selector-class">.rpm</span></span><br></pre></td></tr></table></figure>
-<p>部署mgm node：</p>
+<p><strong> 部署mgm node：</strong></p>
+<p>在master.hp上执行下面的命令：</p>
+<p>删除CentOS6.5自装的mysql-libs：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rpm -<span class="keyword">qa</span> | <span class="keyword">grep</span> mysql</span><br><span class="line">rpm -<span class="keyword">e</span> --nodeps mysql-libs-<span class="number">5.1</span>.<span class="number">71</span>-<span class="number">1</span>.el6.x86_64</span><br></pre></td></tr></table></figure>
 <p>安装server的rpm包：</p>
 <figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">yum</span> <span class="selector-tag">-y</span> <span class="selector-tag">install</span> <span class="selector-tag">MySQL-Cluster-server-gpl-7</span><span class="selector-class">.4</span><span class="selector-class">.11-1</span><span class="selector-class">.el6</span><span class="selector-class">.x86_64</span></span><br></pre></td></tr></table></figure>
 <p>创建配置目录：</p>
@@ -138,8 +139,31 @@ MySQL Cluster版本：7.4.11">
 <p>首次启动mgm node：<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ndb_mgmd -f /var/<span class="class"><span class="keyword">lib</span>/<span class="title">mysql</span>-<span class="title">cluster</span>/<span class="title">config</span>.<span class="title">ini</span> --<span class="title">initial</span></span></span><br></pre></td></tr></table></figure></p>
 <p>注意如果是第二次启动就直接：</p>
 <figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ndb_mgmd -f /var/<span class="class"><span class="keyword">lib</span>/<span class="title">mysql</span>-<span class="title">cluster</span>/<span class="title">config</span>.<span class="title">ini</span></span></span><br></pre></td></tr></table></figure>
-<p>部署ndb node：</p>
-<p>部署sql node：</p>
+<p><strong> 部署ndb node： </strong></p>
+<p>在slave1.hp和slave2.hp上执行下面的命令：</p>
+<p>删除CentOS6.5自装的mysql-libs：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rpm -<span class="keyword">qa</span> | <span class="keyword">grep</span> mysql</span><br><span class="line">rpm -<span class="keyword">e</span> --nodeps mysql-libs-<span class="number">5.1</span>.<span class="number">71</span>-<span class="number">1</span>.el6.x86_64</span><br></pre></td></tr></table></figure>
+<p>安装server的rpm包：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">yum</span> <span class="selector-tag">-y</span> <span class="selector-tag">install</span> <span class="selector-tag">MySQL-Cluster-server-gpl-7</span><span class="selector-class">.4</span><span class="selector-class">.11-1</span><span class="selector-class">.el6</span><span class="selector-class">.x86_64</span></span><br></pre></td></tr></table></figure>
+<p>创建ndb的数据目录：</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p <span class="meta-keyword">/usr/</span>local<span class="meta-keyword">/mysql/</span>data</span><br></pre></td></tr></table></figure>
+<p>创建ndb的配置文件：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">vi</span> /etc/my.<span class="keyword">cnf</span></span><br></pre></td></tr></table></figure>
+<p>配置如下：<br><figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">[mysqld]</span></span><br><span class="line">ndbcluster</span><br><span class="line"></span><br><span class="line"><span class="string">[mysql_cluster]</span></span><br><span class="line">ndb-connectstring=master.hp</span><br></pre></td></tr></table></figure></p>
+<p>如果第一次启动ndb node：<br><figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ndbd <span class="comment">--initial</span></span><br></pre></td></tr></table></figure></p>
+<p>否则，直接：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ndbd</span><br></pre></td></tr></table></figure></p>
+<p><strong> 部署sql node：</strong></p>
+<p>在slave1.hp和slave2.hp上执行下面的命令：</p>
+<p>删除CentOS6.5自装的mysql-libs：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rpm -<span class="keyword">qa</span> | <span class="keyword">grep</span> mysql</span><br><span class="line">rpm -<span class="keyword">e</span> --nodeps mysql-libs-<span class="number">5.1</span>.<span class="number">71</span>-<span class="number">1</span>.el6.x86_64</span><br></pre></td></tr></table></figure>
+<p>同时安装server和client的rpm包：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">yum</span> <span class="selector-tag">-y</span> <span class="selector-tag">install</span> <span class="selector-tag">MySQL-Cluster-server-gpl-7</span><span class="selector-class">.4</span><span class="selector-class">.11-1</span><span class="selector-class">.el6</span><span class="selector-class">.x86_64</span></span><br></pre></td></tr></table></figure>
+<p>创建sql node的配置文件，同ndb node的配置相同：<br><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">vi</span> /etc/my.<span class="keyword">cnf</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">[mysqld]</span></span><br><span class="line">ndbcluster</span><br><span class="line"></span><br><span class="line"><span class="string">[mysql_cluster]</span></span><br><span class="line">ndb-connectstring=master.hp</span><br></pre></td></tr></table></figure>
+<p>启动sql node：<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqld_safe &gt;<span class="regexp">/dev/</span><span class="keyword">null</span></span><br></pre></td></tr></table></figure></p>
+<p>启动顺序：<br>mgm node-&gt;ndb node-&gt;sql node</p>
+<p>关闭顺序：<br>sql node-&gt;mgm node</p>
+<p>关闭mgm的时候会自动关闭ndb node：<br><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># sql node</span></span><br><span class="line">service mysql <span class="built_in">stop</span></span><br><span class="line"><span class="meta"># mgm node</span></span><br><span class="line">ndb_mgm -e <span class="built_in">shutdown</span></span><br></pre></td></tr></table></figure></p>
 <p><br></p>
 <h4 id="三、通过Ambari自动化部署"><a href="#三、通过Ambari自动化部署" class="headerlink" title="三、通过Ambari自动化部署"></a><strong>三、通过Ambari自动化部署</strong></h4><p>将MySQL Cluster看成一个服务，通过Ambari自动化部署，需要注意的是，需要部署前的节点上没有事先安装过mysql相关的包，否则会发生冲突导致安装失败。</p>
 <p>代码已经上传到github，地址：</p>

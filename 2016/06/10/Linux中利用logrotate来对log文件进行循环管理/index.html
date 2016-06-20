@@ -4,23 +4,23 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>LeetCode Remove Nth Node From End of List | Urey on the way</title>
+    <title>Linux中利用logrotate来对log文件进行转储 | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="List">
+    <meta name="description" content="使用logrotate对日志文件转储，按时或者按大小。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LeetCode Remove Nth Node From End of List">
-<meta property="og:url" content="http://qiaowei.xyz/2015/12/08/LeetCode-Remove-Nth-Node-From-End-of-List/index.html">
+<meta property="og:title" content="Linux中利用logrotate来对log文件进行转储">
+<meta property="og:url" content="http://qiaowei.xyz/2016/06/10/Linux中利用logrotate来对log文件进行循环管理/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="List">
-<meta property="og:updated_time" content="2016-04-07T23:53:22.000Z">
+<meta property="og:description" content="使用logrotate对日志文件转储，按时或者按大小。">
+<meta property="og:updated_time" content="2016-06-20T13:52:58.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LeetCode Remove Nth Node From End of List">
-<meta name="twitter:description" content="List">
+<meta name="twitter:title" content="Linux中利用logrotate来对log文件进行转储">
+<meta name="twitter:description" content="使用logrotate对日志文件转储，按时或者按大小。">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -79,14 +79,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/12/08/LeetCode-Remove-Nth-Node-From-End-of-List/" title="LeetCode Remove Nth Node From End of List" itemprop="url">LeetCode Remove Nth Node From End of List</a>
+      <a href="/2016/06/10/Linux中利用logrotate来对log文件进行循环管理/" title="Linux中利用logrotate来对log文件进行转储" itemprop="url">Linux中利用logrotate来对log文件进行转储</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2015-12-07T23:46:38.000Z" itemprop="datePublished"> 发表于 2015-12-08</time>
+    <time datetime="2016-06-10T14:13:08.000Z" itemprop="datePublished"> 发表于 2016-06-10</time>
     
   </p>
 </header>
@@ -95,13 +95,35 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips:</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#logrotate简介"><span class="toc-number">1.</span> <span class="toc-text">logrotate简介</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#使用需求"><span class="toc-number">2.</span> <span class="toc-text">使用需求</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#样例配置"><span class="toc-number">3.</span> <span class="toc-text">样例配置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#效果"><span class="toc-number">4.</span> <span class="toc-text">效果</span></a></li></ol>
 		
 		</div>
 		
-		<p>List<br><a id="more"></a></p>
-<h4 id="tips"><a href="#tips" class="headerlink" title="tips:"></a>tips:</h4><p>增加头节点可以使结构更清晰，时间复杂度：O(N)，空间复杂度：O(1)</p>
-<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Definition for singly-linked list.</span><br><span class="line"> * struct ListNode &#123;</span><br><span class="line"> *     int val;</span><br><span class="line"> *     ListNode *next;</span><br><span class="line"> *     ListNode(int x) : val(x), next(NULL) &#123;&#125;</span><br><span class="line"> * &#125;;</span><br><span class="line"> */</span></span><br><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    ListNode* removeNthFromEnd(ListNode* head, <span class="keyword">int</span> n) &#123;</span><br><span class="line">        ListNode* dummy = new ListNode(<span class="number">0</span>)<span class="comment">;</span></span><br><span class="line">        dummy-&gt;<span class="keyword">next</span> = head<span class="comment">;</span></span><br><span class="line">        ListNode* fast = dummy<span class="comment">;</span></span><br><span class="line">        ListNode* normal = dummy<span class="comment">;</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span><span class="comment">; i &lt; n; ++i) &#123;</span></span><br><span class="line">            fast = fast-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span>(fast-&gt;<span class="keyword">next</span> != NULL) &#123;</span><br><span class="line">            fast = fast-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">            normal = normal-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        ListNode *tmp = normal-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">        normal-&gt;<span class="keyword">next</span> = normal-&gt;<span class="keyword">next</span>-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">        <span class="keyword">delete</span>(tmp)<span class="comment">;</span></span><br><span class="line">        <span class="keyword">return</span> dummy-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+		<p>使用logrotate对日志文件转储，按时或者按大小。</p>
+<a id="more"></a>
+<p><br></p>
+<h4 id="logrotate简介"><a href="#logrotate简介" class="headerlink" title="logrotate简介"></a><strong>logrotate简介</strong></h4><figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">NAME</span><br><span class="line">       logrotate - rotates, compresses, <span class="keyword">and</span> mails system logs</span><br><span class="line"></span><br><span class="line">SYNOPSIS</span><br><span class="line">       logrotate [-dv] [-f|<span class="comment">--force] [-s|--state file] config_file ..</span></span><br><span class="line"></span><br><span class="line">DESCRIPTION</span><br><span class="line">       logrotate  <span class="keyword">is</span>  designed  <span class="keyword">to</span>  ease  administration <span class="keyword">of</span> systems <span class="keyword">that</span> generate large numbers <span class="keyword">of</span> <span class="built_in">log</span> files.  It allows automatic</span><br><span class="line">       rotation, compression, removal, <span class="keyword">and</span> mailing <span class="keyword">of</span> <span class="built_in">log</span> files.  Each <span class="built_in">log</span> <span class="built_in">file</span> may be handled daily, weekly, monthly, <span class="keyword">or</span> when  <span class="keyword">it</span></span><br><span class="line">       grows too large.</span><br><span class="line"></span><br><span class="line">       Normally,  logrotate  <span class="keyword">is</span>  <span class="built_in">run</span> <span class="keyword">as</span> a daily cron job.  It will <span class="keyword">not</span> modify a <span class="built_in">log</span> multiple <span class="keyword">times</span> <span class="keyword">in</span> one <span class="built_in">day</span> unless <span class="keyword">the</span> criterium</span><br><span class="line">       <span class="keyword">for</span> <span class="keyword">that</span> <span class="built_in">log</span> <span class="keyword">is</span> based <span class="keyword">on</span> <span class="keyword">the</span> <span class="built_in">log</span>'s size <span class="keyword">and</span> logrotate <span class="keyword">is</span> being <span class="built_in">run</span> multiple <span class="keyword">times</span> each <span class="built_in">day</span>, <span class="keyword">or</span>  unless  <span class="keyword">the</span>  -f  <span class="keyword">or</span>  -force</span><br><span class="line">       option <span class="keyword">is</span> used.</span><br><span class="line"></span><br><span class="line">       Any  <span class="built_in">number</span>  <span class="keyword">of</span> config files may be <span class="keyword">given</span> <span class="keyword">on</span> <span class="keyword">the</span> command line. Later config files may override <span class="keyword">the</span> options <span class="keyword">given</span> <span class="keyword">in</span> earlier</span><br><span class="line">       files, so <span class="keyword">the</span> order <span class="keyword">in</span> which <span class="keyword">the</span> logrotate config files are listed <span class="keyword">is</span> important.  Normally,  a  single  config  <span class="built_in">file</span>  which</span><br><span class="line">       includes  any other config files which are needed should be used.  See <span class="keyword">below</span> <span class="keyword">for</span> more information <span class="keyword">on</span> how <span class="keyword">to</span> use <span class="keyword">the</span> include</span><br><span class="line">       directive <span class="keyword">to</span> accomplish this.  If a directory <span class="keyword">is</span> <span class="keyword">given</span> <span class="keyword">on</span> <span class="keyword">the</span> command line, <span class="keyword">every</span> <span class="built_in">file</span> <span class="keyword">in</span> <span class="keyword">that</span> directory <span class="keyword">is</span> used <span class="keyword">as</span> a  con-</span><br><span class="line">       fig <span class="built_in">file</span>.</span><br><span class="line"></span><br><span class="line">       If  no  command  line arguments are <span class="keyword">given</span>, logrotate will print <span class="built_in">version</span> <span class="keyword">and</span> copyright information, along <span class="keyword">with</span> a short usage</span><br><span class="line">       summary.  If any errors occur <span class="keyword">while</span> rotating logs, logrotate will <span class="keyword">exit</span> <span class="keyword">with</span> non-zero status.</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h4 id="使用需求"><a href="#使用需求" class="headerlink" title="使用需求"></a><strong>使用需求</strong></h4><p>在启动flume时候会将启动日志和接下来的运行日志收集到日志文件中<code>/var/log/flume/agent.out</code>，注意这里的这个日志文件不是log4j配置的日志文件。</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/hdp/current/flume-server/bin/flume-ng agent --name agent --conf /etc/flume/conf/agent --conf-file /etc/flume/conf/agent/flume<span class="selector-class">.conf</span> -Dflume<span class="selector-class">.monitoring</span><span class="selector-class">.type</span>=org<span class="selector-class">.apache</span><span class="selector-class">.hadoop</span><span class="selector-class">.metrics2</span><span class="selector-class">.sink</span><span class="selector-class">.flume</span><span class="selector-class">.FlumeTimelineMetricsSink</span> -Dflume<span class="selector-class">.monitoring</span><span class="selector-class">.node</span>=<span class="number">10.254</span>.<span class="number">100.198</span>:<span class="number">6188</span> &gt; /var/log/flume/agent<span class="selector-class">.out</span> <span class="number">2</span>&gt;&amp;<span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>遇到异常情况该日志文件会变的非常大，产生系统隐患，那么我们就需要控制这个文件的大小，最好可以像log4j一样可以定时的或者按照大小来“转储”日志文件，这就可以使用<code>logrotate</code>这个命令实现。</p>
+<p>主流Linux发行版上都默认安装有logrotate包，如果出于某种原因，logrotate没有出现在里头，可以使用apt-get或yum命令来安装。</p>
+<p><br></p>
+<h4 id="样例配置"><a href="#样例配置" class="headerlink" title="样例配置"></a><strong>样例配置</strong></h4><p>基于上面的需求，我们在<code>/etc/logrotate.d/</code>下面创建自定义的配置文件：</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/logrotate.<span class="keyword">d</span>/flume</span><br><span class="line"></span><br><span class="line">/<span class="keyword">var</span>/<span class="keyword">log</span>/flume/agent.<span class="keyword">out</span> &#123;</span><br><span class="line">	size 100M</span><br><span class="line">	create</span><br><span class="line">	start 1</span><br><span class="line">	<span class="keyword">rotate</span> 5</span><br><span class="line">	<span class="keyword">compress</span></span><br><span class="line">	copytruncate</span><br><span class="line">	missingok</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>说明一下（详情请参见<code>man logrotate</code>）：</p>
+<ol>
+<li><code>size</code>：Log files are rotated when they grow bigger than size bytes.</li>
+<li><code>create</code>：Immediately  after rotation (before the postrotate script is run) the log file is created (with the same name as the log file just rotated). </li>
+<li><code>start</code>：This is the number to use as the base for rotation. For example, if you specify 0, the logs will be created  with  a.0  extension  as  they are rotated from the original log files.</li>
+<li><code>rotate</code>：Log  files  are  rotated count times before being removed or mailed to the address specified in a mail directive. If count is 0, old versions are removed rather than rotated.</li>
+<li><code>compress</code>：Old versions of log files are compressed with gzip(1) by default. See also nocompress.</li>
+<li><code>copytruncate</code>：Truncate  the  original  log  file in place after creating a copy, instead of moving the old log file and optionally creating a new one.</li>
+<li><code>missingok</code>：If the log file is missing, go on to the next one without issuing an error message. See also nomissingok.</li>
+</ol>
+<p><br></p>
+<h4 id="效果"><a href="#效果" class="headerlink" title="效果"></a><strong>效果</strong></h4><p>默认情况下，logrotate会每天自动执行一次：<br>在/etc/cron.daily目录下有logrotate执行的脚本（通过crontab程序每天执行一次）<br><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi <span class="meta-keyword">/etc/</span>cron.daily/logrotate</span><br></pre></td></tr></table></figure></p>
+<p>如果配置完想立即测试看一下效果，可以使用logrotate的强制执行的命令：<br><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta-keyword">/usr/</span>sbin/logrotate -vf <span class="meta-keyword">/etc/</span>logrotate.conf</span><br></pre></td></tr></table></figure></p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -109,13 +131,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
+  <a class="article-category-link" href="/categories/flume/">flume</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
+  <span></span> <a href="/tags/flume/">flume</a>
   </div>
 
 </div>
@@ -124,7 +146,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2015/12/08/LeetCode-Remove-Nth-Node-From-End-of-List/" data-title="LeetCode Remove Nth Node From End of List | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2016/06/10/Linux中利用logrotate来对log文件进行循环管理/" data-title="Linux中利用logrotate来对log文件进行转储 | Urey on the way" data-tsina="1758475283" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -137,19 +159,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/12/08/LeetCode-Valid-Parentheses/" title="LeetCode Valid Parentheses">
-  <strong>上一篇：</strong><br/>
-  <span>
-  LeetCode Valid Parentheses</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/11/05/2015-11-05-puppetan-zhuang-yu-ji-ben-shi-yong/"  title="puppet安装与基本使用">
+<a href="/2016/06/04/Flume的Spooling Directory Source支持Sub-directories/"  title="Flume的Spooling Directory Source支持Sub-directories">
  <strong>下一篇：</strong><br/> 
- <span>puppet安装与基本使用
+ <span>Flume的Spooling Directory Source支持Sub-directories
 </span>
 </a>
 </div>
@@ -158,7 +172,7 @@
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2015/12/08/LeetCode-Remove-Nth-Node-From-End-of-List/" data-title="LeetCode Remove Nth Node From End of List" data-url="http://qiaowei.xyz/2015/12/08/LeetCode-Remove-Nth-Node-From-End-of-List/"></div>
+	<div class="ds-thread" data-thread-key="2016/06/10/Linux中利用logrotate来对log文件进行循环管理/" data-title="Linux中利用logrotate来对log文件进行转储" data-url="http://qiaowei.xyz/2016/06/10/Linux中利用logrotate来对log文件进行循环管理/"></div>
 </section>
 
 
@@ -168,7 +182,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips:</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#logrotate简介"><span class="toc-number">1.</span> <span class="toc-text">logrotate简介</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#使用需求"><span class="toc-number">2.</span> <span class="toc-text">使用需求</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#样例配置"><span class="toc-number">3.</span> <span class="toc-text">样例配置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#效果"><span class="toc-number">4.</span> <span class="toc-text">效果</span></a></li></ol>
  
   </div>
 

@@ -4,23 +4,23 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>LeetCode Remove Nth Node From End of List | Urey on the way</title>
+    <title>Flume1.7.0的TaildirSource介绍 | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="List">
+    <meta name="description" content="使用更改后的TaildirSource，可以递归地监听配置目录的动态变化的文件。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LeetCode Remove Nth Node From End of List">
-<meta property="og:url" content="http://qiaowei.xyz/2015/12/08/LeetCode-Remove-Nth-Node-From-End-of-List/index.html">
+<meta property="og:title" content="Flume1.7.0的TaildirSource介绍">
+<meta property="og:url" content="http://qiaowei.xyz/2016/06/29/Flume1.7.0的TaildirSource/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="List">
-<meta property="og:updated_time" content="2016-04-07T23:53:22.000Z">
+<meta property="og:description" content="使用更改后的TaildirSource，可以递归地监听配置目录的动态变化的文件。">
+<meta property="og:updated_time" content="2016-07-02T13:17:35.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LeetCode Remove Nth Node From End of List">
-<meta name="twitter:description" content="List">
+<meta name="twitter:title" content="Flume1.7.0的TaildirSource介绍">
+<meta name="twitter:description" content="使用更改后的TaildirSource，可以递归地监听配置目录的动态变化的文件。">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -79,14 +79,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/12/08/LeetCode-Remove-Nth-Node-From-End-of-List/" title="LeetCode Remove Nth Node From End of List" itemprop="url">LeetCode Remove Nth Node From End of List</a>
+      <a href="/2016/06/29/Flume1.7.0的TaildirSource/" title="Flume1.7.0的TaildirSource介绍" itemprop="url">Flume1.7.0的TaildirSource介绍</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2015-12-07T23:46:38.000Z" itemprop="datePublished"> 发表于 2015-12-08</time>
+    <time datetime="2016-06-29T14:13:08.000Z" itemprop="datePublished"> 发表于 2016-06-29</time>
     
   </p>
 </header>
@@ -95,13 +95,40 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips:</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#需求描述"><span class="toc-number">1.</span> <span class="toc-text">需求描述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#解决方案"><span class="toc-number">2.</span> <span class="toc-text">解决方案</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#增加递归监听子目录的特性"><span class="toc-number">3.</span> <span class="toc-text">增加递归监听子目录的特性</span></a></li></ol>
 		
 		</div>
 		
-		<p>List<br><a id="more"></a></p>
-<h4 id="tips"><a href="#tips" class="headerlink" title="tips:"></a>tips:</h4><p>增加头节点可以使结构更清晰，时间复杂度：O(N)，空间复杂度：O(1)</p>
-<figure class="highlight hsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Definition for singly-linked list.</span><br><span class="line"> * struct ListNode &#123;</span><br><span class="line"> *     int val;</span><br><span class="line"> *     ListNode *next;</span><br><span class="line"> *     ListNode(int x) : val(x), next(NULL) &#123;&#125;</span><br><span class="line"> * &#125;;</span><br><span class="line"> */</span></span><br><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    ListNode* removeNthFromEnd(ListNode* head, <span class="keyword">int</span> n) &#123;</span><br><span class="line">        ListNode* dummy = new ListNode(<span class="number">0</span>)<span class="comment">;</span></span><br><span class="line">        dummy-&gt;<span class="keyword">next</span> = head<span class="comment">;</span></span><br><span class="line">        ListNode* fast = dummy<span class="comment">;</span></span><br><span class="line">        ListNode* normal = dummy<span class="comment">;</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span><span class="comment">; i &lt; n; ++i) &#123;</span></span><br><span class="line">            fast = fast-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span>(fast-&gt;<span class="keyword">next</span> != NULL) &#123;</span><br><span class="line">            fast = fast-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">            normal = normal-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">        ListNode *tmp = normal-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">        normal-&gt;<span class="keyword">next</span> = normal-&gt;<span class="keyword">next</span>-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">        <span class="keyword">delete</span>(tmp)<span class="comment">;</span></span><br><span class="line">        <span class="keyword">return</span> dummy-&gt;<span class="keyword">next</span><span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+		<p>使用更改后的TaildirSource，可以递归地监听配置目录的动态变化的文件。</p>
+<a id="more"></a>
+<p><br></p>
+<h4 id="需求描述"><a href="#需求描述" class="headerlink" title="需求描述"></a><strong>需求描述</strong></h4><p>使用了<code>SpoolDirectorySource</code>可以配置一个监听目录，会监听该目录下所有的文件，但是如果配置目录下面嵌套了子目录，则无法监听，通过修改源码，我们可以递归地对配置目录的所有子目录的所有文件进行监听，见上一篇文章《Flume的Spooling Directory Source支持Sub-directories》</p>
+<p>但是，<code>SpoolDirectorySource</code>的一个限制还没有消除，即监听目录下的文件不允许动态变化。比如我在收集yarn的nodemanager的日志时候，发现监听目录下面的文件是动态追加的，而不是先生成一个<code>.tmp</code>临时文件，全部写完后<code>rename</code>，这样，我们还需要对<code>SpoolDirectorySource</code>进行改进：可以对动态追加内容的文件进行实时监听。</p>
+<p>这有点像：<code>ExecSource</code> + <code>SpoolDirectorySource</code> 的一个source</p>
+<p><br></p>
+<h4 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a><strong>解决方案</strong></h4><p>先看看能否踩在巨人的肩膀上，查看<code>flume1.7.0</code>的 <code>realease note</code> ，发现增加了一个<code>Taildir Source</code>，点进去发现，这不就是我们需要的吗！</p>
+<p>我贴一下官方的description：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Description</span><br><span class="line">This is <span class="keyword">the</span> proposal <span class="keyword">of</span> implementing <span class="keyword">a</span> <span class="built_in">new</span> tailing source.</span><br><span class="line">This source watches <span class="keyword">the</span> specified <span class="built_in">files</span>, <span class="keyword">and</span> tails them <span class="keyword">in</span> nearly real-<span class="built_in">time</span> once appends are detected <span class="built_in">to</span> these <span class="built_in">files</span>.</span><br><span class="line">This source is reliable <span class="keyword">and</span> will <span class="keyword">not</span> miss data even when <span class="keyword">the</span> tailing <span class="built_in">files</span> rotate.</span><br><span class="line">It periodically writes <span class="keyword">the</span> <span class="keyword">last</span> <span class="built_in">read</span> position <span class="keyword">of</span> <span class="keyword">each</span> <span class="built_in">file</span> <span class="keyword">in</span> <span class="keyword">a</span> position <span class="built_in">file</span> <span class="keyword">using</span> <span class="keyword">the</span> JSON <span class="built_in">format</span>.</span><br><span class="line">If Flume is stopped <span class="keyword">or</span> down <span class="keyword">for</span> some reason, <span class="keyword">it</span> can restart tailing <span class="built_in">from</span> <span class="keyword">the</span> position written <span class="keyword">on</span> <span class="title">the</span> <span class="title">existing</span> <span class="title">position</span> <span class="title">file</span>.</span><br><span class="line">It can <span class="built_in">add</span> event headers <span class="built_in">to</span> <span class="keyword">each</span> tailing <span class="built_in">file</span> group.</span><br><span class="line">A attached patch includes <span class="keyword">a</span> config documentation <span class="keyword">of</span> this.</span><br><span class="line">This source requires Unix-style <span class="built_in">file</span> <span class="keyword">system</span> <span class="keyword">and</span> Java <span class="number">1.7</span> <span class="keyword">or</span> later.</span><br></pre></td></tr></table></figure>
+<p>好，有了它，下面就有两种解决方案：</p>
+<ol>
+<li>直接使用flume1.7.0</li>
+<li>将该feature增加到flume1.6.0中</li>
+</ol>
+<p>由于我们已经对flume1.6.0做了比较大的改动，所以显然需要第二种方案。</p>
+<p>集成过程中主要改动的是两个<code>module</code></p>
+<ol>
+<li>将<code>flume-taildir-source</code>添加到<code>flume-ng-sources</code></li>
+<li>编译根据提示一步一步修改<code>flume-ng-core</code>下的部分文件</li>
+</ol>
+<p><br></p>
+<h4 id="增加递归监听子目录的特性"><a href="#增加递归监听子目录的特性" class="headerlink" title="增加递归监听子目录的特性"></a><strong>增加递归监听子目录的特性</strong></h4><p>贴一下<code>TaildirSource</code>的配置：</p>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># source2: tail_dir_source -----------------</span></span><br><span class="line"><span class="built_in">agent</span>.sources.tail_dir_source.<span class="built_in">type</span> = org.apache.flume.source.taildir.TaildirSource</span><br><span class="line"><span class="built_in">agent</span>.sources.tail_dir_source.channels = memory_channel</span><br><span class="line"><span class="built_in">agent</span>.sources.tail_dir_source.positionFile = /tmp/taildir_position.json</span><br><span class="line"><span class="built_in">agent</span>.sources.tail_dir_source.filegroups = f1</span><br><span class="line"><span class="built_in">agent</span>.sources.tail_dir_source.filegroups.f1 = /home/urey/yarn_log/.*</span><br><span class="line"><span class="built_in">agent</span>.sources.tail_dir_source.batchSize = <span class="number">100</span></span><br><span class="line"><span class="built_in">agent</span>.sources.tail_dir_source.backoffSleepIncrement  = <span class="number">1000</span></span><br><span class="line"><span class="built_in">agent</span>.sources.tail_dir_source.maxBackoffSleep  = <span class="number">5000</span></span><br><span class="line"><span class="built_in">agent</span>.sources.tail_dir_source.recursiveDirectorySearch = <span class="literal">true</span></span><br><span class="line"><span class="built_in">agent</span>.sources.tail_dir_source.yarnApplicationHeader = <span class="literal">true</span></span><br><span class="line"><span class="built_in">agent</span>.sources.tail_dir_source.yarnContainerHeader = <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+<p>类似<code>SpoolDirectorySource</code>增加该feature所做的工作，我们最后还需要给<code>TaildirSource</code>增加该feature以满足我们的需求。</p>
+<p>改动类似《Flume的Spooling Directory Source支持Sub-directories》所涉及到，需要注意的是，<br><code>filegroups</code>可以指定多个监听源，每个源指定<strong>相应的监听路径下面的哪些文件</strong>，这里的<strong>下面</strong>经过改动后会递归地包含下面的所有子目录。</p>
+<p>比如：<br>配置了<code>/home/urey/yarn_log/.*</code>，会监听：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/home/</span>urey<span class="regexp">/yarn_log/</span>test1.log</span><br><span class="line"><span class="regexp">/home/</span>urey<span class="regexp">/yarn_log/</span>dir1/test2.log</span><br><span class="line"><span class="regexp">/home/</span>urey<span class="regexp">/yarn_log/</span>dir1<span class="regexp">/dir2/</span>test3.log</span><br><span class="line">...</span><br><span class="line">等等</span><br></pre></td></tr></table></figure></p>
+<p>最新的代码我已上传到github上，欢迎试用：</p>
+<p><a href="https://github.com/qwurey/flume-source-taildir-recursive" target="_blank" rel="external">flume-source-taildir-recursive</a></p>
+<p>注：<br>由于flume1.7.0本身还没有发布，所以<code>TaildirSource</code>可能存在缺陷，如果遇到问题，需要通过查看日志定位问题，看社区是否有相应的issue和解决方案。</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -109,13 +136,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
+  <a class="article-category-link" href="/categories/flume/">flume</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
+  <span></span> <a href="/tags/flume/">flume</a>
   </div>
 
 </div>
@@ -124,7 +151,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.xyz/2015/12/08/LeetCode-Remove-Nth-Node-From-End-of-List/" data-title="LeetCode Remove Nth Node From End of List | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  <div data-url="http://qiaowei.xyz/2016/06/29/Flume1.7.0的TaildirSource/" data-title="Flume1.7.0的TaildirSource介绍 | Urey on the way" data-tsina="1758475283" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -137,19 +164,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/12/08/LeetCode-Valid-Parentheses/" title="LeetCode Valid Parentheses">
-  <strong>上一篇：</strong><br/>
-  <span>
-  LeetCode Valid Parentheses</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/11/05/2015-11-05-puppetan-zhuang-yu-ji-ben-shi-yong/"  title="puppet安装与基本使用">
+<a href="/2016/06/10/Linux中利用logrotate来对log文件进行循环管理/"  title="Linux中利用logrotate来对log文件进行转储">
  <strong>下一篇：</strong><br/> 
- <span>puppet安装与基本使用
+ <span>Linux中利用logrotate来对log文件进行转储
 </span>
 </a>
 </div>
@@ -158,7 +177,7 @@
 
 	
 <section id="comments" class="comment">
-	<div class="ds-thread" data-thread-key="2015/12/08/LeetCode-Remove-Nth-Node-From-End-of-List/" data-title="LeetCode Remove Nth Node From End of List" data-url="http://qiaowei.xyz/2015/12/08/LeetCode-Remove-Nth-Node-From-End-of-List/"></div>
+	<div class="ds-thread" data-thread-key="2016/06/29/Flume1.7.0的TaildirSource/" data-title="Flume1.7.0的TaildirSource介绍" data-url="http://qiaowei.xyz/2016/06/29/Flume1.7.0的TaildirSource/"></div>
 </section>
 
 
@@ -168,7 +187,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips:</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#需求描述"><span class="toc-number">1.</span> <span class="toc-text">需求描述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#解决方案"><span class="toc-number">2.</span> <span class="toc-text">解决方案</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#增加递归监听子目录的特性"><span class="toc-number">3.</span> <span class="toc-text">增加递归监听子目录的特性</span></a></li></ol>
  
   </div>
 

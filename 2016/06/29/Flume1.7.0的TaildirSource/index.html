@@ -17,7 +17,7 @@
 <meta property="og:url" content="http://qiaowei.xyz/2016/06/29/Flume1.7.0的TaildirSource/index.html">
 <meta property="og:site_name" content="Urey on the way">
 <meta property="og:description" content="使用更改后的TaildirSource，可以递归地监听配置目录的动态变化的文件。">
-<meta property="og:updated_time" content="2016-07-02T13:17:35.000Z">
+<meta property="og:updated_time" content="2016-07-02T13:21:46.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Flume1.7.0的TaildirSource介绍">
 <meta name="twitter:description" content="使用更改后的TaildirSource，可以递归地监听配置目录的动态变化的文件。">
@@ -102,7 +102,7 @@
 		<p>使用更改后的TaildirSource，可以递归地监听配置目录的动态变化的文件。</p>
 <a id="more"></a>
 <p><br></p>
-<h4 id="需求描述"><a href="#需求描述" class="headerlink" title="需求描述"></a><strong>需求描述</strong></h4><p>使用了<code>SpoolDirectorySource</code>可以配置一个监听目录，会监听该目录下所有的文件，但是如果配置目录下面嵌套了子目录，则无法监听，通过修改源码，我们可以递归地对配置目录的所有子目录的所有文件进行监听，见上一篇文章《Flume的Spooling Directory Source支持Sub-directories》</p>
+<h4 id="需求描述"><a href="#需求描述" class="headerlink" title="需求描述"></a><strong>需求描述</strong></h4><p>使用了<code>SpoolDirectorySource</code>可以配置一个监听目录，会监听该目录下所有的文件，但是如果配置目录下面嵌套了子目录，则无法监听，通过修改源码，我们可以递归地对配置目录的所有子目录的所有文件进行监听，见上一篇文章 <a href="http://qiaowei.xyz/2016/06/04/Flume%E7%9A%84Spooling%20Directory%20Source%E6%94%AF%E6%8C%81Sub-directories/">Flume的Spooling Directory Source支持Sub-directories</a></p>
 <p>但是，<code>SpoolDirectorySource</code>的一个限制还没有消除，即监听目录下的文件不允许动态变化。比如我在收集yarn的nodemanager的日志时候，发现监听目录下面的文件是动态追加的，而不是先生成一个<code>.tmp</code>临时文件，全部写完后<code>rename</code>，这样，我们还需要对<code>SpoolDirectorySource</code>进行改进：可以对动态追加内容的文件进行实时监听。</p>
 <p>这有点像：<code>ExecSource</code> + <code>SpoolDirectorySource</code> 的一个source</p>
 <p><br></p>

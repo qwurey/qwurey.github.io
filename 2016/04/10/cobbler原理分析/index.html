@@ -17,7 +17,7 @@
 <meta property="og:url" content="http://qiaowei.xyz/2016/04/10/cobbler原理分析/index.html">
 <meta property="og:site_name" content="Urey on the way">
 <meta property="og:description" content="Cobbler通过将设置和管理一个安装服务器所涉及的任务集中在一起，从而简化了系统配置。">
-<meta property="og:updated_time" content="2016-04-10T02:20:49.000Z">
+<meta property="og:updated_time" content="2016-08-02T03:30:50.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="cobbler原理分析">
 <meta name="twitter:description" content="Cobbler通过将设置和管理一个安装服务器所涉及的任务集中在一起，从而简化了系统配置。">
@@ -117,15 +117,15 @@
 <p><br></p>
 <h4 id="三、交互过程分析"><a href="#三、交互过程分析" class="headerlink" title="三、交互过程分析"></a><strong>三、交互过程分析</strong></h4><p>cobbler server与裸机（PXE client）交互过程分析：</p>
 <ol>
-<li>裸机配置了从网络启动后，开机后会广播包请求DHCP服务器（cobbler server）发送其分配好的一个IP</li>
-<li>DHCP服务器（cobbler server）收到请求后发送responese，包括其ip地址</li>
-<li>裸机拿到ip后再向cobbler server发送请求OS引导文件的请求</li>
-<li>cobbler server告诉裸机OS引导文件的名字和TFTP server的ip和port</li>
-<li>裸机通过上面告知的TFTP server地址和port通信，下载引导文件</li>
-<li>裸机执行执行该引导文件，确定加载信息，选择要安装的os，期间会再向cobbler server请求kickstart文件和os image</li>
-<li>cobbler server发送请求的kickstart和os iamge</li>
-<li>裸机加载kickstart文件</li>
-<li>裸机接收os image，安装该os image</li>
+<li>裸机配置了从网络启动后，开机后会自动广播包请求到局域网内的DHCP服务器（cobbler server所在host上已经配置好了dhcp服务器），请求dhcp服务器发送其分配好的一个IP；</li>
+<li>DHCP服务器（cobbler server）收到请求后发送responese，包括给相应host分配的ip地址；</li>
+<li>裸机拿到ip后再向cobbler server发送请求，询问OS引导文件的地址；</li>
+<li>cobbler server收到请求后，会告诉裸机，OS引导文件的名字和TFTP server的ip和port；</li>
+<li>裸机通过上面告知的TFTP server的ip和port通信，下载指定的OS引导文件；</li>
+<li>成功下载到裸机本地后，裸机执行该引导文件，确定加载信息，选择要安装的os，期间会再向cobbler server请求kickstart文件和os image；</li>
+<li>cobbler server发送请求的kickstart和os iamge给裸机；</li>
+<li>裸机加载kickstart文件；</li>
+<li>裸机接收os image，安装该os image；</li>
 </ol>
 <p>之后，裸机就不“裸”了，有了自己的os和dhcp分配给其的ip。</p>
 <p>可以通过查看cobbler server所在机器的dhcp服务的相关文件，来查看分配出去的ip和对应的mac地址：<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /var/<span class="class"><span class="keyword">lib</span>/<span class="title">dhcpd</span>/<span class="title">dhcpd</span>.<span class="title">leases</span></span></span><br></pre></td></tr></table></figure></p>

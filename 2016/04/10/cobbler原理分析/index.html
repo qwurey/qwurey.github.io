@@ -17,7 +17,7 @@
 <meta property="og:url" content="http://qiaowei.xyz/2016/04/10/cobbler原理分析/index.html">
 <meta property="og:site_name" content="Urey on the way">
 <meta property="og:description" content="Cobbler通过将设置和管理一个安装服务器所涉及的任务集中在一起，从而简化了系统配置。">
-<meta property="og:updated_time" content="2016-08-02T03:30:50.000Z">
+<meta property="og:updated_time" content="2016-08-02T03:39:02.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="cobbler原理分析">
 <meta name="twitter:description" content="Cobbler通过将设置和管理一个安装服务器所涉及的任务集中在一起，从而简化了系统配置。">
@@ -127,7 +127,7 @@
 <li>裸机加载kickstart文件；</li>
 <li>裸机接收os image，安装该os image；</li>
 </ol>
-<p>之后，裸机就不“裸”了，有了自己的os和dhcp分配给其的ip。</p>
+<p>之后，裸机就不“裸”了，安装好了自己的os并且拥有了dhcp分配给其的ip。</p>
 <p>可以通过查看cobbler server所在机器的dhcp服务的相关文件，来查看分配出去的ip和对应的mac地址：<br><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /var/<span class="class"><span class="keyword">lib</span>/<span class="title">dhcpd</span>/<span class="title">dhcpd</span>.<span class="title">leases</span></span></span><br></pre></td></tr></table></figure></p>
 <p><br></p>
 <h4 id="四、Cobbler相关"><a href="#四、Cobbler相关" class="headerlink" title="四、Cobbler相关"></a><strong>四、Cobbler相关</strong></h4><p>Cobbler使用Python开发，目前实验使用的版本是Cobbler 2.6.11 Released by Jörgen on January 23, 2016</p>

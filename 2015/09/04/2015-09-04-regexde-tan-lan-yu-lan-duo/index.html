@@ -175,11 +175,11 @@
 </table>
 <p>　　还是上面那个例子：将<strong> a.*?b </strong> 应用于串 <strong>“aabab”</strong> ，它会匹配 “aab”这个子串（对应于原串的前三个字符）和 “ab”这个子串（对应于原串的最后两个字符）。注意：懒惰模式在匹配好了以后会记录该匹配串，如果还有剩余的字符，会继续往下匹配，直到结束，返回所有匹配成功的串。</p>
 <p>　　实战例子: 在python的爬虫应用中，我们常常遇见需要在整个html页面中找到我们需要的内容，这时就要用到regex。比如我们想要找到所有的img标签中的src属性的内容：</p>
-<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;img pic_type=<span class="string">"0"</span> <span class="keyword">class</span>=<span class="string">"BDE_Image"</span> src=<span class="string">"http://imgsrc.baidu.com/forum/w%3D580/sign=294db374d462853592e0d229a0ee76f2/e732c895d143ad4b630e8f4683025aafa40f0611.jpg"</span> pic_ext=<span class="string">"bmp"</span> <span class="built_in">height</span>=<span class="string">"328"</span> <span class="built_in">width</span>=<span class="string">"560"</span>&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;img <span class="attribute">pic_type</span>=<span class="string">"0"</span> <span class="attribute">class</span>=<span class="string">"BDE_Image"</span> <span class="attribute">src</span>=<span class="string">"http://imgsrc.baidu.com/forum/w%3D580/sign=294db374d462853592e0d229a0ee76f2/e732c895d143ad4b630e8f4683025aafa40f0611.jpg"</span> <span class="attribute">pic_ext</span>=<span class="string">"bmp"</span> <span class="attribute">height</span>=<span class="string">"328"</span> <span class="attribute">width</span>=<span class="string">"560"</span>&gt;</span><br></pre></td></tr></table></figure>
 <p>　　用到的正则表达式：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg = <span class="string">r'src="(.+?\.jpg)" pic_ext'</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg = <span class="string">r'src="(.+?\.jpg)" pic_ext'</span></span><br></pre></td></tr></table></figure>
 <p>　　注意，这里就运用了懒惰规则，如果写成这样：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg = <span class="string">r'src="(.+\.jpg)" pic_ext'</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg = <span class="string">r'src="(.+\.jpg)" pic_ext'</span></span><br></pre></td></tr></table></figure>
 <p>　　如果有不止一个img标签的话，就会匹配第一个img标签的开始部分和最后一个img标签的结束部分的全部字符，这样就没有了意义。
 　</p>
 <p>　　上式中，“( )”中的内容表示待提取的字符。</p>
@@ -435,7 +435,7 @@
 		
 
 		<p class="copyright">
-		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
 		
 		<a href="/about" target="_blank" title="urey">urey</a>
 		

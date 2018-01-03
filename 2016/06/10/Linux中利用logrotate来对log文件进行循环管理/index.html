@@ -124,8 +124,8 @@
 <li><code>missingok</code>：If the log file is missing, go on to the next one without issuing an error message. See also nomissingok.</li>
 </ol>
 <p><br></p>
-<h4 id="效果"><a href="#效果" class="headerlink" title="效果"></a><strong>效果</strong></h4><p>默认情况下，logrotate会每天自动执行一次：<br>在/etc/cron.daily目录下有logrotate执行的脚本（通过crontab程序每天执行一次）<br><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi <span class="meta-keyword">/etc/</span>cron.daily/logrotate</span><br></pre></td></tr></table></figure></p>
-<p>如果配置完想立即测试看一下效果，可以使用logrotate的强制执行的命令：<br><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta-keyword">/usr/</span>sbin/logrotate -vf <span class="meta-keyword">/etc/</span>logrotate.conf</span><br></pre></td></tr></table></figure></p>
+<h4 id="效果"><a href="#效果" class="headerlink" title="效果"></a><strong>效果</strong></h4><p>默认情况下，logrotate会每天自动执行一次：<br>在/etc/cron.daily目录下有logrotate执行的脚本（通过crontab程序每天执行一次）<br><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi <span class="regexp">/etc/</span>cron.daily<span class="regexp">/logrotate</span></span><br></pre></td></tr></table></figure></p>
+<p>如果配置完想立即测试看一下效果，可以使用logrotate的强制执行的命令：<br><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/usr/</span>sbin<span class="regexp">/logrotate -vf /</span>etc<span class="regexp">/logrotate.conf</span></span><br></pre></td></tr></table></figure></p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -378,7 +378,7 @@
 		
 
 		<p class="copyright">
-		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
 		
 		<a href="/about" target="_blank" title="urey">urey</a>
 		

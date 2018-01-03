@@ -110,7 +110,7 @@
 <p>自动下载原则：repository里存放的都是各种jar包和maven插件。当向仓库请求插件或依赖的时候，会先检查local repository，如果local repository有则直接返回，否则会向remote repository请求，并缓存到local repository。也可以把做的东西放到本地仓库，仅供本地使用；或上传到远程仓库，供大家使用。</p>
 <p>其中，remote repository主要有3种类型：</p>
 <ol>
-<li>中央仓库：<a href="http://repo1.maven.org/maven2/" target="_blank" rel="external">http://repo1.maven.org/maven2/</a> </li>
+<li>中央仓库：<a href="http://repo1.maven.org/maven2/" target="_blank" rel="noopener">http://repo1.maven.org/maven2/</a> </li>
 <li>私服：内网自建的maven repository，其URL是一个内部网址 </li>
 <li>其他公共仓库：其他可以互联网公共访问maven repository，例如 jboss repository等</li>
 </ol>
@@ -122,7 +122,7 @@
 <p>配置方法：</p>
 <p>在<code>&lt;mirrorOf&gt;&lt;/mirrorOf&gt;</code> 放置repo id，当然，这是mirror最基本的用法。</p>
 <p>为了满足一些复杂的需求，Maven还支持更高级的镜像配置：</p>
-<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 匹配所有远程仓库，此时所有的请求都会发往镜像库</span></span><br><span class="line"><span class="variable">&lt;mirrorOf&gt;</span><span class="keyword">*</span><span class="variable">&lt;/mirrorOf&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 匹配仓库repo1和repo2，使用逗号分隔多个远程仓库</span></span><br><span class="line"><span class="variable">&lt;mirrorOf&gt;</span>repo1,repo2<span class="variable">&lt;/mirrorOf&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 匹配所有远程仓库，repo1除外，使用感叹号将仓库从匹配中排除</span></span><br><span class="line"><span class="variable">&lt;mirrorOf&gt;</span><span class="keyword">*</span>,!repo1<span class="variable">&lt;/miiroOf&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># 匹配所有远程仓库，此时所有的请求都会发往镜像库</span></span><br><span class="line"><span class="params">&lt;mirrorOf&gt;</span>*<span class="params">&lt;/mirrorOf&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># 匹配仓库repo1和repo2，使用逗号分隔多个远程仓库</span></span><br><span class="line"><span class="params">&lt;mirrorOf&gt;</span>repo1,repo2<span class="params">&lt;/mirrorOf&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># 匹配所有远程仓库，repo1除外，使用感叹号将仓库从匹配中排除</span></span><br><span class="line"><span class="params">&lt;mirrorOf&gt;</span>*,!repo1<span class="params">&lt;/miiroOf&gt;</span></span><br></pre></td></tr></table></figure>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -375,7 +375,7 @@
 		
 
 		<p class="copyright">
-		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
 		
 		<a href="/about" target="_blank" title="urey">urey</a>
 		

@@ -107,7 +107,7 @@
 <h4 id="当Octopress遇上OSX-EI-Captain"><a href="#当Octopress遇上OSX-EI-Captain" class="headerlink" title="当Octopress遇上OSX EI Captain"></a><strong>当Octopress遇上OSX EI Captain</strong></h4><p>前一阶段升级了最新的OSX系统，谁知写完日志好端端的<code>rake generate</code>失效了，下意识的<code>rake preview</code>，报错：</p>
 <figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Errno::ENOENT: <span class="keyword">No</span> Such <span class="keyword">File</span> <span class="keyword">or</span> Directory - Jekyll</span><br></pre></td></tr></table></figure>
 <p>这下慌乱了，本来对<code>ruby</code>就不熟，这怎么调错，还好前人早已总结：</p>
-<p><a href="http://schalkneethling.github.io/blog/2015/10/16/errno-enoent-no-such-file-or-directory-jekyll-octopress-el-capitan/" target="_blank" rel="external">Errno::ENOENT: No Such File or Directory - Jekyll ~ Octopress and El Capitan</a></p>
+<p><a href="http://schalkneethling.github.io/blog/2015/10/16/errno-enoent-no-such-file-or-directory-jekyll-octopress-el-capitan/" target="_blank" rel="noopener">Errno::ENOENT: No Such File or Directory - Jekyll ~ Octopress and El Capitan</a></p>
 <p>我小结一下：是新系统下，需要新的依赖库，而这些库需要ruby2.2.3的版本安装，而系统默认是2.2.0。</p>
 <p>我在安装完ruby2.2.3后，<code>ruby -v</code>后仍是2.2.0，也没有折腾，直接改了<code>~/.bash_profile</code>里面的<code>PATH</code>路径，加上了新安装好的ruby所在的<code>bin</code>目录，之后升级完+安装完相应的包后就可以<code>rake generate &amp;&amp; deploy</code>了。</p>
 <p>在CSDN上写文章很方便，移到这里好多细节需要自己处理，图片啊，表格啊，markdown语言啊，着实不容易，但是能增加一点点成就感呢。😄</p>
@@ -363,7 +363,7 @@
 		
 
 		<p class="copyright">
-		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
 		
 		<a href="/about" target="_blank" title="urey">urey</a>
 		

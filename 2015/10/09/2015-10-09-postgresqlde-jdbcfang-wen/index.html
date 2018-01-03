@@ -104,12 +104,12 @@
 		<blockquote>
 <p>“过去的代码都是未经测试的代码” —— 无名</p>
 </blockquote>
-<h4 id="JDBC的版本选择"><a href="#JDBC的版本选择" class="headerlink" title="JDBC的版本选择"></a><strong>JDBC的版本选择</strong></h4><p>官网有给出具体的jdk与postgresql driver的版本对应关系：<a href="https://jdbc.postgresql.org/download.html" target="_blank" rel="external">https://jdbc.postgresql.org/download.html</a></p>
+<h4 id="JDBC的版本选择"><a href="#JDBC的版本选择" class="headerlink" title="JDBC的版本选择"></a><strong>JDBC的版本选择</strong></h4><p>官网有给出具体的jdk与postgresql driver的版本对应关系：<a href="https://jdbc.postgresql.org/download.html" target="_blank" rel="noopener">https://jdbc.postgresql.org/download.html</a></p>
 <p>这里使用jdk1.7，对应：JDBC41 Postgresql Driver, Version 9.4-1203</p>
 <h4 id="连接数据库"><a href="#连接数据库" class="headerlink" title="连接数据库"></a><strong>连接数据库</strong></h4><p>导入jar包</p>
 <p>在shell终端进入psql：</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">psql</span> -U urey</span><br></pre></td></tr></table></figure>
-<p>新建数据库testdb并切换到该数据库下：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">DATABASE</span> testdb;</span><br><span class="line">\c testdb</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">psql -U urey</span></span><br></pre></td></tr></table></figure>
+<p>新建数据库testdb并切换到该数据库下：<br><figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">DATABASE</span> testdb;</span><br><span class="line">\c testdb</span><br></pre></td></tr></table></figure></p>
 <p>新建表test并插入一条数据：</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">test</span>(<span class="keyword">id</span> <span class="built_in">int</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">test</span> <span class="keyword">VALUES</span>(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
 <p>查看刚插入的数据：</p>
@@ -369,7 +369,7 @@
 		
 
 		<p class="copyright">
-		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
 		
 		<a href="/about" target="_blank" title="urey">urey</a>
 		

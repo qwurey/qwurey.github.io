@@ -139,7 +139,7 @@
 <li>Task: ServiceComponentHost层面的操作，为了完成一个Operation，需要为不同的机器分配一系列的Task去执行。</li>
 </ol>
 <p>需要特别说明的是操作的执行顺序：</p>
-<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 不同的Stage只能顺序执行。后面的Stage只有在前面Stage执行成功后才会下发给Agent。如果前面Stage失败，后面的Stage将取消。</span><br><span class="line"><span class="number">2.</span> 同一个Stage内的多个<span class="built_in">Task</span>可以并行执行，可以同时下发给Agent。如果某个<span class="built_in">Task</span>失败，其他的已下发且正执行的<span class="built_in">Task</span>将被取消。</span><br><span class="line"><span class="number">3.</span> 分配给同一个机器的不同<span class="built_in">Task</span>只会顺序执行。</span><br></pre></td></tr></table></figure>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>. 不同的Stage只能顺序执行。后面的Stage只有在前面Stage执行成功后才会下发给Agent。如果前面Stage失败，后面的Stage将取消。</span><br><span class="line"><span class="number">2</span>. 同一个Stage内的多个<span class="keyword">Task</span>可以并行执行，可以同时下发给Agent。如果某个<span class="keyword">Task</span>失败，其他的已下发且正执行的<span class="keyword">Task</span>将被取消。</span><br><span class="line"><span class="number">3</span>. 分配给同一个机器的不同<span class="keyword">Task</span>只会顺序执行。</span><br></pre></td></tr></table></figure>
 <p>下图描述了这三种资源与操作的对应关系：</p>
 <p><img src="http://7xlhna.com1.z0.glb.clouddn.com/ambari-concepts.png" width="600" height="150" style="display:block;margin:auto"></p>
 <p>上述的三个操作抽象是定义态的描述，它们分别对应一个执行态的抽象：</p>
@@ -405,7 +405,7 @@
 		
 
 		<p class="copyright">
-		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
 		
 		<a href="/about" target="_blank" title="urey">urey</a>
 		

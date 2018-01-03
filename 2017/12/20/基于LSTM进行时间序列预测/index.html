@@ -19,16 +19,16 @@
 <meta property="og:site_name" content="Urey on the way">
 <meta property="og:description" content="基于LSTM对系统的访问量进行预测。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://qiaowei.tech/images/lstm1/original_data_format.png%20=100*100">
+<meta property="og:image" content="http://qiaowei.tech/images/lstm1/original_data_format.png">
 <meta property="og:image" content="http://qiaowei.tech/images/lstm1/original_data_wc.png">
 <meta property="og:image" content="http://qiaowei.tech/images/lstm1/train_data_format.png">
 <meta property="og:image" content="http://qiaowei.tech/images/lstm1/1batch.png">
 <meta property="og:image" content="http://qiaowei.tech/images/lstm1/64batch.png">
-<meta property="og:updated_time" content="2018-01-03T13:53:28.926Z">
+<meta property="og:updated_time" content="2018-01-03T13:58:12.997Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基于LSTM进行时间序列预测">
 <meta name="twitter:description" content="基于LSTM对系统的访问量进行预测。">
-<meta name="twitter:image" content="http://qiaowei.tech/images/lstm1/original_data_format.png%20=100*100">
+<meta name="twitter:image" content="http://qiaowei.tech/images/lstm1/original_data_format.png">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -112,7 +112,7 @@
 <p>目的：根据历史数据的每天每分钟的系统访问量，预测接下来一天的每分钟的系统访问量。</p>
 <p><br></p>
 <h4 id="一、特征工程"><a href="#一、特征工程" class="headerlink" title="一、特征工程"></a>一、特征工程</h4><p>历史数据格式，每天共有1440分钟，因此每天的原始数据格式为,共有1440条数据：</p>
-<p><img src="/images/lstm1/original_data_format.png =100*100" alt="original_data_format"></p>
+<p><img src="/images/lstm1/original_data_format.png" alt="original_data_format">{:height=”100px” width=”100px”}</p>
 <p><img src="/images/lstm1/original_data_wc.png" alt="original_data_wc.png"></p>
 <p>为了细粒度的刻画每分钟，本文增加了67维特征，包括：</p>
 <ol>

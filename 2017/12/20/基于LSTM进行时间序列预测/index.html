@@ -24,7 +24,7 @@
 <meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/train_data_format.png">
 <meta property="og:image" content="http://qiaowei.tech/images/lstm1/1batch.png">
 <meta property="og:image" content="http://qiaowei.tech/images/lstm1/64batch.png">
-<meta property="og:updated_time" content="2018-01-03T14:35:10.906Z">
+<meta property="og:updated_time" content="2018-01-03T14:35:55.354Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基于LSTM进行时间序列预测">
 <meta name="twitter:description" content="基于LSTM对系统的访问量进行预测。">
@@ -139,7 +139,7 @@
 <li>增加1维（前5个工作日的相应index分钟的平均访问量或者 前2个周末日的相应index分钟的平均访问量）：meanIndex</li>
 </ol>
 <p>处理好后的训练数据如下：</p>
-<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/train_data_format.png" width="100" height="50" style="display:block;margin:auto"></p>
+<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/train_data_format.png" width="400" height="150" style="display:block;margin:auto"></p>
 <p>由于不同特征间的取值范围相差比较大，因此需要对数据进行标准化，这里选择了z-score对全部的特征进行标准化，包括one-hot encoding的特征。</p>
 <p>但在实际的测试过程中，发现其中很多特征是重复的、无用的，模型效果一般，因此降维到6维，只取了我认为6个最重要的特征。</p>
 <p><br></p>

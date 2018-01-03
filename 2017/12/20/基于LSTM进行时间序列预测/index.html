@@ -19,16 +19,16 @@
 <meta property="og:site_name" content="Urey on the way">
 <meta property="og:description" content="基于LSTM对系统的访问量进行预测。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://qiaowei.tech/Users/urey/Downloads/original_data_format.png">
-<meta property="og:image" content="http://qiaowei.tech/Users/urey/Downloads/original_data_wc.png">
-<meta property="og:image" content="http://qiaowei.tech/Users/urey/Downloads/train_data_format.png">
-<meta property="og:image" content="http://qiaowei.tech/Users/urey/Downloads/1batch.png">
-<meta property="og:image" content="http://qiaowei.tech/Users/urey/Downloads/64batch.png">
-<meta property="og:updated_time" content="2018-01-03T13:43:14.456Z">
+<meta property="og:image" content="http://qiaowei.tech/images/lstm1/original_data_format.png">
+<meta property="og:image" content="http://qiaowei.tech/images/lstm1/original_data_wc.png">
+<meta property="og:image" content="http://qiaowei.tech/images/lstm1/train_data_format.png">
+<meta property="og:image" content="http://qiaowei.tech/images/lstm1/1batch.png">
+<meta property="og:image" content="http://qiaowei.tech/images/lstm1/64batch.png">
+<meta property="og:updated_time" content="2018-01-03T13:51:20.802Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基于LSTM进行时间序列预测">
 <meta name="twitter:description" content="基于LSTM对系统的访问量进行预测。">
-<meta name="twitter:image" content="http://qiaowei.tech/Users/urey/Downloads/original_data_format.png">
+<meta name="twitter:image" content="http://qiaowei.tech/images/lstm1/original_data_format.png">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -112,8 +112,8 @@
 <p>目的：根据历史数据的每天每分钟的系统访问量，预测接下来一天的每分钟的系统访问量。</p>
 <p><br></p>
 <h4 id="一、特征工程"><a href="#一、特征工程" class="headerlink" title="一、特征工程"></a>一、特征工程</h4><p>历史数据格式，每天共有1440分钟，因此每天的原始数据格式为,共有1440条数据：</p>
-<p><img src="/Users/urey/Downloads/original_data_format.png" alt="original_data_format">{:height=”50px” width=”50px”}</p>
-<p><img src="/Users/urey/Downloads/original_data_wc.png" alt="original_data_wc.png"></p>
+<p><img src="/images/lstm1/original_data_format.png" alt="original_data_format">{:height=”50px” width=”50px”}</p>
+<p><img src="/images/lstm1/original_data_wc.png" alt="original_data_wc.png"></p>
 <p>为了细粒度的刻画每分钟，本文增加了67维特征，包括：</p>
 <ol>
 <li>增加7维（是否是周一，是否是周二等）：isMon, isTue, isWed, isThu, isFri, isSat, isSun </li>
@@ -139,7 +139,7 @@
 <li>增加1维（前5个工作日的相应index分钟的平均访问量或者 前2个周末日的相应index分钟的平均访问量）：meanIndex</li>
 </ol>
 <p>处理好后的训练数据如下：</p>
-<p><img src="/Users/urey/Downloads/train_data_format.png" alt="train_data_format.png"></p>
+<p><img src="/images/lstm1/train_data_format.png" alt="train_data_format.png"></p>
 <p>由于不同特征间的取值范围相差比较大，因此需要对数据进行标准化，这里选择了z-score对全部的特征进行标准化，包括one-hot encoding的特征。</p>
 <p>但在实际的测试过程中，发现其中很多特征是重复的、无用的，模型效果一般，因此降维到6维，只取了我认为6个最重要的特征。</p>
 <p><br></p>
@@ -147,14 +147,14 @@
 <p>具体超参数设置如下：</p>
 <figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">time_step</span> = <span class="number">30</span></span><br><span class="line"><span class="attr">batch_size</span> = <span class="number">64</span></span><br><span class="line"><span class="attr">rnn_unit</span> = <span class="number">60</span></span><br><span class="line"><span class="attr">input_size</span> = <span class="number">67</span></span><br><span class="line"><span class="attr">output_size</span> = <span class="number">1</span></span><br><span class="line"><span class="attr">lstm_depth</span> = <span class="number">2</span></span><br><span class="line"><span class="attr">output_keep_prob</span> = <span class="number">0.5</span></span><br><span class="line"><span class="attr">input_keep_prob</span> = <span class="number">1.0</span></span><br><span class="line"><span class="attr">lr</span> = <span class="number">0.0005</span></span><br><span class="line"><span class="attr">l2_regularization_rate</span> = <span class="number">0.001</span></span><br><span class="line"><span class="attr">is_training</span> = <span class="number">1</span></span><br><span class="line"><span class="attr">is_multi_layer</span> = <span class="number">1</span></span><br></pre></td></tr></table></figure>
 <p>这里简单的剖析下模型结构，为了理解，我们选取了batch_size为1的情形，即每次喂进模型1条训练样本（每个训练样本实际上包含了30条训练数据）：</p>
-<p><img src="/Users/urey/Downloads/1batch.png" alt="1batch"></p>
+<p><img src="/images/lstm1/1batch.png" alt="1batch"></p>
 <ol>
 <li>第1步会经过一个DNN层将输入数据转换成可以喂进lstm层的数据；</li>
 <li>第2、3、…步是lstm内部的转换示意，即lstm cell会在时序上展开，上一个时序的内容会影响下一个时序的内容；</li>
 <li>最后由于lstm cell内部有rnn_unit个神经元结构，但是希望每个时间点的lstm cell只输出一个变量，因此再经过一个DNN层来转换；</li>
 </ol>
 <p>batch_size设为64时的模型结构：</p>
-<p><img src="/Users/urey/Downloads/64batch.png" alt="64batch"></p>
+<p><img src="/images/lstm1/64batch.png" alt="64batch"></p>
 <p>画图费了老劲了:cry:…</p>
 <p>定义模型时最重要的就是各个层之间维度的转换，具体代码如下：</p>
 <figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">def lstm(batch):</span><br><span class="line">    # reshape from <span class="number">3</span>D <span class="keyword">to</span> <span class="number">2</span>D</span><br><span class="line">    <span class="built_in">input</span> = <span class="keyword">tf</span>.reshape(<span class="keyword">X</span>, [-<span class="number">1</span>, input_size])</span><br><span class="line">    input_rnn = <span class="keyword">tf</span>.matmul(<span class="built_in">input</span>, weights[<span class="string">'in'</span>]) + biases[<span class="string">'in'</span>]</span><br><span class="line">    # reshape from <span class="number">2</span>D <span class="keyword">to</span> <span class="number">3</span>D</span><br><span class="line">    input_rnn = <span class="keyword">tf</span>.reshape(input_rnn, [-<span class="number">1</span>, time_step, rnn_unit])</span><br><span class="line">    lstm_cell = <span class="keyword">tf</span>.<span class="keyword">nn</span>.rnn_cell.BasicLSTMCell(rnn_unit)</span><br><span class="line">    <span class="keyword">if</span> is_trainin<span class="variable">g:</span></span><br><span class="line">        <span class="keyword">print</span>(<span class="string">'Training lstm nn...'</span>)</span><br><span class="line">        lstm_cell = <span class="keyword">tf</span>.<span class="keyword">nn</span>.rnn_cell.DropoutWrapper(lstm_cell, input_keep_prob=input_keep_prob, output_keep_prob=output_keep_prob)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> is_multi_layer:</span><br><span class="line">        # multi lstm layer</span><br><span class="line">        <span class="keyword">print</span>(<span class="string">'Using multi lstm layer.'</span>)</span><br><span class="line">        stacked_lstm = <span class="keyword">tf</span>.<span class="keyword">nn</span>.rnn_cell.MultiRNNCell([lstm_cell] * lstm_depth, state_is_tuple=True)</span><br><span class="line">        init_state = stacked_lstm.zero_state(batch, dtype=<span class="keyword">tf</span>.float32)</span><br><span class="line">        output_rnn, final_states = <span class="keyword">tf</span>.<span class="keyword">nn</span>.dynamic_rnn(stacked_lstm, input_rnn, initial_state=init_state, dtype=<span class="keyword">tf</span>.float32, time_major=False)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        # single lstm layer</span><br><span class="line">        <span class="keyword">print</span>(<span class="string">'Using single lstm layer.'</span>)</span><br><span class="line">        init_state = lstm_cell.zero_state(batch, dtype=<span class="keyword">tf</span>.float32)</span><br><span class="line">        # output_rnn是记录lstm每个输出节点的结果，final_states是最后一个cell的结果</span><br><span class="line">        output_rnn, final_states = <span class="keyword">tf</span>.<span class="keyword">nn</span>.dynamic_rnn(lstm_cell, input_rnn, initial_state=init_state, dtype=<span class="keyword">tf</span>.float32, time_major=False)</span><br><span class="line"></span><br><span class="line">    # output layer</span><br><span class="line">    output = <span class="keyword">tf</span>.reshape(output_rnn, [-<span class="number">1</span>, rnn_unit])</span><br><span class="line">    pred = <span class="keyword">tf</span>.matmul(output, weights[<span class="string">'out'</span>]) + biases[<span class="string">'out'</span>]</span><br><span class="line">    <span class="keyword">return</span> pred, final_states</span><br></pre></td></tr></table></figure>

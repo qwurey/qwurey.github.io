@@ -4,27 +4,31 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Java使用quartz实现作业调度 | Urey on the way</title>
+    <title>基于LSTM进行时间序列预测 | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="在spring boot中使用quartz实现作业调度的功能，简单易用。">
-<meta name="keywords" content="quartz">
+    <meta name="description" content="基于LSTM对系统的访问量进行预测。">
+<meta name="keywords" content="DL, lstm">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Java使用quartz实现作业调度">
-<meta property="og:url" content="http://qiaowei.tech/2016/05/11/Java使用quartz实现作业调度/index.html">
+<meta property="og:title" content="基于LSTM进行时间序列预测">
+<meta property="og:url" content="http://qiaowei.tech/2017/12/20/基于LSTM进行时间序列预测/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="在spring boot中使用quartz实现作业调度的功能，简单易用。">
+<meta property="og:description" content="基于LSTM对系统的访问量进行预测。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://7xlhna.com1.z0.glb.clouddn.com/quartzCronExpression.png">
-<meta property="og:updated_time" content="2016-05-14T02:07:03.000Z">
+<meta property="og:image" content="http://qiaowei.tech/Users/urey/Downloads/original_data_format.png">
+<meta property="og:image" content="http://qiaowei.tech/Users/urey/Downloads/original_data_wc.png">
+<meta property="og:image" content="http://qiaowei.tech/Users/urey/Downloads/train_data_format.png">
+<meta property="og:image" content="http://qiaowei.tech/Users/urey/Downloads/1batch.png">
+<meta property="og:image" content="http://qiaowei.tech/Users/urey/Downloads/64batch.png">
+<meta property="og:updated_time" content="2018-01-03T13:43:14.456Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Java使用quartz实现作业调度">
-<meta name="twitter:description" content="在spring boot中使用quartz实现作业调度的功能，简单易用。">
-<meta name="twitter:image" content="http://7xlhna.com1.z0.glb.clouddn.com/quartzCronExpression.png">
+<meta name="twitter:title" content="基于LSTM进行时间序列预测">
+<meta name="twitter:description" content="基于LSTM对系统的访问量进行预测。">
+<meta name="twitter:image" content="http://qiaowei.tech/Users/urey/Downloads/original_data_format.png">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -83,14 +87,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/05/11/Java使用quartz实现作业调度/" title="Java使用quartz实现作业调度" itemprop="url">Java使用quartz实现作业调度</a>
+      <a href="/2017/12/20/基于LSTM进行时间序列预测/" title="基于LSTM进行时间序列预测" itemprop="url">基于LSTM进行时间序列预测</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2016-05-11T15:31:11.000Z" itemprop="datePublished"> 发表于 2016-05-11</time>
+    <time datetime="2017-12-20T14:31:11.000Z" itemprop="datePublished"> 发表于 2017-12-20</time>
     
   </p>
 </header>
@@ -99,61 +103,75 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#什么是Quartz？"><span class="toc-number">1.</span> <span class="toc-text">什么是Quartz？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#在Spring-boot中如何使用Quartz？"><span class="toc-number">2.</span> <span class="toc-text">在Spring boot中如何使用Quartz？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#什么是cron表达式？"><span class="toc-number">3.</span> <span class="toc-text">什么是cron表达式？</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、特征工程"><span class="toc-number">1.</span> <span class="toc-text">一、特征工程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、模型设置"><span class="toc-number">2.</span> <span class="toc-text">二、模型设置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、预测效果："><span class="toc-number">3.</span> <span class="toc-text">三、预测效果：</span></a></li></ol>
 		
 		</div>
 		
-		<p>在spring boot中使用quartz实现作业调度的功能，简单易用。</p>
+		<p>基于LSTM对系统的访问量进行预测。</p>
 <a id="more"></a>
+<p>目的：根据历史数据的每天每分钟的系统访问量，预测接下来一天的每分钟的系统访问量。</p>
 <p><br></p>
-<h4 id="什么是Quartz？"><a href="#什么是Quartz？" class="headerlink" title="什么是Quartz？"></a><strong>什么是Quartz？</strong></h4><p>Quartz是Java领域最著名的、功能丰富的、开放源码的作业调度工具，几乎可以在所有的Java应用程序中集成——从小的单机应用到大的电子商务系统。 Quartz可以用来执行成百上千甚至数万的级别的、简单或者复杂的作业调度，一个Job可以执行任意的你所编程的任务。 Quartz调度包括许多企业级功能，如JTA事务和集群支持。</p>
-<p>Quartz的主要角色有：</p>
+<h4 id="一、特征工程"><a href="#一、特征工程" class="headerlink" title="一、特征工程"></a>一、特征工程</h4><p>历史数据格式，每天共有1440分钟，因此每天的原始数据格式为,共有1440条数据：</p>
+<p><img src="/Users/urey/Downloads/original_data_format.png" alt="original_data_format">{:height=”50px” width=”50px”}</p>
+<p><img src="/Users/urey/Downloads/original_data_wc.png" alt="original_data_wc.png"></p>
+<p>为了细粒度的刻画每分钟，本文增加了67维特征，包括：</p>
 <ol>
-<li>Job：被调度的任务，重写其中execute方法，每次调度时会执行该方法；</li>
-<li>JobDetail：一个Job的具体化，可以这么看，JobDetail = Job + JobData</li>
-<li>Scheduler：调度器</li>
-<li>SchedulerFactory：调度工厂</li>
-<li>各种ScheduleBuilder：CronScheduleBuilder（支持cron表达式的调度器）、CalendarIntervalScheduleBuilder（支持时间间隔的调度器）、SimpleScheduleBuilder（最简单的触发器，可以设置间隔，重复次数）</li>
-<li>Trigger：触发器，用于定义任务调度和时间规则，可以这么看，Trigger = ScheduleBuilder + Time</li>
+<li>增加7维（是否是周一，是否是周二等）：isMon, isTue, isWed, isThu, isFri, isSat, isSun </li>
 </ol>
-<p>每个JobDetail都可以被唯一标识且指定一个抽象的Job，每个Trigger也都可以被唯一标识，Scheduler将JobDetail和Trigger绑定在了一起，即当trigger发生时，会调用JobDetail对应的Job的execute方法。</p>
-<p>初始化一个调度器，需要JobDetail和Trigger：<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">scheduler</span><span class="selector-class">.scheduleJob</span>(<span class="selector-tag">jobDetail</span>, <span class="selector-tag">trigger</span>);</span><br><span class="line"><span class="selector-tag">scheduler</span><span class="selector-class">.start</span>();</span><br></pre></td></tr></table></figure></p>
-<p>初始化一个JobDetail：<br><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>.jobDetail = newJob(SnapshotPolicyJob.class)</span><br><span class="line">		.withIdentity(snapshotPolicyEntity.getId() + <span class="string">"-snapshot"</span>, snapshotPolicyEntity.getService())</span><br><span class="line">		.usingJobData(<span class="string">"service"</span>, snapshotPolicyEntity.getService())</span><br><span class="line">		.usingJobData(<span class="string">"directory"</span>, getDirectoryPrefix(snapshotPolicyEntity.getProject()) + snapshotPolicyEntity.getDirectory())</span><br><span class="line">		.build();</span><br><span class="line"></span><br><span class="line"><span class="comment">//可以通过JobDetail给Job传参数，简单类型通过JobData传，复杂类型通过JobDataMap传：</span></span><br><span class="line">JobDataMap jobDataMap = <span class="keyword">this</span>.jobDetail.getJobDataMap();</span><br><span class="line">jobDataMap.<span class="built_in">put</span>(<span class="string">"snapshotPolicyEntity"</span>, snapshotPolicyEntity);</span><br><span class="line">jobDataMap.<span class="built_in">put</span>(<span class="string">"snapshotHistoryRepository"</span>, snapshotHistoryRepository);</span><br><span class="line">jobDataMap.<span class="built_in">put</span>(<span class="string">"snapshotPolicyRepository"</span>, snapshotPolicyRepository);</span><br><span class="line">jobDataMap.<span class="built_in">put</span>(<span class="string">"configuration"</span>, configuration);</span><br></pre></td></tr></table></figure></p>
-<p>每一个JobDetail对应了一个Job：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SnapshotPolicyJob</span> <span class="keyword">implements</span> <span class="title">Job</span></span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(JobExecutionContext context)</span> <span class="keyword">throws</span> JobExecutionException </span>&#123;</span><br><span class="line">		<span class="comment">// ...</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>初始化一个Trigger，需要调度规则：<br><figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">this.trigger = newTrigger<span class="params">()</span></span><br><span class="line">	<span class="string">.withIdentity</span><span class="params">(snapshotPolicyEntity.getName()</span>, snapshotPolicyEntity.getService<span class="params">()</span>)</span><br><span class="line">	<span class="string">.startAt</span><span class="params">(BackupUtils.now()</span>)</span><br><span class="line">	<span class="string">.withSchedule</span><span class="params">(cronBuilder)</span></span><br><span class="line">	<span class="string">.build</span><span class="params">()</span>;</span><br></pre></td></tr></table></figure></p>
-<p>初始化一个调度规则：<br><figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">cronExp</span> = <span class="string">"0 "</span> + minute + <span class="string">" "</span> + hour + <span class="string">" "</span> + day + <span class="string">" * ?"</span>;</span><br><span class="line"><span class="attribute">cronBuilder</span> = CronScheduleBuilder.cronSchedule(cronExp);</span><br></pre></td></tr></table></figure></p>
-<p>这样，调度流程就串了起来，在满足调度条件后，会执行调度任务的作业。</p>
-<p>默认情况下，调度信息是保留在内存中的，可以通过配置将调度信息持久化到数据库中。</p>
+<ol>
+<li>增加24维（每1小时算1维，0点到23点，看是否属于其中）：is24_0，is24_1，is24_2，is24_3，is24_4，is24_5，is24_6，is24_7，is24_8，is24_9，is24_10，is24_11，is24_12，is24_13，is24_14，is24_15，is24_16，is24_17，is24_18，is24_19，is24_20，is24_21，is24_22，is24_23</li>
+</ol>
+<ol>
+<li>增加12维（每2小时算1维，看是否属于其中）：is12_0，is12_2，is12_4，is12_6，is12_8，is12_10，is12_12，is12_14，is12_16，is12_18，is12_20，is24_22</li>
+<li>增加8维（每3小时算1维，看是否属于其中）：is8_0，is8_3，is8_6，is8_9，is8_12，is8_15，is8_18，is8_21</li>
+</ol>
+<ol>
+<li>增加6维（每4小时算1维，看是否属于其中）：is6_0，is6_4，is6_8，is6_12，is6_16，is6_20</li>
+<li><p>增加4维（上午、下午、凌晨、晚上，看是否属于其中）：is4_0，is4_6，is4_12，is4_18</p>
+</li>
+<li><p>增加1维（每天的第几个小时）：hourdayIndex</p>
+</li>
+<li><p>增加1维（属于当天的第几分钟）：index</p>
+</li>
+<li><p>增加1维（是否是工作日）：isWeekday</p>
+</li>
+<li>增加1维（每周的第几天）：weekdayIndex</li>
+<li>增加1维（前5个工作日的相应index分钟的平均访问量或者 前2个周末日的相应index分钟的平均访问量）：meanIndex</li>
+</ol>
+<p>处理好后的训练数据如下：</p>
+<p><img src="/Users/urey/Downloads/train_data_format.png" alt="train_data_format.png"></p>
+<p>由于不同特征间的取值范围相差比较大，因此需要对数据进行标准化，这里选择了z-score对全部的特征进行标准化，包括one-hot encoding的特征。</p>
+<p>但在实际的测试过程中，发现其中很多特征是重复的、无用的，模型效果一般，因此降维到6维，只取了我认为6个最重要的特征。</p>
 <p><br></p>
-<h4 id="在Spring-boot中如何使用Quartz？"><a href="#在Spring-boot中如何使用Quartz？" class="headerlink" title="在Spring boot中如何使用Quartz？"></a><strong>在Spring boot中如何使用Quartz？</strong></h4><p>在pom.xml添加依赖：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.quartz-scheduler<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>quartz<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.2.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>之后就可以通过代码实现业务逻辑，这里需要注意的是：在Job内，不能使用spring的注入机制注入对象，必须通过JobDataMap的方式由JobDetail传给Job相应的复杂类型的对象。</p>
-<p><br></p>
-<h4 id="什么是cron表达式？"><a href="#什么是cron表达式？" class="headerlink" title="什么是cron表达式？"></a><strong>什么是cron表达式？</strong></h4><p>CronTrigger 能够提供比 SimpleTrigger 更有具体实际意义的调度方案，调度规则基于 Cron 表达式。</p>
-<p>Quartz的cron表达式的格式十分类似于 UNIX的cron表达式，但还是有少许明显的区别。区别之一就是 Quartz 的格式向下支持到秒级别的计划，而 UNIX cron 计划仅支持至分钟级。许多我们的触发计划要基于秒级递增的(例如，每45秒)。</p>
-<p>另一个与 UNIX的cron表达式的不同点是在表达式中支持域的数目。UNIX 给出五个域(分、时、日、月和周)，Quartz 提供七个域。如下图所示：</p>
-<p><img src="http://7xlhna.com1.z0.glb.clouddn.com/quartzCronExpression.png" alt=""></p>
-<p>注意，从左到右依次是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">秒	分	时	日	月	周	年</span><br></pre></td></tr></table></figure></p>
-<p>其中第七个域（年）可以省略为空，即这样两个cron表达式是等效的：<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">六个域：<span class="number">0</span> <span class="number">3</span> * * * ?</span><br><span class="line">七个域：<span class="number">0</span> <span class="number">3</span> * * * ? *</span><br></pre></td></tr></table></figure></p>
-<p>比如：</p>
-<p>按月调度：每月1号8点10分调度<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">10</span> <span class="number">8</span> <span class="number">1</span> * ?</span><br></pre></td></tr></table></figure></p>
-<p>按周调度：每周一8点10分调度<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">10</span> <span class="number">8</span> * * <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
-<p>注意：1-7 对应 SUN-SAT，即1是周日，7是周六</p>
-<p>按日调度：每日8点10分调度<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">10</span> <span class="number">8</span> * * ?</span><br></pre></td></tr></table></figure></p>
-<p>按小时调度：每小时的第10分调度<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">10</span> * * * ?</span><br></pre></td></tr></table></figure></p>
-  
+<h4 id="二、模型设置"><a href="#二、模型设置" class="headerlink" title="二、模型设置"></a>二、模型设置</h4><p>我们选取了LSTM模型，时间步长(time_step)选为30，即根据30个样本数据来拟合出下一时刻的访问量。每30条训练数据构成1个训练样本，即每个时间点的lstm cell喂进去一条训练数据，共有30个时间点。</p>
+<p>具体超参数设置如下：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">time_step</span> = <span class="number">30</span></span><br><span class="line"><span class="attr">batch_size</span> = <span class="number">64</span></span><br><span class="line"><span class="attr">rnn_unit</span> = <span class="number">60</span></span><br><span class="line"><span class="attr">input_size</span> = <span class="number">67</span></span><br><span class="line"><span class="attr">output_size</span> = <span class="number">1</span></span><br><span class="line"><span class="attr">lstm_depth</span> = <span class="number">2</span></span><br><span class="line"><span class="attr">output_keep_prob</span> = <span class="number">0.5</span></span><br><span class="line"><span class="attr">input_keep_prob</span> = <span class="number">1.0</span></span><br><span class="line"><span class="attr">lr</span> = <span class="number">0.0005</span></span><br><span class="line"><span class="attr">l2_regularization_rate</span> = <span class="number">0.001</span></span><br><span class="line"><span class="attr">is_training</span> = <span class="number">1</span></span><br><span class="line"><span class="attr">is_multi_layer</span> = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>这里简单的剖析下模型结构，为了理解，我们选取了batch_size为1的情形，即每次喂进模型1条训练样本（每个训练样本实际上包含了30条训练数据）：</p>
+<p><img src="/Users/urey/Downloads/1batch.png" alt="1batch"></p>
+<ol>
+<li>第1步会经过一个DNN层将输入数据转换成可以喂进lstm层的数据；</li>
+<li>第2、3、…步是lstm内部的转换示意，即lstm cell会在时序上展开，上一个时序的内容会影响下一个时序的内容；</li>
+<li>最后由于lstm cell内部有rnn_unit个神经元结构，但是希望每个时间点的lstm cell只输出一个变量，因此再经过一个DNN层来转换；</li>
+</ol>
+<p>batch_size设为64时的模型结构：</p>
+<p><img src="/Users/urey/Downloads/64batch.png" alt="64batch"></p>
+<p>画图费了老劲了:cry:…</p>
+<p>定义模型时最重要的就是各个层之间维度的转换，具体代码如下：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">def lstm(batch):</span><br><span class="line">    # reshape from <span class="number">3</span>D <span class="keyword">to</span> <span class="number">2</span>D</span><br><span class="line">    <span class="built_in">input</span> = <span class="keyword">tf</span>.reshape(<span class="keyword">X</span>, [-<span class="number">1</span>, input_size])</span><br><span class="line">    input_rnn = <span class="keyword">tf</span>.matmul(<span class="built_in">input</span>, weights[<span class="string">'in'</span>]) + biases[<span class="string">'in'</span>]</span><br><span class="line">    # reshape from <span class="number">2</span>D <span class="keyword">to</span> <span class="number">3</span>D</span><br><span class="line">    input_rnn = <span class="keyword">tf</span>.reshape(input_rnn, [-<span class="number">1</span>, time_step, rnn_unit])</span><br><span class="line">    lstm_cell = <span class="keyword">tf</span>.<span class="keyword">nn</span>.rnn_cell.BasicLSTMCell(rnn_unit)</span><br><span class="line">    <span class="keyword">if</span> is_trainin<span class="variable">g:</span></span><br><span class="line">        <span class="keyword">print</span>(<span class="string">'Training lstm nn...'</span>)</span><br><span class="line">        lstm_cell = <span class="keyword">tf</span>.<span class="keyword">nn</span>.rnn_cell.DropoutWrapper(lstm_cell, input_keep_prob=input_keep_prob, output_keep_prob=output_keep_prob)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> is_multi_layer:</span><br><span class="line">        # multi lstm layer</span><br><span class="line">        <span class="keyword">print</span>(<span class="string">'Using multi lstm layer.'</span>)</span><br><span class="line">        stacked_lstm = <span class="keyword">tf</span>.<span class="keyword">nn</span>.rnn_cell.MultiRNNCell([lstm_cell] * lstm_depth, state_is_tuple=True)</span><br><span class="line">        init_state = stacked_lstm.zero_state(batch, dtype=<span class="keyword">tf</span>.float32)</span><br><span class="line">        output_rnn, final_states = <span class="keyword">tf</span>.<span class="keyword">nn</span>.dynamic_rnn(stacked_lstm, input_rnn, initial_state=init_state, dtype=<span class="keyword">tf</span>.float32, time_major=False)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        # single lstm layer</span><br><span class="line">        <span class="keyword">print</span>(<span class="string">'Using single lstm layer.'</span>)</span><br><span class="line">        init_state = lstm_cell.zero_state(batch, dtype=<span class="keyword">tf</span>.float32)</span><br><span class="line">        # output_rnn是记录lstm每个输出节点的结果，final_states是最后一个cell的结果</span><br><span class="line">        output_rnn, final_states = <span class="keyword">tf</span>.<span class="keyword">nn</span>.dynamic_rnn(lstm_cell, input_rnn, initial_state=init_state, dtype=<span class="keyword">tf</span>.float32, time_major=False)</span><br><span class="line"></span><br><span class="line">    # output layer</span><br><span class="line">    output = <span class="keyword">tf</span>.reshape(output_rnn, [-<span class="number">1</span>, rnn_unit])</span><br><span class="line">    pred = <span class="keyword">tf</span>.matmul(output, weights[<span class="string">'out'</span>]) + biases[<span class="string">'out'</span>]</span><br><span class="line">    <span class="keyword">return</span> pred, final_states</span><br></pre></td></tr></table></figure>
+<h4 id="三、预测效果："><a href="#三、预测效果：" class="headerlink" title="三、预测效果："></a>三、预测效果：</h4>  
 	</div>
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/quartz/">quartz</a>
+  <a class="article-category-link" href="/categories/DL/">DL</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/quartz/">quartz</a>
+  <span></span> <a href="/tags/DL-lstm/">DL, lstm</a>
   </div>
 
 </div>
@@ -162,7 +180,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.tech/2016/05/11/Java使用quartz实现作业调度/" data-title="Java使用quartz实现作业调度 | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  <div data-url="http://qiaowei.tech/2017/12/20/基于LSTM进行时间序列预测/" data-title="基于LSTM进行时间序列预测 | Urey on the way" data-tsina="1758475283" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -175,19 +193,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2016/06/04/Flume的Spooling Directory Source支持Sub-directories/" title="Flume的Spooling Directory Source支持Sub-directories">
-  <strong>上一篇：</strong><br/>
-  <span>
-  Flume的Spooling Directory Source支持Sub-directories</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2016/05/10/Flume event转化为ES的document过程分析/"  title="Flume event转化为ES的document过程分析">
+<a href="/2016/06/29/Flume1.7.0的TaildirSource/"  title="Flume1.7.0的TaildirSource介绍">
  <strong>下一篇：</strong><br/> 
- <span>Flume event转化为ES的document过程分析
+ <span>Flume1.7.0的TaildirSource介绍
 </span>
 </a>
 </div>
@@ -208,7 +218,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#什么是Quartz？"><span class="toc-number">1.</span> <span class="toc-text">什么是Quartz？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#在Spring-boot中如何使用Quartz？"><span class="toc-number">2.</span> <span class="toc-text">在Spring boot中如何使用Quartz？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#什么是cron表达式？"><span class="toc-number">3.</span> <span class="toc-text">什么是cron表达式？</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、特征工程"><span class="toc-number">1.</span> <span class="toc-text">一、特征工程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、模型设置"><span class="toc-number">2.</span> <span class="toc-text">二、模型设置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、预测效果："><span class="toc-number">3.</span> <span class="toc-text">三、预测效果：</span></a></li></ol>
  
   </div>
 

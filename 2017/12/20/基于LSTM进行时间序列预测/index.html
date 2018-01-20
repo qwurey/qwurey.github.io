@@ -25,7 +25,7 @@
 <meta property="og:image" content="http://qiaowei.tech/images/lstm1/1batch.png">
 <meta property="og:image" content="http://qiaowei.tech/images/lstm1/64batch.png">
 <meta property="og:image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fnn134wjwzj31kw0dbtf2.jpg">
-<meta property="og:updated_time" content="2018-01-20T05:53:56.742Z">
+<meta property="og:updated_time" content="2018-01-20T08:00:04.215Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基于LSTM进行时间序列预测">
 <meta name="twitter:description" content="基于LSTM对系统的访问量进行预测。">
@@ -104,7 +104,7 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、特征工程"><span class="toc-number">1.</span> <span class="toc-text">一、特征工程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、模型设置"><span class="toc-number">2.</span> <span class="toc-text">二、模型设置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、预测效果："><span class="toc-number">3.</span> <span class="toc-text">三、预测效果：</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、特征工程"><span class="toc-number">1.</span> <span class="toc-text">一、特征工程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、模型设置"><span class="toc-number">2.</span> <span class="toc-text">二、模型设置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、预测效果："><span class="toc-number">3.</span> <span class="toc-text">三、预测效果：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#四、如何预测"><span class="toc-number">4.</span> <span class="toc-text">四、如何预测</span></a></li></ol>
 		
 		</div>
 		
@@ -169,6 +169,26 @@
 <figure class="highlight ceylon"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">up<span class="number">_</span><span class="keyword">value</span> = predict<span class="number">_</span><span class="keyword">value</span> * <span class="number">0.8</span>;</span><br><span class="line">down<span class="number">_</span><span class="keyword">value</span> = predict<span class="number">_</span><span class="keyword">value</span> * <span class="number">1.2</span>;</span><br></pre></td></tr></table></figure>
 <p>下图蓝色线显示的是每一分钟的实际访问量的值，灰色是根据预测值生成的基带：</p>
 <p><img src="https://ws2.sinaimg.cn/large/006tKfTcly1fnn134wjwzj31kw0dbtf2.jpg" alt="res"></p>
+<p><br></p>
+<h4 id="四、如何预测"><a href="#四、如何预测" class="headerlink" title="四、如何预测"></a>四、如何预测</h4><p>模型训练好以后，如何投入线上使用呢？</p>
+<p>每天<code>00:03:0</code>会执行一遍预测代码，分为如下几个大步骤：</p>
+<ol>
+<li><p>生成上一日从<code>23:30:0</code>到<code>23:59:0</code>的<code>30</code>个标准化后的特征向量<code>prev_seq</code>，维度<code>[30, 7]</code>；</p>
+</li>
+<li><p>喂进模型，模型的输出<code>next_seq</code>的最后一个元素就是今天的<code>00:00:0</code>的访问量的预测值；</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">predict_count = np.float32(next_se<span class="string">q[-1]</span>).item()</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>拿到<code>00:00:0</code>时刻的访问量的预测值后，生成该时刻的标准化后的特征向量<code>normalized_feature_vector</code>  ，维度<code>[1, 7]</code>；</p>
+</li>
+<li><p>与之前的<code>prev_seq</code>加在一起，形成新的测试样本：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">prev_seq = np.vstack((prev_seq[<span class="number">1</span>:], normalized_feature_vector))</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>把<code>prev_seq</code>继续喂进模型，以此往复，直到生成当日的全部的<code>1440</code>个预测值：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">next_seq = sess.run(pred, feed_dict=&#123;X: [prev_seq]&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><br></p>
+<p>详细代码参见：<a href="https://github.com/qwurey/Transaction-Predict" target="_blank" rel="noopener">https://github.com/qwurey/Transaction-Predict</a></p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -237,7 +257,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、特征工程"><span class="toc-number">1.</span> <span class="toc-text">一、特征工程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、模型设置"><span class="toc-number">2.</span> <span class="toc-text">二、模型设置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、预测效果："><span class="toc-number">3.</span> <span class="toc-text">三、预测效果：</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、特征工程"><span class="toc-number">1.</span> <span class="toc-text">一、特征工程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、模型设置"><span class="toc-number">2.</span> <span class="toc-text">二、模型设置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、预测效果："><span class="toc-number">3.</span> <span class="toc-text">三、预测效果：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#四、如何预测"><span class="toc-number">4.</span> <span class="toc-text">四、如何预测</span></a></li></ol>
  
   </div>
 

@@ -4,25 +4,33 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Ambari删除服务的方法小结 | Urey on the way</title>
+    <title>LSTM用于时间序列预测的几种方式 | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="通过rest api 或者 通过操作ambari元数据库实现">
-<meta name="keywords" content="ambari">
+    <meta name="description" content="本篇接上一篇《基于LSTM进行时间序列预测》，通过选取LSTM中有用的输出进而改变loss的计算方式，来看哪一种模型下的预测效果更好。">
+<meta name="keywords" content="DL, lstm">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Ambari删除服务的方法小结">
-<meta property="og:url" content="http://qiaowei.tech/2016/03/26/Ambari删除服务的方法小结/index.html">
+<meta property="og:title" content="LSTM用于时间序列预测的几种方式">
+<meta property="og:url" content="http://qiaowei.tech/2018/01/01/LSTM用于时间序列预测的几种方式/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="通过rest api 或者 通过操作ambari元数据库实现">
+<meta property="og:description" content="本篇接上一篇《基于LSTM进行时间序列预测》，通过选取LSTM中有用的输出进而改变loss的计算方式，来看哪一种模型下的预测效果更好。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2016-03-26T13:14:43.000Z">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/006tKfTcly1fnmzt980z2j31ck0di762.jpg">
+<meta property="og:image" content="https://ws4.sinaimg.cn/large/006tKfTcly1fnmztaoieqj31bs0f076q.jpg">
+<meta property="og:image" content="https://ws3.sinaimg.cn/large/006tKfTcly1fnmzt8e3h5j30l20c8mxx.jpg">
+<meta property="og:image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fnmzt9oo1sj30km0c6gmm.jpg">
+<meta property="og:image" content="https://ws3.sinaimg.cn/large/006tKfTcly1fnmztch8bhj30g80hi3zu.jpg">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/006tKfTcly1fnmztbl283j30ig0het9p.jpg">
+<meta property="og:image" content="https://ws4.sinaimg.cn/large/006tKfTcly1fnmzta6a2oj30gg0pw75n.jpg">
+<meta property="og:updated_time" content="2018-01-20T05:10:00.219Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Ambari删除服务的方法小结">
-<meta name="twitter:description" content="通过rest api 或者 通过操作ambari元数据库实现">
+<meta name="twitter:title" content="LSTM用于时间序列预测的几种方式">
+<meta name="twitter:description" content="本篇接上一篇《基于LSTM进行时间序列预测》，通过选取LSTM中有用的输出进而改变loss的计算方式，来看哪一种模型下的预测效果更好。">
+<meta name="twitter:image" content="https://ws1.sinaimg.cn/large/006tKfTcly1fnmzt980z2j31ck0di762.jpg">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -81,14 +89,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/03/26/Ambari删除服务的方法小结/" title="Ambari删除服务的方法小结" itemprop="url">Ambari删除服务的方法小结</a>
+      <a href="/2018/01/01/LSTM用于时间序列预测的几种方式/" title="LSTM用于时间序列预测的几种方式" itemprop="url">LSTM用于时间序列预测的几种方式</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2016-03-26T09:00:57.000Z" itemprop="datePublished"> 发表于 2016-03-26</time>
+    <time datetime="2018-01-01T13:31:11.000Z" itemprop="datePublished"> 发表于 2018-01-01</time>
     
   </p>
 </header>
@@ -97,20 +105,50 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、使用REST-API"><span class="toc-number">1.</span> <span class="toc-text">一、使用REST API</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-停止服务："><span class="toc-number">1.0.0.0.1.</span> <span class="toc-text">(1). 停止服务：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-删除服务："><span class="toc-number">1.0.0.0.2.</span> <span class="toc-text">(2). 删除服务：</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、从Ambari元数据库中直接删除"><span class="toc-number">2.</span> <span class="toc-text">二、从Ambari元数据库中直接删除</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-先停掉ambari-server"><span class="toc-number">2.0.0.0.1.</span> <span class="toc-text">(1). 先停掉ambari-server:</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-执行sql命令："><span class="toc-number">2.0.0.0.2.</span> <span class="toc-text">(2). 执行sql命令：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-重新开启ambari-server："><span class="toc-number">2.0.0.0.3.</span> <span class="toc-text">(3). 重新开启ambari-server：</span></a></li></ol></li></ol></li></ol></li></ol></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#模型介绍"><span class="toc-number">1.</span> <span class="toc-text">模型介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#one-to-one"><span class="toc-number">1.0.0.1.</span> <span class="toc-text">one to one</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#one-to-many"><span class="toc-number">1.0.0.2.</span> <span class="toc-text">one to many</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#many-to-one"><span class="toc-number">1.0.0.3.</span> <span class="toc-text">many to one</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#many-to-many"><span class="toc-number">1.0.0.4.</span> <span class="toc-text">many to many</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实际应用"><span class="toc-number">2.</span> <span class="toc-text">实际应用</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#方法一："><span class="toc-number">2.0.0.1.</span> <span class="toc-text">方法一：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#方法二：331"><span class="toc-number">2.0.0.2.</span> <span class="toc-text">方法二：331</span></a></li></ol></li></ol></li></ol></li></ol>
 		
 		</div>
 		
-		<p>通过rest api 或者 通过操作ambari元数据库实现<br><a id="more"></a></p>
-<h2 id="一、使用REST-API"><a href="#一、使用REST-API" class="headerlink" title="一、使用REST API"></a>一、使用REST API</h2><h6 id="1-停止服务："><a href="#1-停止服务：" class="headerlink" title="(1). 停止服务："></a>(1). 停止服务：</h6><figure class="highlight gauss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># stop MYSQL service</span></span><br><span class="line"><span class="meta"># 注意: 修改 ambari_server_ip &amp; cluster_name</span></span><br><span class="line">curl -u admin:admin -H <span class="string">"X-Requested-By: ambari"</span> -X PUT -d '&#123;<span class="string">"RequestInfo"</span>:&#123;<span class="string">"context"</span>:<span class="string">"Stop Service"</span>&#125;,<span class="string">"Body"</span>:&#123;<span class="string">"ServiceInfo"</span>:&#123;<span class="string">"state"</span>:<span class="string">"INSTALLED"</span>&#125;&#125;&#125;' http:<span class="comment">//ambari_server_ip:8080/api/v1/clusters/cluster_name/services/MYSQL</span></span><br></pre></td></tr></table></figure>
-<h6 id="2-删除服务："><a href="#2-删除服务：" class="headerlink" title="(2). 删除服务："></a>(2). 删除服务：</h6><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># delete MYSQL service</span></span><br><span class="line"><span class="comment"># 注意: 修改 ambari_server_ip &amp; cluster_name</span></span><br><span class="line">curl -u admin:admin -H <span class="string">"X-Requested-By: ambari"</span> -X DELETE  http:<span class="regexp">//</span>ambari_server_ip:<span class="number">8080</span><span class="regexp">/api/</span>v1<span class="regexp">/clusters/</span>cluster_name<span class="regexp">/services/</span>MYSQL</span><br></pre></td></tr></table></figure>
-<h2 id="二、从Ambari元数据库中直接删除"><a href="#二、从Ambari元数据库中直接删除" class="headerlink" title="二、从Ambari元数据库中直接删除"></a>二、从Ambari元数据库中直接删除</h2><p>为什么这么删除，多麻烦？其实这是笔者在用rest api删除发现bug后才想到的方法。ambari2.1.1 rest api 删除服务偶尔会出现bug，情形是重启ambari－server又出现了该服务，此时在安装该服务会出现 server error的错误！</p>
-<p>处理方法：<br>通过数据库删除，ambari默认使用pg，使用其他数据库原理一样。</p>
-<h6 id="1-先停掉ambari-server"><a href="#1-先停掉ambari-server" class="headerlink" title="(1). 先停掉ambari-server:"></a>(1). 先停掉ambari-server:</h6><figure class="highlight vbscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ambari-<span class="built_in">server</span> <span class="keyword">stop</span></span><br></pre></td></tr></table></figure>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 登录数据库：默认密码是：bigdata</span></span><br><span class="line">psql -U ambari</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看数据库</span></span><br><span class="line">\l </span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 切换到ambari数据库</span></span><br><span class="line">\c ambari   </span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看表</span></span><br><span class="line">\d</span><br></pre></td></tr></table></figure>
-<h6 id="2-执行sql命令："><a href="#2-执行sql命令：" class="headerlink" title="(2). 执行sql命令："></a>(2). 执行sql命令：</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> hostcomponentstate <span class="keyword">WHERE</span> service_name <span class="keyword">IN</span> (<span class="string">'SERVICE_NAME'</span>);</span><br><span class="line"> </span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> hostcomponentdesiredstate <span class="keyword">WHERE</span> service_name <span class="keyword">IN</span> (<span class="string">'SERVICE_NAME'</span>);</span><br><span class="line"> </span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> servicecomponentdesiredstate <span class="keyword">WHERE</span> service_name <span class="keyword">IN</span> (<span class="string">'SERVICE_NAME'</span>);</span><br><span class="line"> </span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> servicedesiredstate <span class="keyword">WHERE</span> service_name <span class="keyword">IN</span> (<span class="string">'SERVICE_NAME'</span>);</span><br><span class="line"> </span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> clusterservices <span class="keyword">WHERE</span> service_name <span class="keyword">IN</span> (<span class="string">'SERVICE_NAME'</span>);</span><br></pre></td></tr></table></figure>
-<h6 id="3-重新开启ambari-server："><a href="#3-重新开启ambari-server：" class="headerlink" title="(3). 重新开启ambari-server："></a>(3). 重新开启ambari-server：</h6><figure class="highlight axapta"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ambari-<span class="keyword">server</span> start</span><br></pre></td></tr></table></figure>
-<p>注意：<br>sql语句顺序有很大的关系，实际上是从component到service到cluster这个层次顺序删除的，这也是ambari设计的层次结构。</p>
+		<p>本篇接上一篇《基于LSTM进行时间序列预测》，通过选取LSTM中有用的输出进而改变loss的计算方式，来看哪一种模型下的预测效果更好。</p>
+<a id="more"></a>
+<h3 id="模型介绍"><a href="#模型介绍" class="headerlink" title="模型介绍"></a>模型介绍</h3><p>LSTM是RNN中的一种，解决了序列很长的情形下梯度消失or梯度爆炸的问题，因此LSTM也可以用下图来表示。</p>
+<p><img src="https://ws1.sinaimg.cn/large/006tKfTcly1fnmzt980z2j31ck0di762.jpg" alt="lstm1"></p>
+<p>在实际的应用中，通常包括以下几类：</p>
+<p><img src="https://ws4.sinaimg.cn/large/006tKfTcly1fnmztaoieqj31bs0f076q.jpg" alt="lstm2"></p>
+<h6 id="one-to-one"><a href="#one-to-one" class="headerlink" title="one to one"></a>one to one</h6><p>这个不用多讲，就是输入x，经过变换Wx+b和激活函数f得到输出y；</p>
+<h6 id="one-to-many"><a href="#one-to-many" class="headerlink" title="one to many"></a>one to many</h6><p>输入不是序列，经过LSTM输出一段序列，比如根据一张图片生成一段文字。在这种情形下，又分为了两种情况：</p>
+<ol>
+<li><p>输入只经过第1个时间点的lstm cell；</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tKfTcly1fnmzt8e3h5j30l20c8mxx.jpg" alt="lstm3"></p>
+</li>
+<li><p>输入经过每一个时间点的lstm cell，但是输入X是不变的；注意要与many to many区别开来，many to many的输入是分时间点的。</p>
+</li>
+</ol>
+<p><img src="https://ws2.sinaimg.cn/large/006tKfTcly1fnmzt9oo1sj30km0c6gmm.jpg" alt="lstm4"></p>
+<h6 id="many-to-one"><a href="#many-to-one" class="headerlink" title="many to one"></a>many to one</h6><p>输入是一个序列，输出只取最后一个时间点的输出，该类型可以应用在时间序列分析中预测一个值，也可以处理分类问题，比如输入一段文字判别它所属的类别，输入一个句子判断其情感倾向，输入一段视频并判断它的类别等，下面会详细介绍如何应用在时序分析中。</p>
+<h6 id="many-to-many"><a href="#many-to-many" class="headerlink" title="many to many"></a>many to many</h6><p>输入是一个序列，输出也是一个序列。这个模型最为复杂，花样最多，后面我会在用一篇文章来详细介绍它。</p>
+<p>复杂在于输入序列的长度N和输出序列的长度M可以不同，N!=M；</p>
+<p>花样在于哪些时间点的输出作为最后序列的输出，比如图1中最后两个many to many的结构上的差异；</p>
+<p>模型复杂使得该类型的应用广泛，比如：</p>
+<ul>
+<li>机器翻译：输入是一种类型的语言，输出是另一种类型的语言；</li>
+<li>文本摘要：输入是一段文本序列，输出是这段文本序列的摘要序列；</li>
+<li>阅读理解：将输入的文章和问题分别编码，再对其进行解码得到问题的答案；</li>
+<li>语音识别：输入是语音信号序列，输出是文字序列；</li>
+</ul>
+<h3 id="实际应用"><a href="#实际应用" class="headerlink" title="实际应用"></a>实际应用</h3><p>在预测访问量的案例中，输入是不变的，即每次都是30个时间点的数据作为一个样本，来预测下一个时间点的访问量；但是可以通过控制选取哪些作为输出来计算loss，从而计算梯度更新模型参数值。</p>
+<p>下面介绍三种使用了不同类型的方法，为了简便，假设<code>time_step=3</code> ，且没有去刻画<code>lstm cell</code>中的<code>num_units</code>个单元与输入x和输出y之间的映射（因为每个时间点的x的维度、num_units、y的维度大概率各不相同，所以需要通过reshape或者增加dnn层来进行转换）</p>
+<h6 id="方法一："><a href="#方法一：" class="headerlink" title="方法一："></a>方法一：</h6><p>使用了many to many的类型，看一下训练数据的生成就明白了：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> <span class="selector-tag">i</span> <span class="keyword">in</span> range(len(normalized_train_data) - time_step - <span class="number">1</span>):</span><br><span class="line">   sample_x = normalized_train_data[<span class="selector-tag">i</span>: <span class="selector-tag">i</span> + time_step]</span><br><span class="line">   sample_y = normalized_train_data[<span class="selector-tag">i</span> + <span class="number">1</span>: <span class="selector-tag">i</span> + time_step + <span class="number">1</span>, <span class="number">1</span>, np.newaxis]</span><br><span class="line">   train_x.append(sample_x.tolist())</span><br><span class="line">   train_y.append(sample_y.tolist())</span><br></pre></td></tr></table></figure>
+<p>输出的序列包含many个数据，与标签对比计算loss，更新网络。蓝色y1, y2, y3是相应的3个时间点的输出，这里把y1看成是基于h0和x1对下一时刻的预测，把y2看成是基于h1和x2对下一时刻的预测，以此类推，因此，对应计算loss的标签分别是Y2, Y3, Y4。</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tKfTcly1fnmztch8bhj30g80hi3zu.jpg" alt="lstm5"></p>
+<h6 id="方法二：331"><a href="#方法二：331" class="headerlink" title="方法二：331"></a>方法二：331</h6><p>使用了many to one的类型，只取最后1个时间点的输出，认为它是对接下来时间点的访问量的预测值，与下一时间点真实的访问量比较，计算loss，更新网络。这里把最后一个时间点的输出看成是对下一时刻的预测，因此，y3与Y4计算loss。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">output_rnn, final_states = tf.nn.dynamic_rnn(lstm_cell, input_rnn, <span class="attribute">initial_state</span>=init_state, <span class="attribute">dtype</span>=tf.float32, <span class="attribute">time_major</span>=<span class="literal">False</span>)</span><br><span class="line">last_cell_output = output_rnn[:, -1, :]</span><br></pre></td></tr></table></figure>
+<p><img src="https://ws1.sinaimg.cn/large/006tKfTcly1fnmztbl283j30ig0het9p.jpg" alt="lstm6"></p>
+<p>######方法三:444</p>
+<p>使用了many to many的类型，这里在每一时刻输出的基础上增加一个DNN层来拟合出y4，进而再与标签Y4比较计算loss。</p>
+<p><img src="https://ws4.sinaimg.cn/large/006tKfTcly1fnmzta6a2oj30gg0pw75n.jpg" alt="lstm7"></p>
+<p>目前测试效果显示方法二的效果最好。</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -118,13 +156,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/ambari/">ambari</a>
+  <a class="article-category-link" href="/categories/DL/">DL</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/ambari/">ambari</a>
+  <span></span> <a href="/tags/DL-lstm/">DL, lstm</a>
   </div>
 
 </div>
@@ -133,7 +171,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.tech/2016/03/26/Ambari删除服务的方法小结/" data-title="Ambari删除服务的方法小结 | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  <div data-url="http://qiaowei.tech/2018/01/01/LSTM用于时间序列预测的几种方式/" data-title="LSTM用于时间序列预测的几种方式 | Urey on the way" data-tsina="1758475283" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -146,19 +184,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2016/03/30/Flume开发特定组件/" title="Flume开发特定组件">
-  <strong>上一篇：</strong><br/>
-  <span>
-  Flume开发特定组件</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2016/03/23/Flume-Source对多行的处理/"  title="Flume Source对多行的处理">
+<a href="/2017/12/20/基于LSTM进行时间序列预测/"  title="基于LSTM进行时间序列预测">
  <strong>下一篇：</strong><br/> 
- <span>Flume Source对多行的处理
+ <span>基于LSTM进行时间序列预测
 </span>
 </a>
 </div>
@@ -179,7 +209,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、使用REST-API"><span class="toc-number">1.</span> <span class="toc-text">一、使用REST API</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-停止服务："><span class="toc-number">1.0.0.0.1.</span> <span class="toc-text">(1). 停止服务：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-删除服务："><span class="toc-number">1.0.0.0.2.</span> <span class="toc-text">(2). 删除服务：</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、从Ambari元数据库中直接删除"><span class="toc-number">2.</span> <span class="toc-text">二、从Ambari元数据库中直接删除</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-先停掉ambari-server"><span class="toc-number">2.0.0.0.1.</span> <span class="toc-text">(1). 先停掉ambari-server:</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-执行sql命令："><span class="toc-number">2.0.0.0.2.</span> <span class="toc-text">(2). 执行sql命令：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-重新开启ambari-server："><span class="toc-number">2.0.0.0.3.</span> <span class="toc-text">(3). 重新开启ambari-server：</span></a></li></ol></li></ol></li></ol></li></ol></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#模型介绍"><span class="toc-number">1.</span> <span class="toc-text">模型介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#one-to-one"><span class="toc-number">1.0.0.1.</span> <span class="toc-text">one to one</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#one-to-many"><span class="toc-number">1.0.0.2.</span> <span class="toc-text">one to many</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#many-to-one"><span class="toc-number">1.0.0.3.</span> <span class="toc-text">many to one</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#many-to-many"><span class="toc-number">1.0.0.4.</span> <span class="toc-text">many to many</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实际应用"><span class="toc-number">2.</span> <span class="toc-text">实际应用</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#方法一："><span class="toc-number">2.0.0.1.</span> <span class="toc-text">方法一：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#方法二：331"><span class="toc-number">2.0.0.2.</span> <span class="toc-text">方法二：331</span></a></li></ol></li></ol></li></ol></li></ol>
  
   </div>
 

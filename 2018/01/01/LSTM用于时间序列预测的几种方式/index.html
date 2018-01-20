@@ -26,7 +26,7 @@
 <meta property="og:image" content="https://ws3.sinaimg.cn/large/006tKfTcly1fnmztch8bhj30g80hi3zu.jpg">
 <meta property="og:image" content="https://ws1.sinaimg.cn/large/006tKfTcly1fnmztbl283j30ig0het9p.jpg">
 <meta property="og:image" content="https://ws4.sinaimg.cn/large/006tKfTcly1fnmzta6a2oj30gg0pw75n.jpg">
-<meta property="og:updated_time" content="2018-01-20T05:10:00.219Z">
+<meta property="og:updated_time" content="2018-01-20T05:17:32.408Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="LSTM用于时间序列预测的几种方式">
 <meta name="twitter:description" content="本篇接上一篇《基于LSTM进行时间序列预测》，通过选取LSTM中有用的输出进而改变loss的计算方式，来看哪一种模型下的预测效果更好。">
@@ -105,18 +105,20 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#模型介绍"><span class="toc-number">1.</span> <span class="toc-text">模型介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#one-to-one"><span class="toc-number">1.0.0.1.</span> <span class="toc-text">one to one</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#one-to-many"><span class="toc-number">1.0.0.2.</span> <span class="toc-text">one to many</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#many-to-one"><span class="toc-number">1.0.0.3.</span> <span class="toc-text">many to one</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#many-to-many"><span class="toc-number">1.0.0.4.</span> <span class="toc-text">many to many</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实际应用"><span class="toc-number">2.</span> <span class="toc-text">实际应用</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#方法一："><span class="toc-number">2.0.0.1.</span> <span class="toc-text">方法一：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#方法二：331"><span class="toc-number">2.0.0.2.</span> <span class="toc-text">方法二：331</span></a></li></ol></li></ol></li></ol></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、模型介绍"><span class="toc-number">1.</span> <span class="toc-text">一、模型介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#A-one-to-one"><span class="toc-number">1.0.0.1.</span> <span class="toc-text">A. one to one</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#B-one-to-many"><span class="toc-number">1.0.0.2.</span> <span class="toc-text">B. one to many</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#C-many-to-one"><span class="toc-number">1.0.0.3.</span> <span class="toc-text">C. many to one</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#D-many-to-many"><span class="toc-number">1.0.0.4.</span> <span class="toc-text">D. many to many</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、实际应用"><span class="toc-number">2.</span> <span class="toc-text">二、实际应用</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#方法一："><span class="toc-number">2.0.0.1.</span> <span class="toc-text">方法一：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#方法二："><span class="toc-number">2.0.0.2.</span> <span class="toc-text">方法二：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#方法三"><span class="toc-number">2.0.0.3.</span> <span class="toc-text">方法三</span></a></li></ol></li></ol></li></ol></li></ol>
 		
 		</div>
 		
 		<p>本篇接上一篇《基于LSTM进行时间序列预测》，通过选取LSTM中有用的输出进而改变loss的计算方式，来看哪一种模型下的预测效果更好。</p>
 <a id="more"></a>
-<h3 id="模型介绍"><a href="#模型介绍" class="headerlink" title="模型介绍"></a>模型介绍</h3><p>LSTM是RNN中的一种，解决了序列很长的情形下梯度消失or梯度爆炸的问题，因此LSTM也可以用下图来表示。</p>
+<h3 id="一、模型介绍"><a href="#一、模型介绍" class="headerlink" title="一、模型介绍"></a>一、模型介绍</h3><p>LSTM是RNN中的一种，解决了序列很长的情形下梯度消失or梯度爆炸的问题，因此LSTM也可以用下图来表示。</p>
 <p><img src="https://ws1.sinaimg.cn/large/006tKfTcly1fnmzt980z2j31ck0di762.jpg" alt="lstm1"></p>
 <p>在实际的应用中，通常包括以下几类：</p>
 <p><img src="https://ws4.sinaimg.cn/large/006tKfTcly1fnmztaoieqj31bs0f076q.jpg" alt="lstm2"></p>
-<h6 id="one-to-one"><a href="#one-to-one" class="headerlink" title="one to one"></a>one to one</h6><p>这个不用多讲，就是输入x，经过变换Wx+b和激活函数f得到输出y；</p>
-<h6 id="one-to-many"><a href="#one-to-many" class="headerlink" title="one to many"></a>one to many</h6><p>输入不是序列，经过LSTM输出一段序列，比如根据一张图片生成一段文字。在这种情形下，又分为了两种情况：</p>
+<p><br></p>
+<h6 id="A-one-to-one"><a href="#A-one-to-one" class="headerlink" title="A. one to one"></a>A. one to one</h6><p>这个不用多讲，就是输入x，经过变换Wx+b和激活函数f得到输出y；</p>
+<p><br></p>
+<h6 id="B-one-to-many"><a href="#B-one-to-many" class="headerlink" title="B. one to many"></a>B. one to many</h6><p>输入不是序列，经过LSTM输出一段序列，比如根据一张图片生成一段文字。在这种情形下，又分为了两种情况：</p>
 <ol>
 <li><p>输入只经过第1个时间点的lstm cell；</p>
 <p><img src="https://ws3.sinaimg.cn/large/006tKfTcly1fnmzt8e3h5j30l20c8mxx.jpg" alt="lstm3"></p>
@@ -125,8 +127,10 @@
 </li>
 </ol>
 <p><img src="https://ws2.sinaimg.cn/large/006tKfTcly1fnmzt9oo1sj30km0c6gmm.jpg" alt="lstm4"></p>
-<h6 id="many-to-one"><a href="#many-to-one" class="headerlink" title="many to one"></a>many to one</h6><p>输入是一个序列，输出只取最后一个时间点的输出，该类型可以应用在时间序列分析中预测一个值，也可以处理分类问题，比如输入一段文字判别它所属的类别，输入一个句子判断其情感倾向，输入一段视频并判断它的类别等，下面会详细介绍如何应用在时序分析中。</p>
-<h6 id="many-to-many"><a href="#many-to-many" class="headerlink" title="many to many"></a>many to many</h6><p>输入是一个序列，输出也是一个序列。这个模型最为复杂，花样最多，后面我会在用一篇文章来详细介绍它。</p>
+<p><br></p>
+<h6 id="C-many-to-one"><a href="#C-many-to-one" class="headerlink" title="C. many to one"></a>C. many to one</h6><p>输入是一个序列，输出只取最后一个时间点的输出，该类型可以应用在时间序列分析中预测一个值，也可以处理分类问题，比如输入一段文字判别它所属的类别，输入一个句子判断其情感倾向，输入一段视频并判断它的类别等，下面会详细介绍如何应用在时序分析中。</p>
+<p><br></p>
+<h6 id="D-many-to-many"><a href="#D-many-to-many" class="headerlink" title="D. many to many"></a>D. many to many</h6><p>输入是一个序列，输出也是一个序列。这个模型最为复杂，花样最多，后面我会在用一篇文章来详细介绍它。</p>
 <p>复杂在于输入序列的长度N和输出序列的长度M可以不同，N!=M；</p>
 <p>花样在于哪些时间点的输出作为最后序列的输出，比如图1中最后两个many to many的结构上的差异；</p>
 <p>模型复杂使得该类型的应用广泛，比如：</p>
@@ -136,18 +140,21 @@
 <li>阅读理解：将输入的文章和问题分别编码，再对其进行解码得到问题的答案；</li>
 <li>语音识别：输入是语音信号序列，输出是文字序列；</li>
 </ul>
-<h3 id="实际应用"><a href="#实际应用" class="headerlink" title="实际应用"></a>实际应用</h3><p>在预测访问量的案例中，输入是不变的，即每次都是30个时间点的数据作为一个样本，来预测下一个时间点的访问量；但是可以通过控制选取哪些作为输出来计算loss，从而计算梯度更新模型参数值。</p>
+<p><br></p>
+<h3 id="二、实际应用"><a href="#二、实际应用" class="headerlink" title="二、实际应用"></a>二、实际应用</h3><p>在预测访问量的案例中，输入是不变的，即每次都是30个时间点的数据作为一个样本，来预测下一个时间点的访问量；但是可以通过控制选取哪些作为输出来计算loss，从而计算梯度更新模型参数值。</p>
 <p>下面介绍三种使用了不同类型的方法，为了简便，假设<code>time_step=3</code> ，且没有去刻画<code>lstm cell</code>中的<code>num_units</code>个单元与输入x和输出y之间的映射（因为每个时间点的x的维度、num_units、y的维度大概率各不相同，所以需要通过reshape或者增加dnn层来进行转换）</p>
 <h6 id="方法一："><a href="#方法一：" class="headerlink" title="方法一："></a>方法一：</h6><p>使用了many to many的类型，看一下训练数据的生成就明白了：</p>
 <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> <span class="selector-tag">i</span> <span class="keyword">in</span> range(len(normalized_train_data) - time_step - <span class="number">1</span>):</span><br><span class="line">   sample_x = normalized_train_data[<span class="selector-tag">i</span>: <span class="selector-tag">i</span> + time_step]</span><br><span class="line">   sample_y = normalized_train_data[<span class="selector-tag">i</span> + <span class="number">1</span>: <span class="selector-tag">i</span> + time_step + <span class="number">1</span>, <span class="number">1</span>, np.newaxis]</span><br><span class="line">   train_x.append(sample_x.tolist())</span><br><span class="line">   train_y.append(sample_y.tolist())</span><br></pre></td></tr></table></figure>
 <p>输出的序列包含many个数据，与标签对比计算loss，更新网络。蓝色y1, y2, y3是相应的3个时间点的输出，这里把y1看成是基于h0和x1对下一时刻的预测，把y2看成是基于h1和x2对下一时刻的预测，以此类推，因此，对应计算loss的标签分别是Y2, Y3, Y4。</p>
 <p><img src="https://ws3.sinaimg.cn/large/006tKfTcly1fnmztch8bhj30g80hi3zu.jpg" alt="lstm5"></p>
-<h6 id="方法二：331"><a href="#方法二：331" class="headerlink" title="方法二：331"></a>方法二：331</h6><p>使用了many to one的类型，只取最后1个时间点的输出，认为它是对接下来时间点的访问量的预测值，与下一时间点真实的访问量比较，计算loss，更新网络。这里把最后一个时间点的输出看成是对下一时刻的预测，因此，y3与Y4计算loss。</p>
+<p><br></p>
+<h6 id="方法二："><a href="#方法二：" class="headerlink" title="方法二："></a>方法二：</h6><p>使用了many to one的类型，只取最后1个时间点的输出，认为它是对接下来时间点的访问量的预测值，与下一时间点真实的访问量比较，计算loss，更新网络。这里把最后一个时间点的输出看成是对下一时刻的预测，因此，y3与Y4计算loss。</p>
 <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">output_rnn, final_states = tf.nn.dynamic_rnn(lstm_cell, input_rnn, <span class="attribute">initial_state</span>=init_state, <span class="attribute">dtype</span>=tf.float32, <span class="attribute">time_major</span>=<span class="literal">False</span>)</span><br><span class="line">last_cell_output = output_rnn[:, -1, :]</span><br></pre></td></tr></table></figure>
 <p><img src="https://ws1.sinaimg.cn/large/006tKfTcly1fnmztbl283j30ig0het9p.jpg" alt="lstm6"></p>
-<p>######方法三:444</p>
-<p>使用了many to many的类型，这里在每一时刻输出的基础上增加一个DNN层来拟合出y4，进而再与标签Y4比较计算loss。</p>
+<p><br></p>
+<h6 id="方法三"><a href="#方法三" class="headerlink" title="方法三"></a>方法三</h6><p>使用了many to many的类型，这里在每一时刻输出的基础上增加一个DNN层来拟合出y4，进而再与标签Y4比较计算loss。</p>
 <p><img src="https://ws4.sinaimg.cn/large/006tKfTcly1fnmzta6a2oj30gg0pw75n.jpg" alt="lstm7"></p>
+<p><br></p>
 <p>目前测试效果显示方法二的效果最好。</p>
   
 	</div>
@@ -209,7 +216,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#模型介绍"><span class="toc-number">1.</span> <span class="toc-text">模型介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#one-to-one"><span class="toc-number">1.0.0.1.</span> <span class="toc-text">one to one</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#one-to-many"><span class="toc-number">1.0.0.2.</span> <span class="toc-text">one to many</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#many-to-one"><span class="toc-number">1.0.0.3.</span> <span class="toc-text">many to one</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#many-to-many"><span class="toc-number">1.0.0.4.</span> <span class="toc-text">many to many</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实际应用"><span class="toc-number">2.</span> <span class="toc-text">实际应用</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#方法一："><span class="toc-number">2.0.0.1.</span> <span class="toc-text">方法一：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#方法二：331"><span class="toc-number">2.0.0.2.</span> <span class="toc-text">方法二：331</span></a></li></ol></li></ol></li></ol></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、模型介绍"><span class="toc-number">1.</span> <span class="toc-text">一、模型介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#A-one-to-one"><span class="toc-number">1.0.0.1.</span> <span class="toc-text">A. one to one</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#B-one-to-many"><span class="toc-number">1.0.0.2.</span> <span class="toc-text">B. one to many</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#C-many-to-one"><span class="toc-number">1.0.0.3.</span> <span class="toc-text">C. many to one</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#D-many-to-many"><span class="toc-number">1.0.0.4.</span> <span class="toc-text">D. many to many</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、实际应用"><span class="toc-number">2.</span> <span class="toc-text">二、实际应用</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#方法一："><span class="toc-number">2.0.0.1.</span> <span class="toc-text">方法一：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#方法二："><span class="toc-number">2.0.0.2.</span> <span class="toc-text">方法二：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#方法三"><span class="toc-number">2.0.0.3.</span> <span class="toc-text">方法三</span></a></li></ol></li></ol></li></ol></li></ol>
  
   </div>
 

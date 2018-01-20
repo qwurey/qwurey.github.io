@@ -26,7 +26,7 @@
 <meta property="og:image" content="https://ws3.sinaimg.cn/large/006tKfTcly1fnmztch8bhj30g80hi3zu.jpg">
 <meta property="og:image" content="https://ws1.sinaimg.cn/large/006tKfTcly1fnmztbl283j30ig0het9p.jpg">
 <meta property="og:image" content="https://ws4.sinaimg.cn/large/006tKfTcly1fnmzta6a2oj30gg0pw75n.jpg">
-<meta property="og:updated_time" content="2018-01-20T05:17:32.408Z">
+<meta property="og:updated_time" content="2018-01-20T05:18:28.414Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="LSTM用于时间序列预测的几种方式">
 <meta name="twitter:description" content="本篇接上一篇《基于LSTM进行时间序列预测》，通过选取LSTM中有用的输出进而改变loss的计算方式，来看哪一种模型下的预测效果更好。">
@@ -143,6 +143,7 @@
 <p><br></p>
 <h3 id="二、实际应用"><a href="#二、实际应用" class="headerlink" title="二、实际应用"></a>二、实际应用</h3><p>在预测访问量的案例中，输入是不变的，即每次都是30个时间点的数据作为一个样本，来预测下一个时间点的访问量；但是可以通过控制选取哪些作为输出来计算loss，从而计算梯度更新模型参数值。</p>
 <p>下面介绍三种使用了不同类型的方法，为了简便，假设<code>time_step=3</code> ，且没有去刻画<code>lstm cell</code>中的<code>num_units</code>个单元与输入x和输出y之间的映射（因为每个时间点的x的维度、num_units、y的维度大概率各不相同，所以需要通过reshape或者增加dnn层来进行转换）</p>
+<p><br></p>
 <h6 id="方法一："><a href="#方法一：" class="headerlink" title="方法一："></a>方法一：</h6><p>使用了many to many的类型，看一下训练数据的生成就明白了：</p>
 <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> <span class="selector-tag">i</span> <span class="keyword">in</span> range(len(normalized_train_data) - time_step - <span class="number">1</span>):</span><br><span class="line">   sample_x = normalized_train_data[<span class="selector-tag">i</span>: <span class="selector-tag">i</span> + time_step]</span><br><span class="line">   sample_y = normalized_train_data[<span class="selector-tag">i</span> + <span class="number">1</span>: <span class="selector-tag">i</span> + time_step + <span class="number">1</span>, <span class="number">1</span>, np.newaxis]</span><br><span class="line">   train_x.append(sample_x.tolist())</span><br><span class="line">   train_y.append(sample_y.tolist())</span><br></pre></td></tr></table></figure>
 <p>输出的序列包含many个数据，与标签对比计算loss，更新网络。蓝色y1, y2, y3是相应的3个时间点的输出，这里把y1看成是基于h0和x1对下一时刻的预测，把y2看成是基于h1和x2对下一时刻的预测，以此类推，因此，对应计算loss的标签分别是Y2, Y3, Y4。</p>

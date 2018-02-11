@@ -4,25 +4,28 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Flume1.7.0的TaildirSource介绍 | Urey on the way</title>
+    <title>tensorflow+k8s实现分布式深度学习平台框架 | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="使用更改后的TaildirSource，可以递归地监听配置目录的动态变化的文件。">
-<meta name="keywords" content="flume">
+    <meta name="description" content="将Tensorflow的分布式作业用Kubernetes来管理、调度、运行。">
+<meta name="keywords" content="DL, Tensorflow, Kubernetes">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Flume1.7.0的TaildirSource介绍">
-<meta property="og:url" content="http://qiaowei.tech/2016/06/29/Flume1.7.0的TaildirSource/index.html">
+<meta property="og:title" content="tensorflow+k8s实现分布式深度学习平台框架">
+<meta property="og:url" content="http://qiaowei.tech/2018/02/02/tensorflow+k8s实现分布式深度学习平台框架/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="使用更改后的TaildirSource，可以递归地监听配置目录的动态变化的文件。">
+<meta property="og:description" content="将Tensorflow的分布式作业用Kubernetes来管理、调度、运行。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2016-07-02T13:21:46.000Z">
+<meta property="og:image" content="https://ws4.sinaimg.cn/large/006tKfTcgy1focj30vk4tj31ja0iqwln.jpg">
+<meta property="og:image" content="https://ws4.sinaimg.cn/large/006tKfTcgy1fock2h3ppmj31kw12jwyi.jpg">
+<meta property="og:updated_time" content="2018-02-11T13:33:12.950Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Flume1.7.0的TaildirSource介绍">
-<meta name="twitter:description" content="使用更改后的TaildirSource，可以递归地监听配置目录的动态变化的文件。">
+<meta name="twitter:title" content="tensorflow+k8s实现分布式深度学习平台框架">
+<meta name="twitter:description" content="将Tensorflow的分布式作业用Kubernetes来管理、调度、运行。">
+<meta name="twitter:image" content="https://ws4.sinaimg.cn/large/006tKfTcgy1focj30vk4tj31ja0iqwln.jpg">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -81,14 +84,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/06/29/Flume1.7.0的TaildirSource/" title="Flume1.7.0的TaildirSource介绍" itemprop="url">Flume1.7.0的TaildirSource介绍</a>
+      <a href="/2018/02/02/tensorflow+k8s实现分布式深度学习平台框架/" title="tensorflow+k8s实现分布式深度学习平台框架" itemprop="url">tensorflow+k8s实现分布式深度学习平台框架</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2016-06-29T14:13:08.000Z" itemprop="datePublished"> 发表于 2016-06-29</time>
+    <time datetime="2018-02-02T14:31:11.000Z" itemprop="datePublished"> 发表于 2018-02-02</time>
     
   </p>
 </header>
@@ -97,40 +100,43 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#需求描述"><span class="toc-number">1.</span> <span class="toc-text">需求描述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#解决方案"><span class="toc-number">2.</span> <span class="toc-text">解决方案</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#增加递归监听子目录的特性"><span class="toc-number">3.</span> <span class="toc-text">增加递归监听子目录的特性</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、结合初衷"><span class="toc-number">1.</span> <span class="toc-text">一、结合初衷</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、框架详解"><span class="toc-number">2.</span> <span class="toc-text">二、框架详解</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、结合机制"><span class="toc-number">3.</span> <span class="toc-text">三、结合机制</span></a></li></ol>
 		
 		</div>
 		
-		<p>使用更改后的TaildirSource，可以递归地监听配置目录的动态变化的文件。</p>
+		<p>将Tensorflow的分布式作业用Kubernetes来管理、调度、运行。</p>
 <a id="more"></a>
+<p>让k8s可以跑分布式TF的作业，可以做的很复杂，这样就靠近一个分布式深度学习平台或者AI平台，也可以简单的搭建，从而让分布式TF作业的运行、管理更加简单可控。这里介绍如何简单的实现Tensorflow on Kubernetes。</p>
 <p><br></p>
-<h4 id="需求描述"><a href="#需求描述" class="headerlink" title="需求描述"></a><strong>需求描述</strong></h4><p>使用了<code>SpoolDirectorySource</code>可以配置一个监听目录，会监听该目录下所有的文件，但是如果配置目录下面嵌套了子目录，则无法监听，通过修改源码，我们可以递归地对配置目录的所有子目录的所有文件进行监听，见上一篇文章 <a href="http://qiaowei.xyz/2016/06/04/Flume%E7%9A%84Spooling%20Directory%20Source%E6%94%AF%E6%8C%81Sub-directories/" target="_blank" rel="noopener">Flume的Spooling Directory Source支持Sub-directories</a></p>
-<p>但是，<code>SpoolDirectorySource</code>的一个限制还没有消除，即监听目录下的文件不允许动态变化。比如我在收集yarn的nodemanager的日志时候，发现监听目录下面的文件是动态追加的，而不是先生成一个<code>.tmp</code>临时文件，全部写完后<code>rename</code>，这样，我们还需要对<code>SpoolDirectorySource</code>进行改进：可以对动态追加内容的文件进行实时监听。</p>
-<p>这有点像：<code>ExecSource</code> + <code>SpoolDirectorySource</code> 的一个source</p>
-<p><br></p>
-<h4 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a><strong>解决方案</strong></h4><p>先看看能否踩在巨人的肩膀上，查看<code>flume1.7.0</code>的 <code>realease note</code> ，发现增加了一个<code>Taildir Source</code>，点进去发现，这不就是我们需要的吗！</p>
-<p>我贴一下官方的description：</p>
-<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Description</span><br><span class="line">This is the<span class="built_in"> proposal </span>of implementing a new tailing source.</span><br><span class="line">This source watches the specified files, <span class="keyword">and</span> tails them <span class="keyword">in</span> nearly real-time once appends are detected <span class="keyword">to</span> these files.</span><br><span class="line">This source is reliable <span class="keyword">and</span> will <span class="keyword">not</span> miss data even when the tailing files rotate.</span><br><span class="line">It periodically writes the last read position of each file <span class="keyword">in</span> a position file using the JSON format.</span><br><span class="line"><span class="keyword">If</span> Flume is stopped <span class="keyword">or</span> down <span class="keyword">for</span> some reason, it can restart tailing <span class="keyword">from</span> the position written on the existing position file.</span><br><span class="line">It can <span class="builtin-name">add</span> event headers <span class="keyword">to</span> each tailing file group.</span><br><span class="line">A attached patch includes a<span class="built_in"> config </span>documentation of this.</span><br><span class="line">This source requires Unix-style file<span class="built_in"> system </span><span class="keyword">and</span> Java 1.7 <span class="keyword">or</span> later.</span><br></pre></td></tr></table></figure>
-<p>好，有了它，下面就有两种解决方案：</p>
-<ol>
-<li>直接使用flume1.7.0</li>
-<li>将该feature增加到flume1.6.0中</li>
+<h4 id="一、结合初衷"><a href="#一、结合初衷" class="headerlink" title="一、结合初衷"></a>一、结合初衷</h4><ol>
+<li><p>达到资源隔离的目的。一个分布式TF的Job有若干个参数型任务和若干个计算型任务组成，将每个任务都封装到一个容器中，称之为“任务容器”，将每个“任务容器”作为调度、运行、资源管理的单位。</p>
+<p><img src="https://ws4.sinaimg.cn/large/006tKfTcgy1focj30vk4tj31ja0iqwln.jpg" alt="job_task_container"></p>
+</li>
+<li><p>方便管理，尤其是大规模的分布式应用。如果手动的启动1个分布式TF的Job会非常的麻烦，我们需要到每个机器运行相应task的启动脚本，比如一个有2个计算型任务和1个参数型任务的分布式TF的Job：</p>
+<p>在host1上：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python train.py --ps_hosts=192.168.130.12:2222 --worker_hosts=192.168.130.13:2222,192.168.130.14:2222 --job_name=ps --task_index=0</span><br></pre></td></tr></table></figure>
+<p>在host2上：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python train.py --ps_hosts=192.168.130.12:2222 --worker_hosts=192.168.130.13:2222,192.168.130.14:2222 --job_name=worker --task_index=0</span><br></pre></td></tr></table></figure>
+<p>在host3上：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python train.py --ps_hosts=192.168.130.12:2222 --worker_hosts=192.168.130.13:2222,192.168.130.14:2222 --job_name=worker --task_index=1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>可以利用K8s的特性，做很多的针对深度学习作业的优化。比如：任务调度，GPU调度，日志查看，任务的可靠性保证等等。</p>
+</li>
 </ol>
-<p>由于我们已经对flume1.6.0做了比较大的改动，所以显然需要第二种方案。</p>
-<p>集成过程中主要改动的是两个<code>module</code></p>
-<ol>
-<li>将<code>flume-taildir-source</code>添加到<code>flume-ng-sources</code></li>
-<li>编译根据提示一步一步修改<code>flume-ng-core</code>下的部分文件</li>
-</ol>
+<h4 id="二、框架详解"><a href="#二、框架详解" class="headerlink" title="二、框架详解"></a><br>二、框架详解</h4><p>结合的本质是如何将分布式TF的Job的两类任务和k8s的对象结合起来，这里将1个计算型任务对应成1个k8s的<code>Job</code>，执行完自动销毁，将1个参数型任务对应1个k8s的<code>Deployment</code>，如果挂掉会自动重启。</p>
+<p>算法人员首先需要将训练作业的代码和经过处理后的训练数据上传到NFS上，当然还要将TF的环境Docker镜像提前上传到私有镜像仓库中，之后在k8s集群的master节点运行命令提交作业：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python render_template.py tfcluster_template.yaml.jinja [project_name] [ps_task_number] [worker_task_number]</span><br><span class="line">=&gt;</span><br><span class="line">python render_template.py web-predict 1 2</span><br></pre></td></tr></table></figure>
+<p>它会生成一个k8s的<code>yaml</code>配置文件，再运行命令提交给k8s的<code>API Server</code>:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl create -f tfcluster_job1.yaml</span><br></pre></td></tr></table></figure>
+<p>这就将1个TF的Job成功的在k8s集群上run了起来，值得注意的是，所有的计算型任务执行完成后会自动销毁，但是参数型任务由于对应的是<code>Deployment</code>，会一直运行下去，这需要我们起额外的监控进程，一旦发现每个作业相应的所有计算型任务全部<code>run</code>完，自动kill掉其所有的参数型任务，即对应的<code>Deployment</code>。</p>
+<p>每个TF作业的所有计算型任务都会共享NFS上面的<code>相应项目名称目录</code>下的<code>log</code>、<code>data</code>、<code>src</code>、<code>model</code>目录，这是通过k8s的<code>PV</code>和<code>PVC</code>实现的，创建PV和PVC的操作都是在搭建平台时完成的。最后TF训练作业的模型存在model下面。</p>
+<p><img src="https://ws4.sinaimg.cn/large/006tKfTcgy1fock2h3ppmj31kw12jwyi.jpg" alt="arch"></p>
 <p><br></p>
-<h4 id="增加递归监听子目录的特性"><a href="#增加递归监听子目录的特性" class="headerlink" title="增加递归监听子目录的特性"></a><strong>增加递归监听子目录的特性</strong></h4><p>贴一下<code>TaildirSource</code>的配置：</p>
-<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># source2: tail_dir_source -----------------</span></span><br><span class="line">agent.sources.tail_dir_source.<span class="attr">type</span> = org.apache.flume.source.taildir.TaildirSource</span><br><span class="line">agent.sources.tail_dir_source.<span class="attr">channels</span> = memory_channel</span><br><span class="line">agent.sources.tail_dir_source.<span class="attr">positionFile</span> = /tmp/taildir_position.json</span><br><span class="line">agent.sources.tail_dir_source.<span class="attr">filegroups</span> = f1</span><br><span class="line">agent.sources.tail_dir_source.filegroups.<span class="attr">f1</span> = /home/urey/yarn_log/.*</span><br><span class="line">agent.sources.tail_dir_source.<span class="attr">batchSize</span> = <span class="number">100</span></span><br><span class="line">agent.sources.tail_dir_source.<span class="attr">backoffSleepIncrement</span>  = <span class="number">1000</span></span><br><span class="line">agent.sources.tail_dir_source.<span class="attr">maxBackoffSleep</span>  = <span class="number">5000</span></span><br><span class="line">agent.sources.tail_dir_source.<span class="attr">recursiveDirectorySearch</span> = <span class="literal">true</span></span><br><span class="line">agent.sources.tail_dir_source.<span class="attr">yarnApplicationHeader</span> = <span class="literal">true</span></span><br><span class="line">agent.sources.tail_dir_source.<span class="attr">yarnContainerHeader</span> = <span class="literal">true</span></span><br></pre></td></tr></table></figure>
-<p>类似<code>SpoolDirectorySource</code>增加该feature所做的工作，我们最后还需要给<code>TaildirSource</code>增加该feature以满足我们的需求。</p>
-<p>改动类似《Flume的Spooling Directory Source支持Sub-directories》所涉及到，需要注意的是，<br><code>filegroups</code>可以指定多个监听源，每个源指定<strong>相应的监听路径下面的哪些文件</strong>，这里的<strong>下面</strong>经过改动后会递归地包含下面的所有子目录。</p>
-<p>比如：<br>配置了<code>/home/urey/yarn_log/.*</code>，会监听：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/home/</span>urey<span class="regexp">/yarn_log/</span>test1.log</span><br><span class="line"><span class="regexp">/home/</span>urey<span class="regexp">/yarn_log/</span>dir1/test2.log</span><br><span class="line"><span class="regexp">/home/</span>urey<span class="regexp">/yarn_log/</span>dir1<span class="regexp">/dir2/</span>test3.log</span><br><span class="line">...</span><br><span class="line">等等</span><br></pre></td></tr></table></figure></p>
-<p>最新的代码我已上传到github上，欢迎试用：</p>
-<p><a href="https://github.com/qwurey/flume-source-taildir-recursive" target="_blank" rel="noopener">flume-source-taildir-recursive</a></p>
-<p>注：<br>由于flume1.7.0本身还没有发布，所以<code>TaildirSource</code>可能存在缺陷，如果遇到问题，需要通过查看日志定位问题，看社区是否有相应的issue和解决方案。</p>
+<h4 id="三、结合机制"><a href="#三、结合机制" class="headerlink" title="三、结合机制"></a>三、结合机制</h4><p>具体的配置文件见：</p>
+<p><a href="https://github.com/qwurey/auto-config/blob/master/tfcluster_template_v0.yaml.jinja" target="_blank">tfcluster_template_v0.yaml.jinja</a></p>
+<p>生成的<code>yaml</code>配置文件样例见：</p>
+<p><a href="https://github.com/qwurey/auto-config/blob/master/tfcluster_job1.yaml" target="_blank">tfcluster_job1.yaml</a></p>
+<p><br></p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -138,13 +144,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/flume/">flume</a>
+  <a class="article-category-link" href="/categories/DL/">DL</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/flume/">flume</a>
+  <span></span> <a href="/tags/DL-Tensorflow-Kubernetes/">DL, Tensorflow, Kubernetes</a>
   </div>
 
 </div>
@@ -153,7 +159,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.tech/2016/06/29/Flume1.7.0的TaildirSource/" data-title="Flume1.7.0的TaildirSource介绍 | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  <div data-url="http://qiaowei.tech/2018/02/02/tensorflow+k8s实现分布式深度学习平台框架/" data-title="tensorflow+k8s实现分布式深度学习平台框架 | Urey on the way" data-tsina="1758475283" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -166,19 +172,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2017/12/20/基于LSTM进行时间序列预测/" title="基于LSTM进行时间序列预测">
-  <strong>上一篇：</strong><br/>
-  <span>
-  基于LSTM进行时间序列预测</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2016/06/10/Linux中利用logrotate来对log文件进行循环管理/"  title="Linux中利用logrotate来对log文件进行转储">
+<a href="/2018/01/01/LSTM用于时间序列预测的几种方式/"  title="LSTM用于时间序列预测的几种方式">
  <strong>下一篇：</strong><br/> 
- <span>Linux中利用logrotate来对log文件进行转储
+ <span>LSTM用于时间序列预测的几种方式
 </span>
 </a>
 </div>
@@ -199,7 +197,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#需求描述"><span class="toc-number">1.</span> <span class="toc-text">需求描述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#解决方案"><span class="toc-number">2.</span> <span class="toc-text">解决方案</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#增加递归监听子目录的特性"><span class="toc-number">3.</span> <span class="toc-text">增加递归监听子目录的特性</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、结合初衷"><span class="toc-number">1.</span> <span class="toc-text">一、结合初衷</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、框架详解"><span class="toc-number">2.</span> <span class="toc-text">二、框架详解</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、结合机制"><span class="toc-number">3.</span> <span class="toc-text">三、结合机制</span></a></li></ol>
  
   </div>
 

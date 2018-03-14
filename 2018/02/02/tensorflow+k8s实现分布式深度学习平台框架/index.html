@@ -21,7 +21,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://ws4.sinaimg.cn/large/006tKfTcgy1focj30vk4tj31ja0iqwln.jpg">
 <meta property="og:image" content="https://ws4.sinaimg.cn/large/006tKfTcgy1fock2h3ppmj31kw12jwyi.jpg">
-<meta property="og:updated_time" content="2018-03-14T12:43:33.173Z">
+<meta property="og:updated_time" content="2018-03-14T12:47:04.623Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tensorflow+k8s实现分布式深度学习平台框架">
 <meta name="twitter:description" content="将Tensorflow的分布式作业用Kubernetes来管理、调度、运行。">
@@ -132,12 +132,13 @@
 <p>每个TF作业的所有计算型任务都会共享NFS上面的<code>相应项目名称目录</code>下的<code>log</code>、<code>data</code>、<code>src</code>、<code>model</code>目录，这是通过k8s的<code>PV</code>和<code>PVC</code>实现的，创建PV和PVC的操作都是在搭建平台时完成的。最后TF训练作业的模型存在model下面。</p>
 <p><img src="https://ws4.sinaimg.cn/large/006tKfTcgy1fock2h3ppmj31kw12jwyi.jpg" alt="arch"></p>
 <p><br></p>
-<h4 id="三、结合机制"><a href="#三、结合机制" class="headerlink" title="三、结合机制"></a>三、结合机制</h4><p>具体的配置文件见：</p>
+<h4 id="三、结合机制"><a href="#三、结合机制" class="headerlink" title="三、结合机制"></a>三、结合机制</h4><p>分布式TF Job的具体的配置模板文件见：</p>
 <p><a href="https://github.com/qwurey/auto-config/blob/master/tf_cluster_template.yaml.jinja" target="_blank">tf_cluster_template.yaml.jinja</a></p>
 <p>生成的<code>yaml</code>配置文件样例见：</p>
 <p><a href="https://github.com/qwurey/auto-config/blob/master/tfcluster_job1.yaml" target="_blank">tfcluster_job1.yaml</a></p>
-<p>dan’ren’wu</p>
+<p>单任务TF的Job的配置模板文件见：</p>
 <p><a href="https://github.com/qwurey/auto-config/blob/master/tf_single_template.yaml.jinja" target="_blank">tf_single_template.yaml.jinja</a></p>
+<p>以上都可以根据自己的生产环境的需求做定制。</p>
 <p><br></p>
   
 	</div>

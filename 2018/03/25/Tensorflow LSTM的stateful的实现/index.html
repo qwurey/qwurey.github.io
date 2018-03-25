@@ -4,25 +4,25 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>LeetCode String to Integer | Urey on the way</title>
+    <title>Tensorflow的LSTM的stateful的实现 | Urey on the way</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="urey">
     
 
     
-    <meta name="description" content="tips 考虑whitespace 考虑正负符号 考虑正溢出和负溢出 考虑不能转化情况，返回0  123456789101112131415161718192021222324252627class Solution &amp;#123;public:    int myAtoi(string str) &amp;#1">
-<meta name="keywords" content="leetcode">
+    <meta name="description" content="Tensorflow的LSTM的stateful的实现。">
+<meta name="keywords" content="DL, lstm">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LeetCode String to Integer">
-<meta property="og:url" content="http://qiaowei.tech/2016/03/13/LeetCode-String-to-Integer/index.html">
+<meta property="og:title" content="Tensorflow的LSTM的stateful的实现">
+<meta property="og:url" content="http://qiaowei.tech/2018/03/25/Tensorflow LSTM的stateful的实现/index.html">
 <meta property="og:site_name" content="Urey on the way">
-<meta property="og:description" content="tips 考虑whitespace 考虑正负符号 考虑正溢出和负溢出 考虑不能转化情况，返回0  123456789101112131415161718192021222324252627class Solution &amp;#123;public:    int myAtoi(string str) &amp;#123;        int n = str.length();        int p =">
+<meta property="og:description" content="Tensorflow的LSTM的stateful的实现。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2016-03-13T09:45:53.000Z">
+<meta property="og:updated_time" content="2018-03-25T13:26:07.993Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LeetCode String to Integer">
-<meta name="twitter:description" content="tips 考虑whitespace 考虑正负符号 考虑正溢出和负溢出 考虑不能转化情况，返回0  123456789101112131415161718192021222324252627class Solution &amp;#123;public:    int myAtoi(string str) &amp;#123;        int n = str.length();        int p =">
+<meta name="twitter:title" content="Tensorflow的LSTM的stateful的实现">
+<meta name="twitter:description" content="Tensorflow的LSTM的stateful的实现。">
 
     
     <link rel="alternative" href="/atom.xml" title="Urey on the way" type="application/atom+xml">
@@ -81,14 +81,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/03/13/LeetCode-String-to-Integer/" title="LeetCode String to Integer" itemprop="url">LeetCode String to Integer</a>
+      <a href="/2018/03/25/Tensorflow LSTM的stateful的实现/" title="Tensorflow的LSTM的stateful的实现" itemprop="url">Tensorflow的LSTM的stateful的实现</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="urey" target="_blank" itemprop="author">urey</a>
 		
   <p class="article-time">
-    <time datetime="2016-03-13T09:43:37.000Z" itemprop="datePublished"> 发表于 2016-03-13</time>
+    <time datetime="2018-03-25T14:31:11.000Z" itemprop="datePublished"> 发表于 2018-03-25</time>
     
   </p>
 </header>
@@ -97,17 +97,41 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips</span></a></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、Stateful-VS-Stateless"><span class="toc-number">1.</span> <span class="toc-text">一、Stateful  VS  Stateless</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、如何在原生的TF应用中实现LSTM的stateful"><span class="toc-number">2.</span> <span class="toc-text">二、如何在原生的TF应用中实现LSTM的stateful</span></a></li></ol>
 		
 		</div>
 		
-		<h4 id="tips"><a href="#tips" class="headerlink" title="tips"></a><strong>tips</strong></h4><ol>
-<li>考虑whitespace</li>
-<li>考虑正负符号</li>
-<li>考虑正溢出和负溢出</li>
-<li>考虑不能转化情况，返回0</li>
-</ol>
-<figure class="highlight axapta"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">int</span> myAtoi(string <span class="keyword">str</span>) &#123;</span><br><span class="line">        <span class="keyword">int</span> n = <span class="keyword">str</span>.length();</span><br><span class="line">        <span class="keyword">int</span> p = <span class="number">0</span>;</span><br><span class="line">        bool sign = <span class="number">0</span>;<span class="comment">// 0 -&gt; '+' , 1 -&gt; '-'</span></span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">//whitespace</span></span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">str</span>[p] == <span class="string">' '</span> &amp;&amp; p &lt; n) p++;</span><br><span class="line">        <span class="comment">//'+' and '-'</span></span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">str</span>[p] == <span class="string">'+'</span>) &#123;</span><br><span class="line">            p++;</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span>(<span class="keyword">str</span>[p] == <span class="string">'-'</span>)&#123;</span><br><span class="line">            p++;</span><br><span class="line">            sign = <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//digits</span></span><br><span class="line">        <span class="keyword">for</span>(; p &lt; n; p++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(<span class="keyword">str</span>[p] &lt; <span class="string">'0'</span> || <span class="keyword">str</span>[p] &gt; <span class="string">'9'</span>) <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">if</span>(res &gt; INT_MAX / <span class="number">10</span> || (res == INT_MAX / <span class="number">10</span> &amp;&amp; (<span class="keyword">str</span>[p] - <span class="string">'0'</span>) &gt; INT_MAX % <span class="number">10</span>)) &#123;</span><br><span class="line">                <span class="keyword">return</span> sign == <span class="number">1</span> ? INT_MIN : INT_MAX;</span><br><span class="line">            &#125;</span><br><span class="line">            res = res * <span class="number">10</span> + (<span class="keyword">str</span>[p] - <span class="string">'0'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sign == <span class="number">1</span> ? (<span class="number">-1</span>) * res : res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+		<p>Tensorflow的LSTM的stateful的实现。</p>
+<a id="more"></a>
+<p><br></p>
+<h4 id="一、Stateful-VS-Stateless"><a href="#一、Stateful-VS-Stateless" class="headerlink" title="一、Stateful  VS  Stateless"></a>一、Stateful  VS  Stateless</h4><p>在lstm中，stateful的含义是在每个epoch内部的训练不同的batch时，前一个batch的输出state是后一个batch的initial state，或者简单的讲，当batch为1时，就是第一个已经训练完成的序列的输出state是第二个将要训练的序列的输入state。这里的state既包含cell state也包含hidden state。通常来说，lstm的state会初始化为zero：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(rnn_hidden_unit, state_is_tuple=<span class="keyword">True</span>)</span><br><span class="line">init_state = lstm_cell.zero_state(batch, dtype=tf.float32)</span><br><span class="line">output_rnn, final_states = tf.nn.dynamic_rnn(stacked_lstm, input_rnn, initial_state=rnn_tuple_state, dtype=tf.float32, time_major=<span class="keyword">False</span>)</span><br></pre></td></tr></table></figure>
+<p>这里需要补充一些背景知识：</p>
+<p>lstm的state包含cell_state与hidden_state，这篇文章可以看出两者的不同：<a href="http://colah.github.io/posts/2015-08-Understanding-LSTMs/" target="_blank" rel="noopener">http://colah.github.io/posts/2015-08-Understanding-LSTMs/</a></p>
+<p>因此上面说到的初始化为0是说cell state和hidden state都初始化为0（cell state和hidden state的shape相同），之后cell state的计算方式只是少量的线性操作，hidden state会和各种gate共同操作进而与hidden state一起实现记忆的删除和保留。</p>
+<p>每个lstm cell的输入有三部分：cell state、hidden state和X，输出也有三部分：用于下次循环状态的cell state和hidden state，以及本次状态的输出hidden state。</p>
+<p>lstm 的stateless就是对于每次的训练batch，cell state与hidden state都是初始化为0开始计算的。也就是说不同batch之间是没有任何关系的。</p>
+<p>那什么时候需要stateful，什么时候需要stateless呢？</p>
+<p>大部分的应用都是stateless，因为前后训练的序列是不相关的，这也是大部分模型在训练前都会将训练数据进行shuffle，以保证喂给模型的数据的概率分布是均匀的。</p>
+<p>当序列A必须在序列B训练之前被训练时，往往这类应用是属于stateful的，即在训练序列B是，我们希望序列A的输出state可以喂进序列B的输入state，使得两个序列保持前后的关系。这在时间序列分析的应用中常见，比如：序列A是（t0, t1, t2）</p>
+<p>序列B是（t1, t2, t3）</p>
+<p>而时间轴正是t0, t1, t2, t3这样发生的。</p>
+<p><br></p>
+<h4 id="二、如何在原生的TF应用中实现LSTM的stateful"><a href="#二、如何在原生的TF应用中实现LSTM的stateful" class="headerlink" title="二、如何在原生的TF应用中实现LSTM的stateful"></a>二、如何在原生的TF应用中实现LSTM的stateful</h4><p>在TF中，state可以有两种表示，通过state_is_tuple来控制，一种是cell state和hidden statep拼接在一起，另一种是分开表示，并通过<code>LSTMStateTuple</code>来实现。</p>
+<p>将一个batch的输出state保存下来传递到下一个batch的输入state，通常用<code>placeholder</code>来维持，这里先定义一个state的placeholder：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">state = tf.placeholder(tf.float32, shape=[lstm_depth, <span class="number">2</span>, batch_size, rnn_hidden_unit], name=<span class="string">'cell_state'</span>)</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<p>然后在我们的模型定义中，操作这个定义好的<code>state</code>的<code>placeholder</code>，把这个tensor转换成tuple：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">l = tf.unstack(state, axis=<span class="number">0</span>)</span><br><span class="line">rnn_tuple_state = tuple([</span><br><span class="line">        tf.nn.rnn_cell.LSTMStateTuple(l[idx][<span class="number">0</span>], l[idx][<span class="number">1</span>]) <span class="keyword">for</span> idx <span class="keyword">in</span> range(lstm_depth)</span><br><span class="line">        ])</span><br></pre></td></tr></table></figure>
+<p>当做初始状态喂进lstm cell中：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">output_rnn, final_states = tf.nn.dynamic_rnn(stacked_lstm, input_rnn, initial_state=rnn_tuple_state, dtype=tf.float32, time_major=<span class="keyword">False</span>)</span><br></pre></td></tr></table></figure>
+<p>同时，模型会返回预测结果和输出state：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pred, final_states = lstm(batch_size)</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<p>最后，在我们的训练过程中，在每个epoch中，如果是第一个batch，state初始化为0，否则的话，用上一个batch的输出state作为本次batch的输入state，通过feed_dict喂进state的placeholder中去：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> epoch_step <span class="keyword">in</span> range(max_epoch):</span><br><span class="line">    ...</span><br><span class="line">    step = <span class="number">0</span></span><br><span class="line">    start = <span class="number">0</span></span><br><span class="line">    end = start + batch_size</span><br><span class="line">    <span class="keyword">while</span> end &lt; len(train_x):</span><br><span class="line">        <span class="keyword">if</span> start == <span class="number">0</span>:</span><br><span class="line">            init_state = np.zeros((lstm_depth, <span class="number">2</span>, batch_size, rnn_hidden_unit))</span><br><span class="line">            _, loss_, hidden_state = sess.run([train_op, loss, final_states], </span><br><span class="line">                                              feed_dict=&#123;</span><br><span class="line">                                                  X: train_x[start:end], </span><br><span class="line">                                                  Y: train_y[start:end],</span><br><span class="line">                                                  learning_rate: current_learning_rate,</span><br><span class="line">                                                  state: init_state</span><br><span class="line">                                              &#125;</span><br><span class="line">                                             )</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            _, loss_, hidden_state = sess.run([train_op, loss, final_states], </span><br><span class="line">                                                  feed_dict=&#123;</span><br><span class="line">                                                      X: train_x[start:end], </span><br><span class="line">                                                      Y: train_y[start:end],</span><br><span class="line">                                                      learning_rate: current_learning_rate,</span><br><span class="line">                                                      state: hidden_state</span><br><span class="line">                                                  &#125;</span><br><span class="line">                                                 )</span><br><span class="line">                start += batch_size</span><br><span class="line">                end = start + batch_size</span><br><span class="line">                step += <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p><br></p>
+<p>以上就实现了原生TF的lstm的stateful的过程。</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -115,13 +139,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
+  <a class="article-category-link" href="/categories/DL/">DL</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/leetcode/">leetcode</a>
+  <span></span> <a href="/tags/DL-lstm/">DL, lstm</a>
   </div>
 
 </div>
@@ -130,7 +154,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://qiaowei.tech/2016/03/13/LeetCode-String-to-Integer/" data-title="LeetCode String to Integer | Urey on the way" data-tsina="1758475283" class="share clearfix">
+	  <div data-url="http://qiaowei.tech/2018/03/25/Tensorflow LSTM的stateful的实现/" data-title="Tensorflow的LSTM的stateful的实现 | Urey on the way" data-tsina="1758475283" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -143,19 +167,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2016/03/13/LeetCode-Palindrome-Number/" title="LeetCode Palindrome Number">
-  <strong>上一篇：</strong><br/>
-  <span>
-  LeetCode Palindrome Number</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2016/03/12/LeetCode-Reverse-Integer/"  title="LeetCode Reverse Integer">
+<a href="/2018/02/02/tensorflow+k8s实现分布式深度学习平台框架/"  title="tensorflow+k8s实现分布式深度学习平台框架">
  <strong>下一篇：</strong><br/> 
- <span>LeetCode Reverse Integer
+ <span>tensorflow+k8s实现分布式深度学习平台框架
 </span>
 </a>
 </div>
@@ -176,7 +192,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#tips"><span class="toc-number">1.</span> <span class="toc-text">tips</span></a></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、Stateful-VS-Stateless"><span class="toc-number">1.</span> <span class="toc-text">一、Stateful  VS  Stateless</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、如何在原生的TF应用中实现LSTM的stateful"><span class="toc-number">2.</span> <span class="toc-text">二、如何在原生的TF应用中实现LSTM的stateful</span></a></li></ol>
  
   </div>
 

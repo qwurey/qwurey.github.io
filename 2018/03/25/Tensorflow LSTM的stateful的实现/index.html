@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="Urey on the way">
 <meta property="og:description" content="Tensorflow的LSTM的stateful的实现。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-03-25T13:30:12.294Z">
+<meta property="og:updated_time" content="2018-03-25T13:32:34.964Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Tensorflow的LSTM的stateful的实现">
 <meta name="twitter:description" content="Tensorflow的LSTM的stateful的实现。">
@@ -97,7 +97,7 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、Stateful-VS-Stateless"><span class="toc-number">1.</span> <span class="toc-text">一、Stateful  VS  Stateless</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、如何在原生的TF应用中实现LSTM的stateful"><span class="toc-number">2.</span> <span class="toc-text">二、如何在原生的TF应用中实现LSTM的stateful</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#第二步："><span class="toc-number">2.0.1.</span> <span class="toc-text">第二步：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#第三步："><span class="toc-number">2.0.2.</span> <span class="toc-text">第三步：</span></a></li></ol></li></ol></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、Stateful-VS-Stateless"><span class="toc-number">1.</span> <span class="toc-text">一、Stateful  VS  Stateless</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、如何在原生的TF应用中实现LSTM的stateful"><span class="toc-number">2.</span> <span class="toc-text">二、如何在原生的TF应用中实现LSTM的stateful</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#第一步："><span class="toc-number">2.0.1.</span> <span class="toc-text">第一步：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#第二步："><span class="toc-number">2.0.2.</span> <span class="toc-text">第二步：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#第三步："><span class="toc-number">2.0.3.</span> <span class="toc-text">第三步：</span></a></li></ol></li></ol></li></ol>
 		
 		</div>
 		
@@ -119,8 +119,7 @@
 <p><br></p>
 <h4 id="二、如何在原生的TF应用中实现LSTM的stateful"><a href="#二、如何在原生的TF应用中实现LSTM的stateful" class="headerlink" title="二、如何在原生的TF应用中实现LSTM的stateful"></a>二、如何在原生的TF应用中实现LSTM的stateful</h4><p>在TF中，state可以有两种表示，通过<code>state_is_tuple</code>来控制，一种是cell state和hidden statep拼接在一起，另一种是分开表示，并通过<code>LSTMStateTuple</code>来实现。这里设置<code>state_is_tuple=True</code>，使用第二种表示来实现。分为三步：</p>
 <p><br></p>
-<p>######第一步：</p>
-<p>将一个batch的输出state保存下来传递到下一个batch的输入state，通常用<code>placeholder</code>来维持，这里先定义一个state的placeholder：</p>
+<h6 id="第一步："><a href="#第一步：" class="headerlink" title="第一步："></a>第一步：</h6><p>将一个batch的输出state保存下来传递到下一个batch的输入state，通常用<code>placeholder</code>来维持，这里先定义一个state的placeholder：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">state = tf.placeholder(tf.float32, shape=[lstm_depth, <span class="number">2</span>, batch_size, rnn_hidden_unit], name=<span class="string">'cell_state'</span>)</span><br></pre></td></tr></table></figure>
 <p><br></p>
 <h6 id="第二步："><a href="#第二步：" class="headerlink" title="第二步："></a>第二步：</h6><p>然后在我们的模型定义中，操作这个定义好的<code>state</code>的<code>placeholder</code>，把这个tensor转换成tuple：</p>
@@ -194,7 +193,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、Stateful-VS-Stateless"><span class="toc-number">1.</span> <span class="toc-text">一、Stateful  VS  Stateless</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、如何在原生的TF应用中实现LSTM的stateful"><span class="toc-number">2.</span> <span class="toc-text">二、如何在原生的TF应用中实现LSTM的stateful</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#第二步："><span class="toc-number">2.0.1.</span> <span class="toc-text">第二步：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#第三步："><span class="toc-number">2.0.2.</span> <span class="toc-text">第三步：</span></a></li></ol></li></ol></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、Stateful-VS-Stateless"><span class="toc-number">1.</span> <span class="toc-text">一、Stateful  VS  Stateless</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、如何在原生的TF应用中实现LSTM的stateful"><span class="toc-number">2.</span> <span class="toc-text">二、如何在原生的TF应用中实现LSTM的stateful</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#第一步："><span class="toc-number">2.0.1.</span> <span class="toc-text">第一步：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#第二步："><span class="toc-number">2.0.2.</span> <span class="toc-text">第二步：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#第三步："><span class="toc-number">2.0.3.</span> <span class="toc-text">第三步：</span></a></li></ol></li></ol></li></ol>
  
   </div>
 

@@ -28,7 +28,7 @@
 <meta property="og:image" content="https://ws4.sinaimg.cn/large/006tKfTcgy1fs1ke9psftj30gq0is766.jpg">
 <meta property="og:image" content="https://ws3.sinaimg.cn/large/006tKfTcgy1fs1kehxlspj30i809mtae.jpg">
 <meta property="og:image" content="https://ws3.sinaimg.cn/large/006tKfTcgy1fs1kels55qj30m20vggpi.jpg">
-<meta property="og:updated_time" content="2018-06-07T07:20:35.131Z">
+<meta property="og:updated_time" content="2018-06-07T07:26:44.669Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="实现简单的聊天对话机器人框架">
 <meta name="twitter:description" content="基于rasa nlu与rasa core实现一个简单的多用户使用的聊天对话机器人框架 一、基于rasa nlu构建自然语言理解模型模块1、确认意图和实体类别 创建nlu_data.json文件： 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152&amp;#123;">
@@ -136,7 +136,7 @@
 <h6 id="流程如下："><a href="#流程如下：" class="headerlink" title="流程如下："></a>流程如下：</h6><p><code>chatbot</code>与<code>client</code>完整的对话流程，这里<code>client</code>为用户1001，我们把整个对话记录记为<code>conversation_1001</code>，其中，它由若干次对话构成（<code>#1</code>、<code>#2</code>、<code>#3</code>、<code>#4</code>、<code>...</code>）</p>
 <p><img src="https://ws1.sinaimg.cn/large/006tKfTcgy1fs1kdndk89j30va0x0wkn.jpg" alt="image-20180606163842342"></p>
 <p><br></p>
-<p>下面我们展示<code>#1</code>的三方（<code>client</code>、<code>chatbotService</code>、<code>chatbot</code>）的完整请求与响应交互流程，包括<code>a</code>、<code>b</code>、<code>c</code>三小步：</p>
+<p>下面我们展示<code>#1</code>的三方（<code>client</code>、<code>chatbotService</code>、<code>chatbot</code>）的完整请求与响应交互流程，包括<code>a</code>、<code>b</code>、<code>c</code>、<code>d</code> 四小步：</p>
 <p><br></p>
 <h6 id="a"><a href="#a" class="headerlink" title="a"></a>a</h6><p><code>client</code>(当前用户id为1001)：你好</p>
 <p><code>client</code>发送给<code>chatbotService</code>，<code>chatbotService</code>包装后转发给<code>chatbot</code>，这里需要给<code>chatbot</code>发送的<code>rest api</code>为：<code>/conversations/user_id/parse</code></p>
